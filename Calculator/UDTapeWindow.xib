@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="UDTapeWindowController">
+            <connections>
+                <outlet property="textView" destination="J6z-QQ-VY6" id="9Lf-of-URt"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Paper Tape" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="196" y="240" width="480" height="270"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
+                <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YOJ-sA-avY">
+                        <rect key="frame" x="15" y="40" width="450" height="215"/>
+                        <clipView key="contentView" drawsBackground="NO" id="2Aw-NQ-GPZ">
+                            <rect key="frame" x="0.0" y="0.0" width="435" height="215"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="J6z-QQ-VY6">
+                                    <rect key="frame" x="0.0" y="0.0" width="435" height="215"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <size key="minSize" width="435" height="215"/>
+                                    <size key="maxSize" width="465" height="10000000"/>
+                                    <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                </textView>
+                            </subviews>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="Zd5-iC-6Vr">
+                            <rect key="frame" x="-100" y="-100" width="225" height="15"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="ddW-5D-LST">
+                            <rect key="frame" x="435" y="0.0" width="15" height="215"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+                    <button identifier="clear" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7S0-c6-ROc">
+                        <rect key="frame" x="406" y="8" width="66" height="32"/>
+                        <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7oq-Tc-N48">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="clearLog:" target="-2" id="YKW-wY-1nG"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="YOJ-sA-avY" secondAttribute="trailing" constant="15" id="6Np-xA-NEU"/>
+                    <constraint firstItem="YOJ-sA-avY" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="15" id="LQx-vw-EPf"/>
+                    <constraint firstItem="YOJ-sA-avY" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="15" id="SNi-ks-wQs"/>
+                    <constraint firstAttribute="bottom" secondItem="7S0-c6-ROc" secondAttribute="bottom" constant="15" id="W7f-0Q-Gp4"/>
+                    <constraint firstAttribute="trailing" secondItem="7S0-c6-ROc" secondAttribute="trailing" constant="15" id="vRJ-zw-gq7"/>
+                    <constraint firstItem="7S0-c6-ROc" firstAttribute="top" secondItem="YOJ-sA-avY" secondAttribute="bottom" constant="5" id="y81-2h-jmY"/>
+                </constraints>
+            </view>
+            <point key="canvasLocation" x="136" y="104"/>
+        </window>
+    </objects>
+</document>
