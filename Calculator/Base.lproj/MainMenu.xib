@@ -15,8 +15,18 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
+                <outlet property="_10xButton" destination="WnU-bm-c3Q" id="dqW-37-UVc"/>
+                <outlet property="_log10Button" destination="6gf-Td-peJ" id="pgm-Yn-KGV"/>
+                <outlet property="cosButton" destination="BTd-3D-D2B" id="tp6-5L-btc"/>
+                <outlet property="coshButton" destination="fi6-yy-jTj" id="2Ad-Mb-NcH"/>
                 <outlet property="displayField" destination="qxC-eF-BBQ" id="eT6-jK-GDc"/>
+                <outlet property="exButton" destination="xS4-FP-ghO" id="QUj-cv-TY5"/>
+                <outlet property="lnButton" destination="t9c-jI-xhF" id="yZs-av-tTP"/>
                 <outlet property="recentMenu" destination="aXa-aM-Jaq" id="55J-1a-QDd"/>
+                <outlet property="sinButton" destination="Dn2-9e-Tzc" id="d2v-7r-eZm"/>
+                <outlet property="sinhButton" destination="1pu-T8-jqY" id="8LT-kt-enl"/>
+                <outlet property="tanButton" destination="T89-BN-VlJ" id="eY5-sP-9fp"/>
+                <outlet property="tanhButton" destination="iyF-Ht-ybE" id="0LF-IN-bwD"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -501,55 +511,61 @@
         <window title="Calculator" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="335" y="390" width="563" height="288"/>
+            <rect key="contentRect" x="335" y="390" width="612" height="288"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
             <view key="contentView" autoresizesSubviews="NO" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="563" height="288"/>
+                <rect key="frame" x="0.0" y="0.0" width="612" height="288"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <gridView xPlacement="fill" yPlacement="fill" rowAlignment="none" rowSpacing="1" columnSpacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="kLg-Td-5Lq">
-                        <rect key="frame" x="1" y="81" width="153" height="174"/>
+                        <rect key="frame" x="2" y="1" width="365" height="254"/>
                         <rows>
-                            <gridRow id="zFx-Np-4Hp"/>
-                            <gridRow id="sZY-wc-xXA"/>
-                            <gridRow id="T6E-9v-uHL"/>
-                            <gridRow id="kJb-nX-cD9"/>
-                            <gridRow id="X3J-o0-1sx"/>
+                            <gridRow height="50" id="zFx-Np-4Hp"/>
+                            <gridRow height="50" id="sZY-wc-xXA"/>
+                            <gridRow height="50" id="T6E-9v-uHL"/>
+                            <gridRow height="50" id="kJb-nX-cD9"/>
+                            <gridRow height="50" id="X3J-o0-1sx"/>
                         </rows>
                         <columns>
-                            <gridColumn id="yb3-cr-MhU"/>
-                            <gridColumn id="JBl-fj-AWM"/>
-                            <gridColumn id="bv2-qR-CCh"/>
-                            <gridColumn id="OjK-qR-CRu"/>
-                            <gridColumn id="DuK-oq-oUX"/>
-                            <gridColumn id="usK-v6-WsW"/>
+                            <gridColumn width="60" id="yb3-cr-MhU"/>
+                            <gridColumn width="60" id="JBl-fj-AWM"/>
+                            <gridColumn width="60" id="bv2-qR-CCh"/>
+                            <gridColumn width="60" id="OjK-qR-CRu"/>
+                            <gridColumn width="60" id="DuK-oq-oUX"/>
+                            <gridColumn width="60" id="usK-v6-WsW"/>
                         </columns>
                         <gridCells>
                             <gridCell row="zFx-Np-4Hp" column="yb3-cr-MhU" id="frI-Kq-GKg">
                                 <button key="contentView" identifier="lparen" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Cpg-Kw-IoK">
-                                    <rect key="frame" x="0.0" y="4" width="16" height="170"/>
+                                    <rect key="frame" x="0.0" y="204" width="60" height="50"/>
                                     <buttonCell key="cell" type="square" title="(" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="MNX-RV-sLG">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
                                         <string key="keyEquivalent">9</string>
                                         <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
                                     </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="f3I-QS-OQE"/>
+                                    </connections>
                                 </button>
                             </gridCell>
                             <gridCell row="zFx-Np-4Hp" column="JBl-fj-AWM" id="DwO-CX-TUS">
                                 <button key="contentView" identifier="rparen" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5n6-05-B0U">
-                                    <rect key="frame" x="17" y="4" width="16" height="170"/>
+                                    <rect key="frame" x="61" y="204" width="60" height="50"/>
                                     <buttonCell key="cell" type="square" title=")" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Q75-7D-1Sk">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
                                         <string key="keyEquivalent">0</string>
                                         <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
                                     </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="IDj-Fx-AC5"/>
+                                    </connections>
                                 </button>
                             </gridCell>
                             <gridCell row="zFx-Np-4Hp" column="bv2-qR-CCh" id="o67-me-bin">
                                 <button key="contentView" identifier="mc" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="H1x-3f-Nxs">
-                                    <rect key="frame" x="34" y="4" width="30" height="170"/>
+                                    <rect key="frame" x="122" y="204" width="60" height="50"/>
                                     <buttonCell key="cell" type="square" title="mc" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="34t-kF-IAv">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -558,7 +574,7 @@
                             </gridCell>
                             <gridCell row="zFx-Np-4Hp" column="OjK-qR-CRu" id="3A1-HS-bxK">
                                 <button key="contentView" identifier="mplus" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vjF-cs-VdM">
-                                    <rect key="frame" x="65" y="4" width="30" height="170"/>
+                                    <rect key="frame" x="183" y="204" width="60" height="50"/>
                                     <buttonCell key="cell" type="square" title="m+" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="14b-uA-Wgz">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -567,7 +583,7 @@
                             </gridCell>
                             <gridCell row="zFx-Np-4Hp" column="DuK-oq-oUX" id="LTc-tj-8eH">
                                 <button key="contentView" identifier="mminus" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4sB-DO-kzF">
-                                    <rect key="frame" x="96" y="4" width="28" height="170"/>
+                                    <rect key="frame" x="244" y="204" width="60" height="50"/>
                                     <buttonCell key="cell" type="square" title="m-" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="AXL-Kh-XkF">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -576,41 +592,305 @@
                             </gridCell>
                             <gridCell row="zFx-Np-4Hp" column="usK-v6-WsW" id="hC9-aa-lHG">
                                 <button key="contentView" identifier="mr" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oyM-gT-xY6">
-                                    <rect key="frame" x="125" y="4" width="28" height="170"/>
+                                    <rect key="frame" x="305" y="204" width="60" height="50"/>
                                     <buttonCell key="cell" type="square" title="mr" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="aTa-lm-8Kg">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
                                 </button>
                             </gridCell>
-                            <gridCell row="sZY-wc-xXA" column="yb3-cr-MhU" id="U10-5G-wXK"/>
-                            <gridCell row="sZY-wc-xXA" column="JBl-fj-AWM" id="pPb-yY-ifr"/>
-                            <gridCell row="sZY-wc-xXA" column="bv2-qR-CCh" id="d3g-2J-8ix"/>
-                            <gridCell row="sZY-wc-xXA" column="OjK-qR-CRu" id="Rf9-ed-tpZ"/>
-                            <gridCell row="sZY-wc-xXA" column="DuK-oq-oUX" id="Mj2-au-UNi"/>
-                            <gridCell row="sZY-wc-xXA" column="usK-v6-WsW" id="l1z-ek-mGw"/>
-                            <gridCell row="T6E-9v-uHL" column="yb3-cr-MhU" id="xoe-VS-2Xs"/>
-                            <gridCell row="T6E-9v-uHL" column="JBl-fj-AWM" id="zni-Sb-FMy"/>
-                            <gridCell row="T6E-9v-uHL" column="bv2-qR-CCh" id="oka-69-ML3"/>
-                            <gridCell row="T6E-9v-uHL" column="OjK-qR-CRu" id="5eB-mK-s3s"/>
-                            <gridCell row="T6E-9v-uHL" column="DuK-oq-oUX" id="2TM-Tc-7F7"/>
-                            <gridCell row="T6E-9v-uHL" column="usK-v6-WsW" id="l8G-2d-bRT"/>
-                            <gridCell row="kJb-nX-cD9" column="yb3-cr-MhU" id="ou5-nG-FHY"/>
-                            <gridCell row="kJb-nX-cD9" column="JBl-fj-AWM" id="fwc-yw-OLG"/>
-                            <gridCell row="kJb-nX-cD9" column="bv2-qR-CCh" id="6fh-L9-mhJ"/>
-                            <gridCell row="kJb-nX-cD9" column="OjK-qR-CRu" id="4UM-RI-IpK"/>
-                            <gridCell row="kJb-nX-cD9" column="DuK-oq-oUX" id="FO1-d5-4DJ"/>
-                            <gridCell row="kJb-nX-cD9" column="usK-v6-WsW" id="mcs-iF-KWf"/>
-                            <gridCell row="X3J-o0-1sx" column="yb3-cr-MhU" id="P3r-XO-pWT"/>
-                            <gridCell row="X3J-o0-1sx" column="JBl-fj-AWM" id="2GU-Sd-7Sq"/>
-                            <gridCell row="X3J-o0-1sx" column="bv2-qR-CCh" id="0X5-Xo-dem"/>
-                            <gridCell row="X3J-o0-1sx" column="OjK-qR-CRu" id="eBF-f8-kin"/>
-                            <gridCell row="X3J-o0-1sx" column="DuK-oq-oUX" id="TeT-ba-XHZ"/>
-                            <gridCell row="X3J-o0-1sx" column="usK-v6-WsW" id="lpF-qc-ICH"/>
+                            <gridCell row="sZY-wc-xXA" column="yb3-cr-MhU" id="U10-5G-wXK">
+                                <button key="contentView" identifier="second" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zTC-tc-rNg">
+                                    <rect key="frame" x="0.0" y="153" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="2nd" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="e3h-xZ-WyA">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="secondFunctionPressed:" target="Voe-Tx-rLC" id="yY4-Bo-KOF"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="sZY-wc-xXA" column="JBl-fj-AWM" id="pPb-yY-ifr">
+                                <button key="contentView" identifier="sqr" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="v61-gg-J8Q">
+                                    <rect key="frame" x="61" y="153" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="x^2" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="8pf-cT-b1S">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="Rxf-PV-L9D"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="sZY-wc-xXA" column="bv2-qR-CCh" id="d3g-2J-8ix">
+                                <button key="contentView" identifier="cube" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KJp-Mq-0ZQ">
+                                    <rect key="frame" x="122" y="153" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="x^3" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xue-Tq-5Sh">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="fEv-EB-nas"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="sZY-wc-xXA" column="OjK-qR-CRu" id="Rf9-ed-tpZ">
+                                <button key="contentView" identifier="pow" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3PT-Ts-sCJ">
+                                    <rect key="frame" x="183" y="153" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="x^y" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2uT-JN-LRD">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="cSR-sa-EWN"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="sZY-wc-xXA" column="DuK-oq-oUX" id="Mj2-au-UNi">
+                                <button key="contentView" identifier="e_pow_x" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xS4-FP-ghO">
+                                    <rect key="frame" x="244" y="153" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="e^x" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="jmO-O9-6L8">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="6jH-We-40L"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="sZY-wc-xXA" column="usK-v6-WsW" id="l1z-ek-mGw">
+                                <button key="contentView" identifier="_10_pow_x" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WnU-bm-c3Q">
+                                    <rect key="frame" x="305" y="153" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="10^x" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HPK-Tg-gdG">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="rXR-vJ-tUL"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="T6E-9v-uHL" column="yb3-cr-MhU" id="xoe-VS-2Xs">
+                                <button key="contentView" identifier="invert" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nP9-7F-fqS">
+                                    <rect key="frame" x="0.0" y="102" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="1/x" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Hf-p2-83C">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="Fyl-lT-Hhq"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="T6E-9v-uHL" column="JBl-fj-AWM" id="zni-Sb-FMy">
+                                <button key="contentView" identifier="sqrt" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1d9-1P-Rdu">
+                                    <rect key="frame" x="61" y="102" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="sqrt(x)" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="fdq-ES-eBZ">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="4oA-Es-hmS"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="T6E-9v-uHL" column="bv2-qR-CCh" id="oka-69-ML3">
+                                <button key="contentView" identifier="cbrt" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SzX-O0-bmm">
+                                    <rect key="frame" x="122" y="102" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="cbrt(x)" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ig6-4x-cLu">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="OMO-9W-H9r"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="T6E-9v-uHL" column="OjK-qR-CRu" id="5eB-mK-s3s">
+                                <button key="contentView" identifier="yroot" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YXE-b8-XHm">
+                                    <rect key="frame" x="183" y="102" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="yroot" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="jgs-0A-gho">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="bYj-vM-CC5"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="T6E-9v-uHL" column="DuK-oq-oUX" id="2TM-Tc-7F7">
+                                <button key="contentView" identifier="ln" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="t9c-jI-xhF">
+                                    <rect key="frame" x="244" y="102" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="ln" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="mHW-fl-4C9">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="MQb-ND-VcR"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="T6E-9v-uHL" column="usK-v6-WsW" id="l8G-2d-bRT">
+                                <button key="contentView" identifier="log10" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6gf-Td-peJ">
+                                    <rect key="frame" x="305" y="102" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="log10" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="hFK-gp-7lL">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="8tz-qg-MS9"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="kJb-nX-cD9" column="yb3-cr-MhU" id="ou5-nG-FHY">
+                                <button key="contentView" identifier="fact" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fmg-EM-76M">
+                                    <rect key="frame" x="0.0" y="51" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="x!" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Yfa-wx-I0D">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="cZ8-5O-rpj"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="kJb-nX-cD9" column="JBl-fj-AWM" id="fwc-yw-OLG">
+                                <button key="contentView" identifier="sin" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Dn2-9e-Tzc">
+                                    <rect key="frame" x="61" y="51" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="sin" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2Fe-gf-ag4">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="ZkP-Wk-Qmd"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="kJb-nX-cD9" column="bv2-qR-CCh" id="6fh-L9-mhJ">
+                                <button key="contentView" identifier="cos" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BTd-3D-D2B">
+                                    <rect key="frame" x="122" y="51" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="cos" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xcF-SK-aIb">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="qJJ-aH-3w6"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="kJb-nX-cD9" column="OjK-qR-CRu" id="4UM-RI-IpK">
+                                <button key="contentView" identifier="tan" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="T89-BN-VlJ">
+                                    <rect key="frame" x="183" y="51" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="tan" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HFB-bZ-htK">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="iza-JV-wjT"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="kJb-nX-cD9" column="DuK-oq-oUX" id="FO1-d5-4DJ">
+                                <button key="contentView" identifier="e" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oQV-Hk-45X">
+                                    <rect key="frame" x="244" y="51" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="e" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QeH-ff-Sfq">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="7rU-Ec-D4u"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="kJb-nX-cD9" column="usK-v6-WsW" id="mcs-iF-KWf">
+                                <button key="contentView" identifier="ee" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8Sx-dC-XsR">
+                                    <rect key="frame" x="305" y="51" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="EE" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="T9s-zD-TsB">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="NAP-02-JL3"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="X3J-o0-1sx" column="yb3-cr-MhU" id="P3r-XO-pWT">
+                                <button key="contentView" identifier="rad" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Iyd-tT-U3R">
+                                    <rect key="frame" x="0.0" y="0.0" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="Rad" alternateTitle="Deg" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="D0V-6u-W7X">
+                                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="Rsn-Xc-bmj"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="X3J-o0-1sx" column="JBl-fj-AWM" id="2GU-Sd-7Sq">
+                                <button key="contentView" identifier="sinh" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1pu-T8-jqY">
+                                    <rect key="frame" x="61" y="0.0" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="sinh" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="lXR-HN-cZa">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="yEM-6Y-eSk"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="X3J-o0-1sx" column="bv2-qR-CCh" id="0X5-Xo-dem">
+                                <button key="contentView" identifier="cosh" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fi6-yy-jTj">
+                                    <rect key="frame" x="122" y="0.0" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="cosh" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="h5w-1W-6Mw">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="hAr-sg-Jhm"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="X3J-o0-1sx" column="OjK-qR-CRu" id="eBF-f8-kin">
+                                <button key="contentView" identifier="tanh" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iyF-Ht-ybE">
+                                    <rect key="frame" x="183" y="0.0" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="tanh" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="JP0-gw-Ftb">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="gBQ-eQ-SQA"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="X3J-o0-1sx" column="DuK-oq-oUX" id="TeT-ba-XHZ">
+                                <button key="contentView" identifier="pi" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2e2-Wz-gPr">
+                                    <rect key="frame" x="244" y="0.0" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="Pi" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="mbd-Cn-Ykh">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="Q02-rL-FEn"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
+                            <gridCell row="X3J-o0-1sx" column="usK-v6-WsW" id="lpF-qc-ICH">
+                                <button key="contentView" identifier="rand" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f2n-44-z4m">
+                                    <rect key="frame" x="305" y="0.0" width="60" height="50"/>
+                                    <buttonCell key="cell" type="square" title="Rand" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="MnE-Z7-DHh">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="TKm-KA-fqH"/>
+                                    </connections>
+                                </button>
+                            </gridCell>
                         </gridCells>
                     </gridView>
                     <textField identifier="display" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qxC-eF-BBQ">
-                        <rect key="frame" x="0.0" y="256" width="562" height="31"/>
+                        <rect key="frame" x="0.0" y="256" width="611" height="31"/>
                         <textFieldCell key="cell" controlSize="large" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" drawsBackground="YES" usesSingleLineMode="YES" id="Gsp-OC-y7R">
                             <font key="font" textStyle="largeTitle" name=".SFNS-Regular"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -618,25 +898,7 @@
                         </textFieldCell>
                     </textField>
                     <gridView identifier="basicContainer" autoresizesSubviews="NO" horizontalHuggingPriority="600" verticalHuggingPriority="600" xPlacement="fill" yPlacement="fill" rowAlignment="none" rowSpacing="1" columnSpacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="PXV-Xm-VeB">
-                        <rect key="frame" x="319" y="1" width="243" height="254"/>
-                        <constraints>
-                            <constraint firstItem="ZcY-B8-Eek" firstAttribute="leading" secondItem="PXV-Xm-VeB" secondAttribute="leading" constant="1" id="7YD-hV-kx3"/>
-                            <constraint firstItem="CDr-jE-QGN" firstAttribute="leading" secondItem="odQ-MV-PK1" secondAttribute="trailing" constant="1" id="8XS-dh-CTn"/>
-                            <constraint firstItem="h9D-tb-L9O" firstAttribute="leading" secondItem="PXV-Xm-VeB" secondAttribute="leading" constant="1" id="E8N-6m-7Fn"/>
-                            <constraint firstItem="tb2-0z-Smv" firstAttribute="top" secondItem="CDr-jE-QGN" secondAttribute="bottom" constant="1" id="F50-NJ-hc4"/>
-                            <constraint firstAttribute="trailing" secondItem="TIQ-QV-Whr" secondAttribute="trailing" constant="1" id="KLc-vw-6Jf"/>
-                            <constraint firstAttribute="bottom" secondItem="aJe-pW-wvv" secondAttribute="bottom" constant="1" id="MMd-jy-mzc"/>
-                            <constraint firstItem="ZcY-B8-Eek" firstAttribute="top" secondItem="odQ-MV-PK1" secondAttribute="bottom" constant="1" id="NjJ-CB-acW"/>
-                            <constraint firstItem="UCa-pg-gy9" firstAttribute="leading" secondItem="CDr-jE-QGN" secondAttribute="trailing" constant="1" id="SOQ-Gi-enb"/>
-                            <constraint firstItem="IFO-xq-Fee" firstAttribute="leading" secondItem="PXV-Xm-VeB" secondAttribute="leading" constant="1" id="Zfj-2O-bsS"/>
-                            <constraint firstItem="vcG-2c-oiX" firstAttribute="leading" secondItem="UCa-pg-gy9" secondAttribute="trailing" constant="1" id="azK-SC-LAW"/>
-                            <constraint firstItem="TAb-SG-s4p" firstAttribute="leading" secondItem="PXV-Xm-VeB" secondAttribute="leading" constant="1" id="bx1-Eh-nZn"/>
-                            <constraint firstAttribute="bottom" secondItem="EiN-h8-3C2" secondAttribute="bottom" constant="1" id="eZR-dL-mu2"/>
-                            <constraint firstItem="f3j-VH-Ifs" firstAttribute="top" secondItem="UCa-pg-gy9" secondAttribute="bottom" constant="1" id="l8r-VK-eJn"/>
-                            <constraint firstItem="odQ-MV-PK1" firstAttribute="leading" secondItem="PXV-Xm-VeB" secondAttribute="leading" constant="1" id="oVL-i7-pDB"/>
-                            <constraint firstAttribute="bottom" secondItem="h9D-tb-L9O" secondAttribute="bottom" constant="1" id="ttf-Oh-lnt"/>
-                            <constraint firstAttribute="trailing" secondItem="aJe-pW-wvv" secondAttribute="trailing" constant="1" id="xFe-2b-afa"/>
-                        </constraints>
+                        <rect key="frame" x="368" y="1" width="243" height="254"/>
                         <rows>
                             <gridRow height="50" id="pFF-EX-3em"/>
                             <gridRow height="50" id="dUM-9G-Gco"/>
@@ -653,7 +915,7 @@
                         <gridCells>
                             <gridCell row="pFF-EX-3em" column="gr6-6v-22e" xPlacement="fill" yPlacement="fill" id="gGR-bn-3cr">
                                 <button key="contentView" identifier="clear" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="odQ-MV-PK1">
-                                    <rect key="frame" x="1" y="204" width="59" height="50"/>
+                                    <rect key="frame" x="0.0" y="204" width="60" height="50"/>
                                     <buttonCell key="cell" type="square" title="AC" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4nE-Ch-kyn">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" textStyle="title1" name=".SFNS-Regular"/>
@@ -709,7 +971,7 @@
                             </gridCell>
                             <gridCell row="dUM-9G-Gco" column="gr6-6v-22e" xPlacement="fill" id="5uk-pL-YmK">
                                 <button key="contentView" identifier="b7" verticalHuggingPriority="750" tag="7" translatesAutoresizingMaskIntoConstraints="NO" id="ZcY-B8-Eek">
-                                    <rect key="frame" x="1" y="153" width="59" height="50"/>
+                                    <rect key="frame" x="0.0" y="153" width="60" height="50"/>
                                     <buttonCell key="cell" type="square" title="7" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="dv3-Dp-Lg4">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" textStyle="title1" name=".SFNS-Regular"/>
@@ -769,7 +1031,7 @@
                             </gridCell>
                             <gridCell row="1X3-nB-lvI" column="gr6-6v-22e" xPlacement="fill" yPlacement="fill" id="zdK-3E-zqJ">
                                 <button key="contentView" identifier="b4" verticalHuggingPriority="750" tag="4" translatesAutoresizingMaskIntoConstraints="NO" id="TAb-SG-s4p">
-                                    <rect key="frame" x="36" y="102" width="24" height="50"/>
+                                    <rect key="frame" x="0.0" y="102" width="60" height="50"/>
                                     <buttonCell key="cell" type="square" title="4" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YIQ-Fe-yiB">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" textStyle="title1" name=".SFNS-Regular"/>
@@ -808,10 +1070,7 @@
                             </gridCell>
                             <gridCell row="1X3-nB-lvI" column="Q1D-Uq-DNT" xPlacement="fill" yPlacement="fill" id="8Xb-SP-K9u">
                                 <button key="contentView" identifier="sub" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TIQ-QV-Whr">
-                                    <rect key="frame" x="162" y="102" width="80" height="50"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" constant="80" id="wnI-mI-Xbm"/>
-                                    </constraints>
+                                    <rect key="frame" x="183" y="102" width="60" height="50"/>
                                     <buttonCell key="cell" type="square" title="−" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Lro-sh-s4Y">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" textStyle="title1" name=".SFNS-Regular"/>
@@ -831,7 +1090,7 @@
                             </gridCell>
                             <gridCell row="SrI-WF-yAe" column="gr6-6v-22e" xPlacement="fill" yPlacement="fill" id="aCU-wG-bia">
                                 <button key="contentView" identifier="b1" verticalHuggingPriority="750" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="IFO-xq-Fee">
-                                    <rect key="frame" x="1" y="51" width="59" height="50"/>
+                                    <rect key="frame" x="0.0" y="51" width="60" height="50"/>
                                     <buttonCell key="cell" type="square" title="1" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="zhL-aM-VWC">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" textStyle="title1" name=".SFNS-Regular"/>
@@ -891,10 +1150,7 @@
                             </gridCell>
                             <gridCell row="q0p-aU-2QJ" column="gr6-6v-22e" headOfMergedCell="Mt5-TT-vco" xPlacement="fill" yPlacement="fill" id="Mt5-TT-vco">
                                 <button key="contentView" identifier="b0" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h9D-tb-L9O">
-                                    <rect key="frame" x="1" y="1" width="120" height="80"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="80" id="d7z-gT-Lxl"/>
-                                    </constraints>
+                                    <rect key="frame" x="0.0" y="0.0" width="121" height="50"/>
                                     <buttonCell key="cell" type="square" title="0" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="bd4-0s-S6Z">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" textStyle="title1" name=".SFNS-Regular"/>
@@ -908,10 +1164,7 @@
                             <gridCell row="q0p-aU-2QJ" column="HEB-Mx-J5e" headOfMergedCell="Mt5-TT-vco" id="3ZZ-mB-eT4"/>
                             <gridCell row="q0p-aU-2QJ" column="lJk-bE-cuv" xPlacement="fill" yPlacement="fill" id="shf-DC-SkR">
                                 <button key="contentView" identifier="comma" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EiN-h8-3C2">
-                                    <rect key="frame" x="122" y="1" width="60" height="80"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="80" id="Sck-a7-sgu"/>
-                                    </constraints>
+                                    <rect key="frame" x="122" y="0.0" width="60" height="50"/>
                                     <buttonCell key="cell" type="square" title="," bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="atu-pA-8Tf">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" textStyle="title1" name=".SFNS-Regular"/>
@@ -924,11 +1177,7 @@
                             </gridCell>
                             <gridCell row="q0p-aU-2QJ" column="Q1D-Uq-DNT" xPlacement="fill" yPlacement="fill" id="Tik-2E-8CN">
                                 <button key="contentView" identifier="equals" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aJe-pW-wvv">
-                                    <rect key="frame" x="162" y="1" width="80" height="80"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" constant="80" id="7ub-ge-t0c"/>
-                                        <constraint firstAttribute="height" constant="80" id="wii-DR-oSZ"/>
-                                    </constraints>
+                                    <rect key="frame" x="183" y="0.0" width="60" height="50"/>
                                     <buttonCell key="cell" type="square" title="=" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="F8F-Yt-OEN">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" textStyle="title1" name=".SFNS-Regular"/>
@@ -952,16 +1201,16 @@
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="qxC-eF-BBQ" secondAttribute="trailing" constant="1" id="4Mj-ds-1pP"/>
                     <constraint firstItem="qxC-eF-BBQ" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="8kC-tg-oxJ"/>
+                    <constraint firstAttribute="bottom" secondItem="kLg-Td-5Lq" secondAttribute="bottom" constant="1" id="INe-QR-dm9"/>
                     <constraint firstAttribute="trailing" secondItem="PXV-Xm-VeB" secondAttribute="trailing" constant="1" id="S6H-xt-OBk"/>
                     <constraint firstAttribute="bottom" secondItem="PXV-Xm-VeB" secondAttribute="bottom" constant="1" id="ZHB-Ur-ArS"/>
+                    <constraint firstItem="PXV-Xm-VeB" firstAttribute="leading" secondItem="kLg-Td-5Lq" secondAttribute="trailing" constant="1" id="aSR-rs-2mq"/>
                     <constraint firstItem="PXV-Xm-VeB" firstAttribute="top" secondItem="qxC-eF-BBQ" secondAttribute="bottom" constant="1" id="lZT-6O-ErZ"/>
                     <constraint firstItem="qxC-eF-BBQ" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="1" id="pvF-vs-CGR"/>
-                    <constraint firstItem="kLg-Td-5Lq" firstAttribute="height" secondItem="PXV-Xm-VeB" secondAttribute="height" multiplier="0.685039" id="qx1-6g-diV"/>
-                    <constraint firstItem="kLg-Td-5Lq" firstAttribute="top" secondItem="qxC-eF-BBQ" secondAttribute="bottom" constant="1" id="uZj-IG-YwG"/>
-                    <constraint firstItem="kLg-Td-5Lq" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="1" id="yU4-7z-Z62"/>
+                    <constraint firstItem="kLg-Td-5Lq" firstAttribute="top" secondItem="qxC-eF-BBQ" secondAttribute="bottom" constant="1" id="v97-n9-p4d"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="201" y="442"/>
+            <point key="canvasLocation" x="156" y="448"/>
         </window>
     </objects>
 </document>

@@ -25,11 +25,30 @@
 @property (strong) UDConversionWindowController *converterWindow;
 @property (strong) UDTapeWindowController *tapeWindowController;
 
+@property (assign) BOOL isSecondFunctionActive;
+
 // Actions (Methods linked to buttons)
 - (IBAction)digitPressed:(NSButton *)sender;
 - (IBAction)operationPressed:(NSButton *)sender;
 - (IBAction)decimalPressed:(NSButton *)sender;
+- (IBAction)memoryClearPressed:(NSButton *)sender;
+- (IBAction)memoryAddPressed:(NSButton *)sender;
+- (IBAction)memorySubPressed:(NSButton *)sender;
+- (IBAction)memoryRecallPressed:(NSButton *)sender;
 - (IBAction)openConverter:(id)sender;
+- (IBAction)secondFunctionPressed:(NSButton *)sender;
+
+@property (weak) IBOutlet NSButton *exButton;
+@property (weak) IBOutlet NSButton *_10xButton;
+
+@property (weak) IBOutlet NSButton *lnButton;
+@property (weak) IBOutlet NSButton *_log10Button;
+@property (weak) IBOutlet NSButton *sinButton;
+@property (weak) IBOutlet NSButton *cosButton;
+@property (weak) IBOutlet NSButton *tanButton;
+@property (weak) IBOutlet NSButton *sinhButton;
+@property (weak) IBOutlet NSButton *coshButton;
+@property (weak) IBOutlet NSButton *tanhButton;
 
 @property (weak) IBOutlet NSMenu *recentMenu;
 

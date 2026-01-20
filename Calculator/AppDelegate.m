@@ -22,21 +22,7 @@
     self.historyManager = [[UDConversionHistoryManager alloc] init];
     self.tape = [[UDTape alloc] init];
 
-    // Setup Tape Output
-    __weak typeof(self) weakSelf = self;
-    self.tape.didCommitEquation = ^(NSString *line) {
-        // Auto-open window if it doesn't exist? Or just ensure it's alloc'd?
-        if (!weakSelf.tapeWindowController) {
-            weakSelf.tapeWindowController = [[UDTapeWindowController alloc] initWithWindowNibName:@"UDTapeWindow"];
-        }
-        
-        // Show the window if you want it to pop up automatically,
-        // OR just append in background if you prefer it passive.
-        // [weakSelf.tapeWindowController showWindow:nil];
-        
-        [weakSelf.tapeWindowController appendLog:line];
-    };
-
+    [self updateScientificButtons];
     [self updateUI];
     [self updateRecentMenu];
 }
@@ -64,6 +50,7 @@
 - (IBAction)showTape:(id)sender {
     if (!self.tapeWindowController) {
         self.tapeWindowController = [[UDTapeWindowController alloc] initWithWindowNibName:@"UDTapeWindow"];
+        self.tape.windowController = self.tapeWindowController;
     }
     [self.tapeWindowController showWindow:self];
 }
@@ -72,11 +59,7 @@
     // We will use the Button's "Tag" (set in XIB) to identify the number (0-9)
     NSInteger digit = sender.tag;
     
-    [self.calc digit:digit];
-    
-    // 2. Tape Input (Drafting Phase)
-    // We update the draft every time a digit is pressed
-    [self.tape updateDraftValue:self.calc.currentValue];
+    [self.calc inputDigit:digit];
 
     [self updateUI];
 }
@@ -84,13 +67,7 @@
 - (IBAction)decimalPressed:(NSButton *)sender {
     // 1. Update Calc
     // This switches 'typing' to YES and sets the internal decimal multiplier
-    [self.calc decimal];
-
-    // 2. Update Tape Draft
-    // We update the tape so it knows the current number being built is valid.
-    // (Note: Since the tape stores a double, "5." and "5" look the same to it,
-    // but that's okay because the tape typically only prints when you hit an operator.)
-    [self.tape updateDraftValue:self.calc.currentValue];
+    [self.calc inputDecimal];
 
     // 3. Refresh Display
     [self updateUI];
@@ -109,42 +86,89 @@
     else if ([opTitle isEqualToString:@"clear"]) op = UDOpClear;
     else if ([opTitle isEqualToString:@"negate"]) op = UDOpNegate;
     else if ([opTitle isEqualToString:@"percent"]) op = UDOpPercent;
-        
-    // 1. Handle CLEAR separately
-    if (op == UDOpClear) {
-        [self.calc reset]; // Or performOperation:UDOpClear
-        [self.tape clear];
+    else if ([opTitle isEqualToString:@"lparen"]) op = UDOpParenLeft;
+    else if ([opTitle isEqualToString:@"rparen"]) op = UDOpParenRight;
+    else if ([opTitle isEqualToString:@"pi"]) op = UDOpPi;
+    else if ([opTitle isEqualToString:@"e"]) op = UDOpE;
+    else if ([opTitle isEqualToString:@"rand"]) op = UDOpRand;
+    // row:
+    else if ([opTitle isEqualToString:@"sqr"]) op = UDOpSquare;
+    else if ([opTitle isEqualToString:@"pow"]) op = UDOpPow;
+    else if ([opTitle isEqualToString:@"e_pow_x"]) op = UDOpExp;
+    else if ([opTitle isEqualToString:@"_10_pow_x"]) op = UDOpPow10;
+    else if ([opTitle isEqualToString:@"_2_pow_x"]) op = UDOpPow2;
 
+
+    
+    // CONSTANTS: Treat them as number inputs!
+    if (op == UDOpPi) {
+        [self.calc inputNumber:M_PI]; // You'll need to add this method
+    } else if (op == UDOpE) {
+        [self.calc inputNumber:M_E];
+    } else if (op == UDOpClear) {
+        // 1. Handle CLEAR separately
+        [self.calc reset]; // Or performOperation:UDOpClear
     } else if (op == UDOpEq) {
+
         // CASE 1: EQUALS (=)
-        // 1. Calculate FIRST to get the final answer.
-        [self.calc operation:UDOpEq];
-        
-        // 2. Commit the result to the tape.
-        // We pass the Calculator's final value (e.g., 17) to the tape.
-        [self.tape commitResult:self.calc.currentValue];
-        
+        // 1. Force the calculator to finish pending ops (like "5 + 3")
+        // This collapses the NodeStack into a single Result Node.
+        [self.calc performOperation:UDOpEq];
+
+        // 2. Capture the Result
+        // The Shunting Yard leaves exactly one node (the root) on the stack after Eq.
+        UDASTNode *resultTree = [self.calc.nodeStack lastObject];
+
+        double resultVal = self.calc.currentValue;
+                
+        // 3. Log to Tape (History Update)
+        if (resultTree) {
+            [self.tape logTransaction:resultTree result:resultVal];
+        }
+                
     } else {
         // CASE 2: BINARY OPERATORS (+, -, *, /)
 
-        // CONTINUITY CHECK:
-        // If the tape is empty (new line), but we are NOT typing a new number,
-        // it means we are chaining operations on the previous result.
-        // Action: Grab the calculator's current value and put it into the tape's draft.
-        if ([self.tape isEmpty] && !self.calc.typing) {
-            [self.tape updateDraftValue:self.calc.currentValue];
-        }
-
-        // 1. Update Tape FIRST.
-        // We lock in the number the user just typed (the Draft) and add the operator symbol.
-        [self.tape commitOperator:op];
-        
-        // 2. Update Calculator.
+        // Update Calculator.
         // Perform the Shunting Yard logic (stacking the operator).
-        [self.calc operation:op];
+        [self.calc performOperation:op];
     }
     
     // 3. Update Display
+    [self updateUI];
+}
+
+// Connect 'mc' button here
+- (IBAction)memoryClearPressed:(id)sender {
+    //[self.calc memClear];
+
+    // Optional: Flash the display or show "M" indicator on Tape?
+    [self updateUI];
+}
+
+// Connect 'm+' button here
+- (IBAction)memoryAddPressed:(id)sender {
+   // [self.calc memAdd];
+
+    // Standard behavior: Add current display value to memory
+    // If user is typing "5", add 5. If result is "10", add 10.
+    //self.calc.memoryValue += self.calc.currentValue;
+    [self updateUI];
+}
+
+// Connect 'm-' button here
+- (IBAction)memorySubPressed:(id)sender {
+//    self.calc.memoryValue -= self.calc.currentValue;
+    //[self.calc memSub];
+    [self updateUI];
+}
+
+// Connect 'mr' button here
+- (IBAction)memoryRecallPressed:(id)sender {
+    // Treat this exactly like typing a number
+    //[self.calc memRecall];
+    
+    //[self.tape updateDraftValue:self.calc.memoryValue];
     [self updateUI];
 }
 
@@ -184,6 +208,62 @@
     [self.converterWindow selectCategory:type];
 }
 
+- (IBAction)secondFunctionPressed:(NSButton *)sender {
+    self.isSecondFunctionActive = !self.isSecondFunctionActive;
+
+    // Visual Feedback: Make the "2nd" button look pressed/highlighted
+    sender.state = self.isSecondFunctionActive ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    [self updateScientificButtons];
+}
+
+- (void)updateScientificButtons {
+    BOOL second = self.isSecondFunctionActive;
+    
+    // Helper block to swap button state
+    void (^setBtn)(NSButton*, NSString*, NSString*, NSString*, NSString*) =
+    ^(NSButton *b, NSString *normTitle, NSString *normIdentifier, NSString *secTitle, NSString *secIdentifier) {
+        if (second) {
+            b.title = secTitle;
+            b.identifier = secIdentifier;
+        } else {
+            b.title = normTitle;
+            b.identifier = normIdentifier;
+        }
+    };
+    
+    // Apply changes
+    
+    setBtn(self.exButton, @"eˣ", @"e_pow_x", @"yˣ", @"y_pow_x");
+    setBtn(self._10xButton, @"10ˣ", @"_10_pow_x", @"2ˣ", @"2_pow_x");
+    setBtn(self.lnButton, @"ln", @"ln", @"logᵧ", @"log_y");
+    setBtn(self._log10Button, @"log10", @"log₁₀", @"log2", @"log₂");
+    /*
+    else if ([opTitle isEqualToString:@"sqr"]) op = UDOpSquare;
+    else if ([opTitle isEqualToString:@"pow"]) op = UDOpPow;
+    else if ([opTitle isEqualToString:@"e_pow_x"]) op = UDOpExp;
+    else if ([opTitle isEqualToString:@"_10_pow_x"]) op = UDOpPow10;
+    else if ([opTitle isEqualToString:@"_2_pow_x"]) op = UDOpPow2;*/
+
+    // e^x / y^x
+    // 10^x / 2^x
+    // ln / log y
+    // log 10 / log 2
+    // sin / sin -1
+    // cos / cos -1
+    // tan / tan -1
+    // sinh / sinh -1
+    // cosh / cosh -1
+    // tanh / tanh -1
+    
+    /*setBtn(self._log10Button, @"log", @"log10", @"10ˣ", @"pow10");
+    setBtn(self.lnButton,  @"ln",  @"ln",    @"log y",  UDOpExp);
+
+    setBtn(self.sinButton, @"sin", @"sin", @"sin⁻¹", @"sinh");
+    setBtn(self.cosButton, @"cos", @"cos", @"cos⁻¹", @"cosh");
+    setBtn(self.tanButton, @"tan", @"tan", @"tan⁻¹", @"tanh");*/
+}
+
 - (IBAction)conversionMenuClicked:(NSMenuItem *)sender {
     // CASE A: History (Headless)
     if (sender.representedObject) {
@@ -195,7 +275,7 @@
                                                 fromUnit:data[@"from"]
                                                   toUnit:data[@"to"]];
         
-        [self.calc setCurrentValue:result];
+        [self.calc inputNumber:result];
         [self updateUI];
         [self addToHistory:data];
         return;
@@ -251,9 +331,9 @@
 #pragma mark - Helper
 
 - (void)updateUI {
-    if (self.calc.errorMessage) {
+    /*if (self.calc.errorMessage) {
         [self.displayField setStringValue:self.calc.errorMessage];
-    } else {
+    } else*/ {
         // %g removes trailing zeros for us
         [self.displayField setStringValue:[NSString stringWithFormat:@"%g", self.calc.currentValue]];
     }
@@ -287,7 +367,7 @@
     // scanDouble returns YES if it found a valid double at the start
     if ([scanner scanDouble:&value] && [scanner isAtEnd]) {
         // 3. Update the Calculator
-        [self.calc setCurrentValue:value];
+        [self.calc inputNumber:value];
         [self updateUI];
     } else {
         NSBeep(); // Standard macOS "error" sound for invalid input

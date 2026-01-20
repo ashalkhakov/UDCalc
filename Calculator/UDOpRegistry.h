@@ -23,11 +23,12 @@ typedef NS_ENUM(NSInteger, UDOpAssociativity) {
 // Metadata container
 @interface UDOpInfo : NSObject
 @property (nonatomic, copy, readonly) NSString *symbol;
+@property (nonatomic, assign, readonly) NSInteger tag;
 @property (nonatomic, assign, readonly) UDOpPlacement placement;
 @property (nonatomic, assign, readonly) UDOpAssociativity associativity;
 @property (nonatomic, assign, readonly) NSInteger precedence; // Ready for future use
 
-+ (instancetype)infoWithSymbol:(NSString *)sym placement:(UDOpPlacement)place assoc:(UDOpAssociativity)assoc precedence:(NSInteger)precedence;
++ (instancetype)infoWithSymbol:(NSString *)sym tag:(NSInteger)tag placement:(UDOpPlacement)place assoc:(UDOpAssociativity)assoc precedence:(NSInteger)precedence;
 @end
 
 @interface UDOpRegistry : NSObject

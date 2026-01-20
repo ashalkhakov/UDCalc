@@ -59,7 +59,7 @@
                                         fromUnit:from
                                           toUnit:to];
     
-    [self.calc setCurrentValue:result];
+    [self.calc inputNumber:result];
     
     if (self.didConvertBlock) {
         self.didConvertBlock(cat, from, to);

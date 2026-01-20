@@ -21,6 +21,10 @@
 		9A7B95032F1BF7CE00ED7306 /* ConversionWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A7B95022F1BF7CE00ED7306 /* ConversionWindow.xib */; };
 		9A7B95052F1C08E500ED7306 /* UDUnitConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B95042F1C08E500ED7306 /* UDUnitConverter.m */; };
 		9A7B95082F1C0E0700ED7306 /* UDConversionHistoryManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B95072F1C0E0700ED7306 /* UDConversionHistoryManager.m */; };
+		9AE3F67D2F1EA14800E1CFCF /* UDAST.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F67C2F1EA14800E1CFCF /* UDAST.m */; };
+		9AE3F6802F1EA9AA00E1CFCF /* UDInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F67F2F1EA9AA00E1CFCF /* UDInstruction.m */; };
+		9AE3F6832F1EA9F300E1CFCF /* UDCompiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F6822F1EA9F300E1CFCF /* UDCompiler.m */; };
+		9AE3F6862F1EAB1F00E1CFCF /* UDVM.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F6852F1EAB1F00E1CFCF /* UDVM.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +53,14 @@
 		9A7B95062F1C091D00ED7306 /* UDUnitConverter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDUnitConverter.h; sourceTree = "<group>"; };
 		9A7B95072F1C0E0700ED7306 /* UDConversionHistoryManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDConversionHistoryManager.m; sourceTree = "<group>"; };
 		9A7B95092F1C0E1A00ED7306 /* UDConversionHistoryManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDConversionHistoryManager.h; sourceTree = "<group>"; };
+		9AE3F67B2F1EA12D00E1CFCF /* UDAST.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDAST.h; sourceTree = "<group>"; };
+		9AE3F67C2F1EA14800E1CFCF /* UDAST.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDAST.m; sourceTree = "<group>"; };
+		9AE3F67E2F1EA99300E1CFCF /* UDInstruction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDInstruction.h; sourceTree = "<group>"; };
+		9AE3F67F2F1EA9AA00E1CFCF /* UDInstruction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDInstruction.m; sourceTree = "<group>"; };
+		9AE3F6812F1EA9DD00E1CFCF /* UDCompiler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDCompiler.h; sourceTree = "<group>"; };
+		9AE3F6822F1EA9F300E1CFCF /* UDCompiler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCompiler.m; sourceTree = "<group>"; };
+		9AE3F6842F1EAB0A00E1CFCF /* UDVM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDVM.h; sourceTree = "<group>"; };
+		9AE3F6852F1EAB1F00E1CFCF /* UDVM.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDVM.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +117,14 @@
 				9A717CAC2F1D20C8005A27B7 /* UDTapeWindow.xib */,
 				9A717CAE2F1D493A005A27B7 /* UDOpRegistry.m */,
 				9A717CB02F1D4954005A27B7 /* UDOpRegistry.h */,
+				9AE3F67B2F1EA12D00E1CFCF /* UDAST.h */,
+				9AE3F67C2F1EA14800E1CFCF /* UDAST.m */,
+				9AE3F67E2F1EA99300E1CFCF /* UDInstruction.h */,
+				9AE3F67F2F1EA9AA00E1CFCF /* UDInstruction.m */,
+				9AE3F6812F1EA9DD00E1CFCF /* UDCompiler.h */,
+				9AE3F6822F1EA9F300E1CFCF /* UDCompiler.m */,
+				9AE3F6842F1EAB0A00E1CFCF /* UDVM.h */,
+				9AE3F6852F1EAB1F00E1CFCF /* UDVM.m */,
 			);
 			path = Calculator;
 			sourceTree = "<group>";
@@ -185,11 +205,15 @@
 				9A7B95002F1BF69500ED7306 /* UDConversionWindowController.m in Sources */,
 				9A717CAB2F1D2085005A27B7 /* UDTapeWindowController.m in Sources */,
 				9A7B94EE2F1BB18600ED7306 /* AppDelegate.m in Sources */,
+				9AE3F6802F1EA9AA00E1CFCF /* UDInstruction.m in Sources */,
 				9A7B95052F1C08E500ED7306 /* UDUnitConverter.m in Sources */,
+				9AE3F67D2F1EA14800E1CFCF /* UDAST.m in Sources */,
 				9A717CA82F1D1E75005A27B7 /* UDTapeToken.m in Sources */,
+				9AE3F6862F1EAB1F00E1CFCF /* UDVM.m in Sources */,
 				9A717CA52F1D1D9F005A27B7 /* UDTape.m in Sources */,
 				9A7B94FD2F1BE4FF00ED7306 /* UDCalc.m in Sources */,
 				9A7B95082F1C0E0700ED7306 /* UDConversionHistoryManager.m in Sources */,
+				9AE3F6832F1EA9F300E1CFCF /* UDCompiler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

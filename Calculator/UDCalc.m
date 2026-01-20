@@ -5,20 +5,17 @@
 //  Created by Artyom Shalkhakov on 17.01.2026.
 //
 
-#import <math.h>
-
 #import "UDCalc.h"
-#import "UDOpRegistry.h"
-
-// Note: Apple Calc uses Degrees by default for UI, but math.h uses Radians.
-// Let's assume Degrees for user friendliness.
-#define DEG2RAD(x) ((x) * M_PI / 180.0)
-#define RAD2DEG(x) ((x) * 180.0 / M_PI)
+#import "UDCompiler.h"
+#import "UDVM.h"
 
 @interface UDCalc ()
-@property (strong, readwrite) NSMutableArray<NSNumber *> *valueStack;
-@property (strong, readwrite) NSMutableArray<NSNumber *> *opStack;
-@property (assign) double decMult; // Multiplier for decimal places (0.1, 0.01, etc)
+@property (strong, readwrite) NSMutableArray<UDASTNode *> *nodeStack; // Output Stack
+@property (strong) NSMutableArray<NSNumber *> *opStack;               // Operator Stack
+@property (readwrite) BOOL typing;
+@property (readwrite) double currentValue;
+@property (assign) BOOL hasDecimal;
+@property (assign) double decimalMultiplier;
 @end
 
 @implementation UDCalc
@@ -32,246 +29,237 @@
 }
 
 - (void)reset {
-    // Always start with [0] so there is something to display/operate on
-    _valueStack = [NSMutableArray arrayWithObject:@(0.0)];
+    _nodeStack = [NSMutableArray array];
     _opStack = [NSMutableArray array];
     _typing = NO;
-    _decMult = 0.0;
+    _currentValue = 0;
 }
 
-#pragma mark - Value Helpers
+#pragma mark - Input
 
-- (double)currentValue {
-    if (self.valueStack.count == 0) return 0.0;
-    return [[self.valueStack lastObject] doubleValue];
-}
-
-- (void)setCurrentValue:(double)currentValue {
-    [self popValue];
-    [self pushValue:currentValue];
-}
-
-// Internal helper to push a value safely
-- (void)pushValue:(double)val {
-    [self.valueStack addObject:@(val)];
-}
-
-// Internal helper to pop a value safely
-- (double)popValue {
-    if (self.valueStack.count == 0) return 0.0;
-    double val = [[self.valueStack lastObject] doubleValue];
-    [self.valueStack removeLastObject];
-    return val;
-}
-
-#pragma mark - Input Handling
-
-- (void)digit:(NSInteger)digit {
-    double val = self.currentValue;
-    
-    // CASE A: Start of new number
+- (void)inputDigit:(double)digit {
     if (!self.typing) {
-        // If we just finished an Op, the stack might have a "Placeholder" 0.0 on top.
-        // We overwrite it.
-        self.typing = YES;
-        val = digit;
-        self.decMult = 0.0;
-    }
-    // CASE B: Appending to existing number
-    else {
-        if (self.decMult > 0) {
-            // Typing decimals: 5.2 -> 5.23
-            val += digit * self.decMult;
-            self.decMult /= 10.0;
-        } else {
-            // Typing integers: 5 -> 53
-            val = (val * 10) + digit;
+        // CASE A: NEW NUMBER (Push)
+
+        // If we have no pending operators (e.g., fresh start or after '='),
+        // typing a number should discard the old result/zero.
+        if (self.opStack.count == 0) {
+            [self.nodeStack removeAllObjects];
         }
-    }
-    
-    // Update Top of Stack
-    if (self.valueStack.count > 0) [self.valueStack removeLastObject];
-    [self.valueStack addObject:@(val)];
-}
 
-- (void)decimal {
-    if (!self.typing) {
         self.typing = YES;
-        // Start a new 0.
-        if (self.valueStack.count > 0) [self.valueStack removeLastObject];
-        [self.valueStack addObject:@(0.0)];
-    }
-    
-    // Initialize decimal multiplier if not already set
-    if (self.decMult == 0.0) {
-        self.decMult = 0.1;
+        self.hasDecimal = NO;
+        self.decimalMultiplier = 0.1;
+        
+        self.currentValue = digit;
+        
+        // PUSH new node
+        [self.nodeStack addObject:[UDNumberNode value:self.currentValue]];
+        
+    } else {
+        // CASE B: EDITING (Replace)
+        if (self.hasDecimal) {
+            self.currentValue += (digit * self.decimalMultiplier);
+            self.decimalMultiplier /= 10.0;
+        } else {
+            self.currentValue = (self.currentValue * 10.0) + digit;
+        }
+        
+        // REPLACE top node
+        if (self.nodeStack.count > 0) [self.nodeStack removeLastObject];
+        [self.nodeStack addObject:[UDNumberNode value:self.currentValue]];
     }
 }
 
-#pragma mark - The Shunting Yard Algorithm
+- (void)inputDecimal {
+    // If user hits decimal while not typing (e.g., after '=' or fresh start)
+    // We treat it as "0."
+    if (!self.typing) {
+        [self inputDigit:0]; // Start with 0
+    }
+    
+    // Enable decimal mode for subsequent digits
+    if (!self.hasDecimal) {
+        self.hasDecimal = YES;
+        self.decimalMultiplier = 0.1;
+    }
+}
 
-- (void)operation:(UDOp)newOp {
+// Used for Constants (π, e) or Memory Recall
+- (void)inputNumber:(double)number {
+    self.currentValue = number;
+    
+    // Push as a complete node
+    [self.nodeStack addObject:[UDNumberNode value:number]];
+    
+    // IMPORTANT: Set typing to NO.
+    // Why? If you press Pi, then press '5', it should start a NEW number,
+    // not append 5 to 3.14159...
+    self.typing = NO;
+    
+    // Reset decimal state just in case
+    self.hasDecimal = NO;
+}
 
-    if (newOp == UDOpClear) {
+- (void)performOperation:(UDOp)op {
+    // 1. EQUALS (=)
+    // Flush everything to build the final tree.
+    if (op == UDOpEq) {
+        while (self.opStack.count > 0) {
+            [self reduceOp];
+        }
+        // Calculate the result immediately so UI can show it
+        self.currentValue = [self evaluateCurrentExpression];
+        self.typing = NO;
+        return;
+    }
+    
+    // 2. CLEAR
+    if (op == UDOpClear) {
         [self reset];
         return;
     }
     
-    // 1. Commit current input
-    if (self.typing) {
-        self.typing = NO;
-        self.decMult = 0.0;
-    }
-    
-    UDOpRegistry *registry = [UDOpRegistry shared];
-    UDOpInfo *newInfo = [registry infoForOp:newOp];
-    
-    if (!newInfo) return; // Guard against bad ops
-    
-    // 2. Handle Immediate Ops (Prefix/Postfix)
-    // These apply directly to the number currently on the stack top.
-    if (newInfo.placement == UDOpPlacementPrefix || newInfo.placement == UDOpPlacementPostfix) {
-        [self executeUnaryOp:newOp];
+    // 3. SCIENTIFIC (Unary Postfix: sin, cos, etc.)
+    // These act immediately on the node the user just typed.
+    UDOpInfo *info = [[UDOpRegistry shared] infoForOp:op];
+        
+    // 1. LEFT PARENTHESIS "("
+    // Push strictly to OpStack. It waits there as a marker.
+    if (op == UDOpParenLeft) {
+        // Optional: Implicit Multiply?
+        // If user typed "5" then "(", we could inject a * here.
+        // For now, let's keep it simple.
+        [self.opStack addObject:@(op)];
         return;
     }
     
-    // 3. Handle Binary Ops & Equals (The Shunt)
-    // Loop: While there are ops on the stack that are "stronger" (higher precedence)
-    // than the new one, execute them first.
-    
+    // 2. RIGHT PARENTHESIS ")"
+    // Collapse everything back to the nearest Left Paren
+    if (op == UDOpParenRight) {
+        if (self.typing) self.typing = NO;
+        
+        while (self.opStack.count > 0) {
+            UDOp top = [self.opStack.lastObject integerValue];
+            
+            if (top == UDOpParenLeft) {
+                [self.opStack removeLastObject]; // Pop the '(' and discard it
+
+                // We just finished a group. Wrap the top node in explicit parens.
+                if (self.nodeStack.count > 0) {
+                    UDASTNode *content = [self.nodeStack lastObject];
+                    [self.nodeStack removeLastObject];
+                    
+                    // Wrap it and push it back
+                    [self.nodeStack addObject:[UDParenNode wrap:content]];
+                }
+
+                return; // Done! We successfully closed the group.
+            }
+            
+            [self reduceOp]; // Build the tree node
+        }
+        
+        // If loop finishes without returning, we missed a '('.
+        // (User typed "5 + 2 )"). usually ignore or error.
+        NSLog(@"Syntax Error: Mismatched Parentheses");
+        return;
+    }
+
+    if (info.placement == UDOpPlacementPostfix) {
+        // Build a Function Node wrapper around the top node
+        // e.g. Node(30) becomes FuncNode("sin", args=[Node(30)])
+        [self buildUnaryNode:info.symbol];
+        
+        // Auto-evaluate so the display updates (optional, but standard behavior)
+        self.currentValue = [self evaluateCurrentExpression];
+        return;
+    }
+
+    // 4. BINARY OPERATORS (+, -, *, ^)
+    // Standard Shunting Yard Precedence Logic
+    if (self.typing) self.typing = NO;
+
+    NSInteger myPrec = info.precedence;
+
     while (self.opStack.count > 0) {
         UDOp topOp = [self.opStack.lastObject integerValue];
-        UDOpInfo *topInfo = [registry infoForOp:topOp];
         
-        // STOP Conditions:
+        // BARRIER CHECK:
+        if (topOp == UDOpParenLeft) break; // Stop! Don't pop the parenthesis yet.
         
-        // A. If New Op is stronger, we stack it (e.g. * on top of +)
-        if (newInfo.precedence > topInfo.precedence) {
+        UDOpInfo *topInfo = [[UDOpRegistry shared] infoForOp:topOp];
+
+        // If top operator has greater or equal precedence, pop it and build node
+        if (topInfo.precedence >= myPrec) {
+            [self reduceOp];
+        } else {
             break;
         }
-        
-        // B. Right Associativity check (e.g. ^ operators)
-        if (newInfo.precedence == topInfo.precedence && newInfo.associativity == UDOpAssocRight) {
-            break;
-        }
-        
-        // C. If the New Op is 'Equals', it has Precedence 0, so it forces
-        // everything on the stack to evaluate.
-        
-        // EXECUTE: The top op is stronger/equal. Do it now.
-        [self popAndExecuteTopOp];
     }
-    
-    // 4. Push the New Op (If it's not Equals)
-    if (newOp != UDOpEq) {
-        [self.opStack addObject:@(newOp)];
-        
-        // PRIMING: Push a placeholder 0.0 for the NEXT number the user will type.
-        // This emulates standard calculator behavior where the display waits for input.
-        [self pushValue:0.0];
-    }
+
+    // Push new operator to wait its turn
+    [self.opStack addObject:@(op)];
 }
 
-- (void)popAndExecuteTopOp {
+#pragma mark - AST Construction (The "Reduce" Step)
+
+- (void)reduceOp {
     if (self.opStack.count == 0) return;
     
     UDOp op = [self.opStack.lastObject integerValue];
     [self.opStack removeLastObject];
     
-    // IMPORTANT: Pop Right first, then Left (Subtraction/Division order matters!)
-    double right = [self popValue];
-    double left = [self popValue];
-    double result = 0.0;
+    UDOpInfo *info = [[UDOpRegistry shared] infoForOp:op];
     
-    switch (op) {
-        case UDOpAdd: result = left + right; break;
-        case UDOpSub: result = left - right; break;
-        case UDOpMul: result = left * right; break;
-        case UDOpDiv: result = (right != 0) ? (left / right) : 0; break; // Simple div by zero protection
-        case UDOpPow: result = pow(left, right); break;
-        default: break;
+    // Safety check
+    if (self.nodeStack.count < 2) return;
+    
+    // Pop Right, then Left (Stack is LIFO)
+    UDASTNode *right = [self.nodeStack lastObject]; [self.nodeStack removeLastObject];
+    UDASTNode *left  = [self.nodeStack lastObject]; [self.nodeStack removeLastObject];
+    
+    UDASTNode *newNode = nil;
+    
+    // Decide if it's a function call (pow) or operator (+)
+    // You can customize this logic or add a flag to UDOpInfo
+    if (op == UDOpPow) {
+        newNode = [UDFunctionNode func:@"pow" args:@[left, right]];
+    }
+    else if (op == UDOpPow10) {
+         // Special case if handled as binary, though usually unary
+    }
+    else {
+        newNode = [UDBinaryOpNode op:info.symbol left:left right:right precedence:info.precedence];
     }
     
-    [self pushValue:result];
+    // Push the combined block back
+    [self.nodeStack addObject:newNode];
 }
 
-- (void)executeUnaryOp:(UDOp)op {
-    // 1. Pop the current value (e.g., 5)
-    double val = [self popValue];
+- (void)buildUnaryNode:(NSString *)funcName {
+    if (self.nodeStack.count == 0) return;
     
-    switch (op) {
-        case UDOpNegate: {
-            val = -val;
-            break;
-        }
-        case UDOpPercent: {
-            // ACCOUNTING LOGIC:
-            // If we are in the middle of an Add/Sub operation (e.g. [2, 5] with Pending '+'),
-            // then '%' means "Percent OF the base value".
-            
-            // Check if we have a base value (Stack has items left) AND a pending Op
-            if (self.valueStack.count > 0 && self.opStack.count > 0) {
-                
-                UDOp pendingOp = [self.opStack.lastObject integerValue];
-                
-                // This logic typically applies to + and - (Markup / Markdown)
-                if (pendingOp == UDOpAdd || pendingOp == UDOpSub) {
-                    // Peek at the base value (e.g., 2) WITHOUT popping it
-                    double base = [[self.valueStack lastObject] doubleValue];
-                    
-                    // Calculate percentage relative to base
-                    // 5 becomes (2 * 0.05) = 0.1
-                    val = base * (val / 100.0);
-                } else {
-                    // For * and /, standard behavior is usually just raw percentage
-                    // e.g. 50 * 10% -> 50 * 0.1 = 5
-                    val = val / 100.0;
-                }
-            } else {
-                // No context (just typed "5 %" on a clear screen), standard behavior
-                val = val / 100.0;
-            }
-            break;
-        }
-        
-        // --- TRIGONOMETRY ---
-        
-        case UDOpSin: val = sin(DEG2RAD(val)); break;
-        case UDOpCos: val = cos(DEG2RAD(val)); break;
-        case UDOpTan: val = tan(DEG2RAD(val)); break;
-        
-        case UDOpASin: val = RAD2DEG(asin(val)); break;
-        case UDOpACos: val = RAD2DEG(acos(val)); break;
-        case UDOpATan: val = RAD2DEG(atan(val)); break;
-        
-        // --- ROOTS & LOGS ---
-        case UDOpSqrt: val = sqrt(val); break;
-        case UDOpCbrt: val = cbrt(val); break;
-        case UDOpLog10: val = log10(val); break;
-        case UDOpLn:    val = log(val); break; // log() in C is natural log (ln)
-        
-        // --- POWERS ---
-        case UDOpSquare: val = val * val; break;
-        case UDOpCube:   val = val * val * val; break;
-        
-        case UDOpInvert: val = (val != 0) ? (1.0 / val) : 0.0; break;
-        
-        case UDOpFactorial: {
-            // Factorial is only defined for non-negative integers
-            if (val >= 0 && val == floor(val)) {
-                double f = 1;
-                for (int i = 1; i <= (int)val; i++) f *= i;
-                val = f;
-            } else {
-                val = NAN; // Or handle error
-            }
-        } break;
-            
-        default: break;
-    }
+    UDASTNode *arg = [self.nodeStack lastObject];
+    [self.nodeStack removeLastObject];
     
-    // 2. Push the result back
-    [self pushValue:val];
+    UDASTNode *newNode = [UDFunctionNode func:funcName args:@[arg]];
+    [self.nodeStack addObject:newNode];
+}
+
+#pragma mark - Execution Pipeline
+
+- (double)evaluateCurrentExpression {
+    if (self.nodeStack.count == 0) return 0.0;
+    
+    // 1. Get the Tree (Root is top of stack)
+    UDASTNode *root = [self.nodeStack lastObject];
+    
+    // 2. Compile (Tree -> Instruction List)
+    NSArray *bytecode = [UDCompiler compile:root];
+    
+    // 3. Run VM (Instruction List -> Double)
+    return [UDVM execute:bytecode];
 }
 
 @end

@@ -6,11 +6,13 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "UDOpRegistry.h"
+#import "UDAST.h"        // The AST Nodes
 
 // Shorter Enum names
 typedef NS_ENUM(NSInteger, UDOp) {
-    UDOpNone,
-    UDOpAdd,
+    UDOpNone = 0,
+    UDOpAdd = 1,
     UDOpSub,
     UDOpMul,
     UDOpDiv,
@@ -19,42 +21,62 @@ typedef NS_ENUM(NSInteger, UDOp) {
     UDOpPercent,
     UDOpNegate,
 
-    // --- SCIENTIFIC EXTENSIONS ---
-    UDOpSin, UDOpCos, UDOpTan,
-    UDOpASin, UDOpACos, UDOpATan, // Inverse Trig
-    UDOpSqrt, UDOpCbrt,           // Roots
-    UDOpLog10, UDOpLn,            // Logarithms
-    UDOpPow,                      // x to the power of y (Binary!)
-    UDOpSquare, UDOpCube,         // x^2, x^3 (Unary)
-    UDOpInvert,                   // 1/x
-    UDOpFactorial                 // x!
+    // --- ROW 2 (Powers) ---
+    UDOpSquare,     // x^2
+    UDOpCube,       // x^3
+    UDOpPow,        // x^y (Binary)
+    UDOpExp,        // e^x
+    UDOpPow10,      // 10^x
+    UDOpPow2,       // 2^x
+    
+    // --- ROW 3 (Roots & Logs) ---
+    UDOpInvert,     // 1/x
+    UDOpSqrt,       // sqrt x
+    UDOpCbrt,       // cbrt x
+    UDOpYRoot,      // root(x, y) (Binary)
+    UDOpLn,         // ln
+    UDOpLog10,      // log 10
+    
+    // --- ROW 4 (Trig) ---
+    UDOpFactorial,  // x!
+    UDOpSin,
+    UDOpCos,
+    UDOpTan,
+    UDOpE,          // Constant e
+    UDOpEE,         // Scientific Notation (Advanced)
+    
+    // --- ROW 5 (Hyperbolic & Misc) ---
+    UDOpSinh,
+    UDOpCosh,
+    UDOpTanh,
+    UDOpPi,         // Constant π
+    UDOpRand,       // Random Number
+
+    // --- SPECIAL ---
+    UDOpParenLeft,  // (
+    UDOpParenRight,  // )
 };
 
 @interface UDCalc : NSObject
 
-// DATA STRUCTURES
-// 1. The Numbers: [3, 5, 2]
-@property (nonatomic, strong, readonly) NSMutableArray<NSNumber *> *valueStack;
-// 2. The Pending Operators: [+, *]
-@property (nonatomic, strong, readonly) NSMutableArray<NSNumber *> *opStack;
+// State
+@property (assign, readonly) double currentValue;
+@property (assign, readonly) BOOL typing;
 
-/**
- Contains a description if the last operation failed (e.g., "Error").
- Is nil if everything is fine.
- */
-@property (nonatomic, readonly, strong) NSString *errorMessage;
+// The "Forest" of trees.
+// Usually holds just 1 item if the equation is done.
+// Holds multiple items if we are in the middle of parsing (e.g. "5", "3").
+@property (strong, readonly) NSMutableArray<UDASTNode *> *nodeStack;
 
-// STATE
-@property (nonatomic, assign) BOOL typing; // Is the user currently editing the top number?
-
-// HELPERS
-// Returns the top of the valueStack (or 0 if empty) for display
-@property (nonatomic, assign) double currentValue;
-
-// PUBLIC API
-- (void)digit:(NSInteger)digit;
-- (void)decimal; // Optional: Call this when '.' is pressed
-- (void)operation:(UDOp)op;
+// Core Actions
+- (void)inputDigit:(double)digit;
+- (void)inputDecimal;
+- (void)inputNumber:(double)number;
+- (void)performOperation:(UDOp)op;
 - (void)reset;
+
+// The "Run" Button
+// Compiles the current AST and executes it on the VM.
+- (double)evaluateCurrentExpression;
 
 @end

@@ -9,9 +9,10 @@
 #import "UDCalc.h" // Needs your UDOp Enum definition
 
 @implementation UDOpInfo
-+ (instancetype)infoWithSymbol:(NSString *)sym placement:(UDOpPlacement)place assoc:(UDOpAssociativity)assoc precedence:(NSInteger)precedence {
++ (instancetype)infoWithSymbol:(NSString *)sym tag:(NSInteger)tag placement:(UDOpPlacement)place assoc:(UDOpAssociativity)assoc precedence:(NSInteger)precedence {
     UDOpInfo *i = [[UDOpInfo alloc] init];
     i->_symbol = sym;
+    i->_tag = tag;
     i->_placement = place;
     i->_associativity = assoc;
     i->_precedence = precedence;
@@ -48,48 +49,66 @@
     // 4: Unary (Negate, %)
     
     self.table = @{
-        @(UDOpAdd) : [UDOpInfo infoWithSymbol:@"+" placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:1],
-        @(UDOpSub) : [UDOpInfo infoWithSymbol:@"-" placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:1],
+        @(UDOpAdd) : [UDOpInfo infoWithSymbol:@"+" tag:UDOpAdd placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:1],
+        @(UDOpSub) : [UDOpInfo infoWithSymbol:@"-" tag:UDOpSub placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:1],
         
-        @(UDOpMul) : [UDOpInfo infoWithSymbol:@"×" placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:2],
-        @(UDOpDiv) : [UDOpInfo infoWithSymbol:@"÷" placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:2],
+        @(UDOpMul) : [UDOpInfo infoWithSymbol:@"×" tag:UDOpMul placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:2],
+        @(UDOpDiv) : [UDOpInfo infoWithSymbol:@"÷" tag:UDOpDiv placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:2],
         
         // Unary/Postfix usually bind tightest
-        @(UDOpPercent) : [UDOpInfo infoWithSymbol:@"%" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
-        @(UDOpNegate) : [UDOpInfo infoWithSymbol:@"-" placement:UDOpPlacementPrefix assoc:UDOpAssocRight precedence:4],
+        @(UDOpPercent) : [UDOpInfo infoWithSymbol:@"%" tag:UDOpPercent placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpNegate) : [UDOpInfo infoWithSymbol:@"-" tag:UDOpNegate placement:UDOpPlacementPrefix assoc:UDOpAssocRight precedence:4],
         
-        @(UDOpEq) : [UDOpInfo infoWithSymbol:@"=" placement:UDOpPlacementInfix assoc:UDOpAssocNone precedence:0],
+        @(UDOpEq) : [UDOpInfo infoWithSymbol:@"=" tag:UDOpEq placement:UDOpPlacementInfix assoc:UDOpAssocNone precedence:0],
         
         // --- BINARY SCIENTIFIC (Infix) ---
         // Powers bind tighter than multiply (Precedence 3)
-        @(UDOpPow) : [UDOpInfo infoWithSymbol:@"^" placement:UDOpPlacementInfix assoc:UDOpAssocRight precedence:3],
+        @(UDOpPow) : [UDOpInfo infoWithSymbol:@"^" tag:UDOpPow placement:UDOpPlacementInfix assoc:UDOpAssocRight precedence:3],
 
         // --- UNARY SCIENTIFIC (Postfix) ---
         // These execute immediately on the current number.
         // Precedence 4 (Highest)
-            
+
         // Trigonometry
-        @(UDOpSin) : [UDOpInfo infoWithSymbol:@"sin" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
-        @(UDOpCos) : [UDOpInfo infoWithSymbol:@"cos" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
-        @(UDOpTan) : [UDOpInfo infoWithSymbol:@"tan" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
-            
-        @(UDOpASin) : [UDOpInfo infoWithSymbol:@"asin" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
-        @(UDOpACos) : [UDOpInfo infoWithSymbol:@"acos" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
-        @(UDOpATan) : [UDOpInfo infoWithSymbol:@"atan" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpSin) : [UDOpInfo infoWithSymbol:@"sin" tag:UDOpSin placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpCos) : [UDOpInfo infoWithSymbol:@"cos" tag:UDOpCos placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpTan) : [UDOpInfo infoWithSymbol:@"tan" tag:UDOpTan placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpSinh) : [UDOpInfo infoWithSymbol:@"sinh" tag:UDOpSinh placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpCosh) : [UDOpInfo infoWithSymbol:@"cosh" tag:UDOpCosh placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpTanh) : [UDOpInfo infoWithSymbol:@"tanh" tag:UDOpTanh placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
 
         // Roots & Logs
-        @(UDOpSqrt) : [UDOpInfo infoWithSymbol:@"√" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
-        @(UDOpCbrt) : [UDOpInfo infoWithSymbol:@"∛" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
-        @(UDOpLog10) : [UDOpInfo infoWithSymbol:@"log" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
-        @(UDOpLn) : [UDOpInfo infoWithSymbol:@"ln" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpSqrt) : [UDOpInfo infoWithSymbol:@"√" tag:UDOpSqrt placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpCbrt) : [UDOpInfo infoWithSymbol:@"∛" tag:UDOpCbrt placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpLog10) : [UDOpInfo infoWithSymbol:@"log" tag:UDOpLog10 placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpLn) : [UDOpInfo infoWithSymbol:@"ln" tag:UDOpLn placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
             
         // Powers (Unary Shortcuts)
-        @(UDOpSquare) : [UDOpInfo infoWithSymbol:@"²" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
-        @(UDOpCube) : [UDOpInfo infoWithSymbol:@"³" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
-        
+        @(UDOpSquare) : [UDOpInfo infoWithSymbol:@"²" tag:UDOpSquare placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpCube) : [UDOpInfo infoWithSymbol:@"³" tag:UDOpCube placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpPow2) : [UDOpInfo infoWithSymbol:@"2ˣ"
+                                           tag:UDOpPow2
+                                     placement:UDOpPlacementPostfix
+                                         assoc:UDOpAssocNone
+                                    precedence:4],
+        @(UDOpPow10) : [UDOpInfo infoWithSymbol:@"10ˣ"
+                                            tag:UDOpPow10
+                                      placement:UDOpPlacementPostfix
+                                          assoc:UDOpAssocNone
+                                     precedence:4],
+
         // Misc
-        @(UDOpInvert) : [UDOpInfo infoWithSymbol:@"⁻¹" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
-        @(UDOpFactorial) : [UDOpInfo infoWithSymbol:@"!" placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpInvert) : [UDOpInfo infoWithSymbol:@"⁻¹" tag:UDOpInvert placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        @(UDOpFactorial) : [UDOpInfo infoWithSymbol:@"!" tag:UDOpFactorial placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:4],
+        
+        // --- BINARY SCIENTIFIC (Infix) ---
+        // Precedence 3 (Higher than * /)
+        @(UDOpYRoot) : [UDOpInfo infoWithSymbol:@"yroot" tag:UDOpYRoot placement:UDOpPlacementInfix assoc:UDOpAssocRight precedence:3],
+
+        // --- PARENTHESES ---
+        // Special handling required in logic, but we register them here.
+        @(UDOpParenLeft) : [UDOpInfo infoWithSymbol:@"(" tag:UDOpParenLeft placement:UDOpPlacementPrefix assoc:UDOpAssocNone precedence:0],
+        @(UDOpParenRight) : [UDOpInfo infoWithSymbol:@")" tag:UDOpParenRight placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:0]
     };
 }
 
