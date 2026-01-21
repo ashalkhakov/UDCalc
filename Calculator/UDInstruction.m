@@ -23,6 +23,6 @@
 - (NSString *)debugDescription {
     if (_opcode == UDOpcodePush) return [NSString stringWithFormat:@"PUSH %.4g", _doublePayload];
     if (_opcode == UDOpcodeCall) return [NSString stringWithFormat:@"CALL %@", _stringPayload];
-    return @[@"PUSH", @"ADD", @"SUB", @"MUL", @"DIV", @"CALL"][_opcode];
+    return @[@"PUSH", @"ADD", @"SUB", @"MUL", @"DIV", @"NEG", @"CALL"][_opcode];
 }
 @end

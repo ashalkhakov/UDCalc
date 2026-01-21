@@ -7,7 +7,7 @@
 
 #import "UDTapeToken.h"
 #import "UDCalc.h"
-#import "UDOpRegistry.h" // Import Registry for symbol lookup
+#import "UDFrontend.h" // Import Registry for symbol lookup
 
 @interface UDTapeToken ()
 // Redeclare properties as readwrite for internal use
@@ -49,7 +49,7 @@
             // Check Registry for the "%" symbol to be perfectly safe?
             // Or just append hardcoded "%" since it's a visual postfix on the number.
             // Let's grab the official symbol from the registry for UDOpPercent:
-            UDOpInfo *info = [[UDOpRegistry shared] infoForOp:UDOpPercent];
+            UDOpInfo *info = [[UDFrontend shared] infoForOp:UDOpPercent];
             NSString *percentSym = info ? info.symbol : @"%";
             
             return [baseString stringByAppendingString:percentSym];
@@ -59,7 +59,7 @@
     }
     else {
         // 3. Look up Operator Symbol from Registry
-        UDOpInfo *info = [[UDOpRegistry shared] infoForOp:self.opValue];
+        UDOpInfo *info = [[UDFrontend shared] infoForOp:self.opValue];
         
         if (info) {
             return info.symbol;

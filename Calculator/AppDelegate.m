@@ -88,8 +88,8 @@
     else if ([opTitle isEqualToString:@"percent"]) op = UDOpPercent;
     else if ([opTitle isEqualToString:@"lparen"]) op = UDOpParenLeft;
     else if ([opTitle isEqualToString:@"rparen"]) op = UDOpParenRight;
-    else if ([opTitle isEqualToString:@"pi"]) op = UDOpPi;
-    else if ([opTitle isEqualToString:@"e"]) op = UDOpE;
+    else if ([opTitle isEqualToString:@"pi"]) op = UDOpConstPi;
+    else if ([opTitle isEqualToString:@"e"]) op = UDOpConstE;
     else if ([opTitle isEqualToString:@"rand"]) op = UDOpRand;
     // row:
     else if ([opTitle isEqualToString:@"sqr"]) op = UDOpSquare;
@@ -97,13 +97,13 @@
     else if ([opTitle isEqualToString:@"e_pow_x"]) op = UDOpExp;
     else if ([opTitle isEqualToString:@"_10_pow_x"]) op = UDOpPow10;
     else if ([opTitle isEqualToString:@"_2_pow_x"]) op = UDOpPow2;
-
-
+    else if ([opTitle isEqualToString:@"rad"]) op = UDOpRad;
+    else if ([opTitle isEqualToString:@"fact"]) op = UDOpFactorial;
     
     // CONSTANTS: Treat them as number inputs!
-    if (op == UDOpPi) {
+    if (op == UDOpConstPi) {
         [self.calc inputNumber:M_PI]; // You'll need to add this method
-    } else if (op == UDOpE) {
+    } else if (op == UDOpConstE) {
         [self.calc inputNumber:M_E];
     } else if (op == UDOpClear) {
         // 1. Handle CLEAR separately
@@ -141,6 +141,7 @@
 // Connect 'mc' button here
 - (IBAction)memoryClearPressed:(id)sender {
     //[self.calc memClear];
+    [self.calc performOperation:UDOpMC];
 
     // Optional: Flash the display or show "M" indicator on Tape?
     [self updateUI];
@@ -149,6 +150,7 @@
 // Connect 'm+' button here
 - (IBAction)memoryAddPressed:(id)sender {
    // [self.calc memAdd];
+    [self.calc performOperation:UDOpMAdd];
 
     // Standard behavior: Add current display value to memory
     // If user is typing "5", add 5. If result is "10", add 10.
@@ -158,6 +160,7 @@
 
 // Connect 'm-' button here
 - (IBAction)memorySubPressed:(id)sender {
+    [self.calc performOperation:UDOpMSub];
 //    self.calc.memoryValue -= self.calc.currentValue;
     //[self.calc memSub];
     [self updateUI];
@@ -167,6 +170,7 @@
 - (IBAction)memoryRecallPressed:(id)sender {
     // Treat this exactly like typing a number
     //[self.calc memRecall];
+    [self.calc performOperation:UDOpMR];
     
     //[self.tape updateDraftValue:self.calc.memoryValue];
     [self updateUI];
@@ -219,6 +223,31 @@
 
 - (void)updateScientificButtons {
     BOOL second = self.isSecondFunctionActive;
+    
+    /*
+     // TODO:
+     // Example in ViewDidLoad
+     self.squareRootBtn.symbolType = MathButtonTypeSqrt;
+     self.cubeRootBtn.symbolType = MathButtonTypeCubeRoot;
+     self.piBtn.symbolType = MathButtonTypePi;
+     // Force redraw
+     [self.squareRootBtn setNeedsDisplay:YES];
+     
+     // Example: Configuring the "Square Root" button
+     MathButton *sqrtBtn = [[MathButton alloc] initWithFrame:NSMakeRect(0, 0, 60, 50)];
+     sqrtBtn.symbolType = MathButtonTypeSqrt;
+
+     // Set it to "Function" style (Dark Grey)
+     sqrtBtn.buttonColor = [NSColor colorWithCalibratedWhite:0.2 alpha:1.0];
+     sqrtBtn.highlightColor = [NSColor colorWithCalibratedWhite:0.5 alpha:1.0]; // Flash lighter
+
+     // Example: Configuring the "2nd" button (often lighter grey)
+     MathButton *secondBtn = [[MathButton alloc] initWithFrame:NSMakeRect(60, 0, 60, 50)];
+     secondBtn.symbolType = MathButtonType2nd;
+     secondBtn.buttonColor = [NSColor colorWithCalibratedWhite:0.35 alpha:1.0]; // Light Grey
+     secondBtn.highlightColor = [NSColor colorWithCalibratedWhite:0.6 alpha:1.0];
+     secondBtn.textColor = [NSColor blackColor]; // Text might need to be black on light buttons
+     */
     
     // Helper block to swap button state
     void (^setBtn)(NSButton*, NSString*, NSString*, NSString*, NSString*) =

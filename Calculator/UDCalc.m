@@ -16,6 +16,12 @@
 @property (readwrite) double currentValue;
 @property (assign) BOOL hasDecimal;
 @property (assign) double decimalMultiplier;
+
+// EE support
+@property (assign) double mantissa;         // Stores the base (e.g., 5.0)
+@property (assign) BOOL enteringExponent;   // Are we typing after hitting EE?
+@property (assign) double exponentValue;    // Stores the typed exponent (e.g., 3)
+@property (assign) double exponentSign;     // 1.0 or -1.0
 @end
 
 @implementation UDCalc
@@ -33,45 +39,97 @@
     _opStack = [NSMutableArray array];
     _typing = NO;
     _currentValue = 0;
+    _enteringExponent = NO;
+    _exponentValue = 0;
 }
 
 #pragma mark - Input
 
-- (void)inputDigit:(double)digit {
+- (void)inputEE {
+    // 1. If we aren't typing, start a new number "1 E 0"
     if (!self.typing) {
-        // CASE A: NEW NUMBER (Push)
-
-        // If we have no pending operators (e.g., fresh start or after '='),
-        // typing a number should discard the old result/zero.
-        if (self.opStack.count == 0) {
-            [self.nodeStack removeAllObjects];
-        }
-
+        self.mantissa = 1.0;
         self.typing = YES;
-        self.hasDecimal = NO;
-        self.decimalMultiplier = 0.1;
-        
-        self.currentValue = digit;
-        
-        // PUSH new node
-        [self.nodeStack addObject:[UDNumberNode value:self.currentValue]];
-        
     } else {
-        // CASE B: EDITING (Replace)
-        if (self.hasDecimal) {
-            self.currentValue += (digit * self.decimalMultiplier);
-            self.decimalMultiplier /= 10.0;
-        } else {
-            self.currentValue = (self.currentValue * 10.0) + digit;
-        }
+        // Capture what the user has typed so far as the base
+        self.mantissa = self.currentValue;
+    }
+
+    // 2. Switch modes
+    self.enteringExponent = YES;
+    self.exponentValue = 0.0;
+    self.exponentSign = 1.0;
+    
+    // 3. Update UI (Visual Feedback is tricky here)
+    // Since 'currentValue' is a double, it might not show "E" on the display yet.
+    // Usually, you update a separate display string, or just wait for the first digit.
+}
+
+- (void)inputDigit:(double)digit {
+    // --- CASE A: EXPONENT MODE ---
+    if (self.enteringExponent) {
+        self.typing = YES;
+
+        // Shift existing exponent left and add digit (Integer logic)
+        self.exponentValue = (self.exponentValue * 10.0) + digit;
         
-        // REPLACE top node
-        if (self.nodeStack.count > 0) [self.nodeStack removeLastObject];
-        [self.nodeStack addObject:[UDNumberNode value:self.currentValue]];
+        // Calculate the real value immediately
+        // Value = Mantissa * 10^(Sign * Exponent)
+        double totalExponent = self.exponentValue * self.exponentSign;
+        self.currentValue = self.mantissa * pow(10.0, totalExponent);
+        
+        // Update AST
+        [self updateTopNodeWithValue:self.currentValue];
+    }
+    
+    // --- CASE B: STANDARD MODE (Your existing code) ---
+    else {
+        
+        if (!self.typing) {
+            // CASE A: NEW NUMBER (Push)
+            
+            // If we have no pending operators (e.g., fresh start or after '='),
+            // typing a number should discard the old result/zero.
+            if (self.opStack.count == 0) {
+                [self.nodeStack removeAllObjects];
+            }
+            
+            self.typing = YES;
+            self.hasDecimal = NO;
+            self.decimalMultiplier = 0.1;
+            
+            self.currentValue = digit;
+            
+            // PUSH new node
+            [self.nodeStack addObject:[UDNumberNode value:self.currentValue]];
+            
+        } else {
+            // CASE B: EDITING (Replace)
+            if (self.hasDecimal) {
+                self.currentValue += (digit * self.decimalMultiplier);
+                self.decimalMultiplier /= 10.0;
+            } else {
+                self.currentValue = (self.currentValue * 10.0) + digit;
+            }
+            
+            // REPLACE top node
+            [self updateTopNodeWithValue:self.currentValue];
+        }
     }
 }
 
+// Helper to keep AST clean
+- (void)updateTopNodeWithValue:(double)val {
+    if (self.nodeStack.count > 0 && [self.nodeStack.lastObject isKindOfClass:[UDNumberNode class]]) {
+        [self.nodeStack removeLastObject];
+    }
+    [self.nodeStack addObject:[UDNumberNode value:val]];
+}
+
 - (void)inputDecimal {
+    // Decimal points are forbidden in the exponent (usually)
+    if (self.enteringExponent) return;
+
     // If user hits decimal while not typing (e.g., after '=' or fresh start)
     // We treat it as "0."
     if (!self.typing) {
@@ -102,6 +160,53 @@
 }
 
 - (void)performOperation:(UDOp)op {
+    // 1. INPUT MODIFIERS (EE)
+    if (op == UDOpEE) {
+        [self inputEE]; // Logic to start appending exponent digits
+        return;
+    }
+    
+    // 2. STATE TOGGLES (Rad, 2nd)
+    if (op == UDOpRad) {
+        self.isRadians = !self.isRadians;
+        // Update UI button label "Rad" <-> "Deg"
+        return;
+    }
+    
+    // 3. MEMORY COMMANDS (Immediate Side Effects)
+    if (op == UDOpMC) {
+        self.memoryRegister = 0;
+        return;
+    }
+    if (op == UDOpMAdd) {
+        // Evaluate current, add to memory
+        double val = [self evaluateCurrentExpression];
+        self.memoryRegister += val;
+        // Usually, calculators reset the "Typing" state here
+        self.typing = NO;
+        return;
+    }
+    if (op == UDOpMSub) {
+        double val = [self evaluateCurrentExpression];
+        self.memoryRegister -= val;
+        self.typing = NO;
+        return;
+    }
+    if (op == UDOpNegate) { // +/- Button
+        if (self.enteringExponent) {
+            // Toggle Exponent Sign only
+            self.exponentSign *= -1.0;
+            
+            // Recalculate
+            double totalExponent = self.exponentValue * self.exponentSign;
+            self.currentValue = self.mantissa * pow(10.0, totalExponent);
+        } else {
+            self.currentValue = -self.currentValue;
+        }
+        [self updateTopNodeWithValue:self.currentValue];
+        return;
+    }
+
     // 1. EQUALS (=)
     // Flush everything to build the final tree.
     if (op == UDOpEq) {
@@ -119,11 +224,7 @@
         [self reset];
         return;
     }
-    
-    // 3. SCIENTIFIC (Unary Postfix: sin, cos, etc.)
-    // These act immediately on the node the user just typed.
-    UDOpInfo *info = [[UDOpRegistry shared] infoForOp:op];
-        
+            
     // 1. LEFT PARENTHESIS "("
     // Push strictly to OpStack. It waits there as a marker.
     if (op == UDOpParenLeft) {
@@ -133,7 +234,7 @@
         [self.opStack addObject:@(op)];
         return;
     }
-    
+
     // 2. RIGHT PARENTHESIS ")"
     // Collapse everything back to the nearest Left Paren
     if (op == UDOpParenRight) {
@@ -165,11 +266,22 @@
         NSLog(@"Syntax Error: Mismatched Parentheses");
         return;
     }
+    
+    // When user hits +, -, *, /
+    if (self.typing) {
+        self.typing = NO;
+        self.enteringExponent = NO; // Turn off EE mode
+    }
+
+    // 3. SCIENTIFIC (Unary Postfix: sin, cos, etc.)
+    // These act immediately on the node the user just typed.
+    UDOpInfo *info = [[UDFrontend shared] infoForOp:op];
 
     if (info.placement == UDOpPlacementPostfix) {
         // Build a Function Node wrapper around the top node
         // e.g. Node(30) becomes FuncNode("sin", args=[Node(30)])
-        [self buildUnaryNode:info.symbol];
+        //[self buildUnaryNode:info.symbol];
+        [self buildNode:info];
         
         // Auto-evaluate so the display updates (optional, but standard behavior)
         self.currentValue = [self evaluateCurrentExpression];
@@ -186,9 +298,10 @@
         UDOp topOp = [self.opStack.lastObject integerValue];
         
         // BARRIER CHECK:
-        if (topOp == UDOpParenLeft) break; // Stop! Don't pop the parenthesis yet.
-        
-        UDOpInfo *topInfo = [[UDOpRegistry shared] infoForOp:topOp];
+        if (topOp == UDOpParenLeft)
+            break; // Stop! Don't pop the parenthesis yet.
+
+        UDOpInfo *topInfo = [[UDFrontend shared] infoForOp:topOp];
 
         // If top operator has greater or equal precedence, pop it and build node
         if (topInfo.precedence >= myPrec) {
@@ -210,41 +323,29 @@
     UDOp op = [self.opStack.lastObject integerValue];
     [self.opStack removeLastObject];
     
-    UDOpInfo *info = [[UDOpRegistry shared] infoForOp:op];
+    UDOpInfo *info = [[UDFrontend shared] infoForOp:op];
     
-    // Safety check
-    if (self.nodeStack.count < 2) return;
-    
-    // Pop Right, then Left (Stack is LIFO)
-    UDASTNode *right = [self.nodeStack lastObject]; [self.nodeStack removeLastObject];
-    UDASTNode *left  = [self.nodeStack lastObject]; [self.nodeStack removeLastObject];
-    
-    UDASTNode *newNode = nil;
-    
-    // Decide if it's a function call (pow) or operator (+)
-    // You can customize this logic or add a flag to UDOpInfo
-    if (op == UDOpPow) {
-        newNode = [UDFunctionNode func:@"pow" args:@[left, right]];
-    }
-    else if (op == UDOpPow10) {
-         // Special case if handled as binary, though usually unary
-    }
-    else {
-        newNode = [UDBinaryOpNode op:info.symbol left:left right:right precedence:info.precedence];
-    }
-    
-    // Push the combined block back
-    [self.nodeStack addObject:newNode];
+    [self buildNode:info];
 }
 
-- (void)buildUnaryNode:(NSString *)funcName {
-    if (self.nodeStack.count == 0) return;
-    
-    UDASTNode *arg = [self.nodeStack lastObject];
-    [self.nodeStack removeLastObject];
-    
-    UDASTNode *newNode = [UDFunctionNode func:funcName args:@[arg]];
-    [self.nodeStack addObject:newNode];
+-(void)buildNode:(UDOpInfo *)info {
+    if (!info) {
+        NSLog(@"No operator info supplied");
+        return;
+    }
+
+    if (info.action) {
+        UDFrontendContext *context = [[UDFrontendContext alloc] init];
+        
+        context.nodeStack = self.nodeStack;
+        context.pendingOp = UDOpNone;
+        context.isRadians = self.isRadians;
+        context.memoryValue = self.memoryRegister;
+        
+        UDASTNode *node = info.action(context);
+        
+        [self.nodeStack addObject:node];
+    }
 }
 
 #pragma mark - Execution Pipeline

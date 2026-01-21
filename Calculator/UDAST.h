@@ -30,6 +30,27 @@ typedef NS_ENUM(NSInteger, UDASTPrecedence) {
 + (instancetype)value:(double)v;
 @end
 
+// --- CONSTANT NODE (e.g. pi or e) ---
+@interface UDConstantNode : UDASTNode
+@property (nonatomic, copy, readonly) NSString *symbol;
+@property (nonatomic, readonly) double value;
++ (instancetype)value:(double)v symbol:(NSString *)sym;
+@end
+
+// --- UNARY PREFIX NODE (e.g. -5) ---
+@interface UDUnaryOpNode : UDASTNode
+@property (nonatomic, copy, readonly) NSString *op; // "-"
+@property (nonatomic, strong, readonly) UDASTNode *child;
++ (instancetype)op:(NSString *)op child:(UDASTNode *)c;
+@end
+
+// --- UNARY POSTFIX NODE (e.g. 5!) ---
+@interface UDPostfixOpNode : UDASTNode
+@property (nonatomic, copy, readonly) NSString *symbol; // "!" or "%"
+@property (nonatomic, strong, readonly) UDASTNode *child;
++ (instancetype)symbol:(NSString *)sym child:(UDASTNode *)c;
+@end
+
 // --- BINARY OPERATOR NODE (e.g., 5 + 3) ---
 @interface UDBinaryOpNode : UDASTNode
 @property (nonatomic, readonly) NSString *op;

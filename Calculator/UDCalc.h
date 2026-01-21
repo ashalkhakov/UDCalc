@@ -6,62 +6,18 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "UDOpRegistry.h"
+#import "UDFrontend.h"
 #import "UDAST.h"        // The AST Nodes
-
-// Shorter Enum names
-typedef NS_ENUM(NSInteger, UDOp) {
-    UDOpNone = 0,
-    UDOpAdd = 1,
-    UDOpSub,
-    UDOpMul,
-    UDOpDiv,
-    UDOpEq,
-    UDOpClear,
-    UDOpPercent,
-    UDOpNegate,
-
-    // --- ROW 2 (Powers) ---
-    UDOpSquare,     // x^2
-    UDOpCube,       // x^3
-    UDOpPow,        // x^y (Binary)
-    UDOpExp,        // e^x
-    UDOpPow10,      // 10^x
-    UDOpPow2,       // 2^x
-    
-    // --- ROW 3 (Roots & Logs) ---
-    UDOpInvert,     // 1/x
-    UDOpSqrt,       // sqrt x
-    UDOpCbrt,       // cbrt x
-    UDOpYRoot,      // root(x, y) (Binary)
-    UDOpLn,         // ln
-    UDOpLog10,      // log 10
-    
-    // --- ROW 4 (Trig) ---
-    UDOpFactorial,  // x!
-    UDOpSin,
-    UDOpCos,
-    UDOpTan,
-    UDOpE,          // Constant e
-    UDOpEE,         // Scientific Notation (Advanced)
-    
-    // --- ROW 5 (Hyperbolic & Misc) ---
-    UDOpSinh,
-    UDOpCosh,
-    UDOpTanh,
-    UDOpPi,         // Constant π
-    UDOpRand,       // Random Number
-
-    // --- SPECIAL ---
-    UDOpParenLeft,  // (
-    UDOpParenRight,  // )
-};
 
 @interface UDCalc : NSObject
 
 // State
 @property (assign, readonly) double currentValue;
 @property (assign, readonly) BOOL typing;
+
+@property (nonatomic, assign) BOOL isRadians; // Toggled by 'Rad'
+@property (nonatomic, assign) BOOL isEEActive; // Toggled by 'EE'
+@property (nonatomic, assign) double memoryRegister; // The 'M' value
 
 // The "Forest" of trees.
 // Usually holds just 1 item if the equation is done.

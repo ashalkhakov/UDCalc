@@ -22,6 +22,23 @@
         [prog addObject:[UDInstruction push:n.value]]; // Access property directly
     }
     
+    else if ([node isKindOfClass:[UDUnaryOpNode class]]) {
+        UDUnaryOpNode *un = (UDUnaryOpNode *)node;
+        [self visitNode:un.child into:prog];
+        
+        if ([un.op isEqualToString:@"-"]) [prog addObject:[UDInstruction op:UDOpcodeNeg]];
+        else NSLog(@"Unhandled unary prefix op: %@", un.op);
+    }
+    
+    else if ([node isKindOfClass:[UDPostfixOpNode class]]) {
+        UDPostfixOpNode *pn = (UDPostfixOpNode *)node;
+        [self visitNode:pn.child into:prog];
+        
+        if ([pn.symbol isEqualToString:@"%"]) NSLog(@"Not implemented yet: percentage");
+        else if ([pn.symbol isEqualToString:@"!"]) [prog addObject:[UDInstruction call:@"fact"]];
+        else NSLog(@"Unhandled postfix op: %@", pn.symbol);
+    }
+    
     // 2. BINARY OPERATOR (Recursively visit Left, then Right, then Op)
     else if ([node isKindOfClass:[UDBinaryOpNode class]]) {
         UDBinaryOpNode *bin = (UDBinaryOpNode *)node;
@@ -31,9 +48,10 @@
         
         // Emit Opcode
         if ([bin.op isEqualToString:@"+"]) [prog addObject:[UDInstruction op:UDOpcodeAdd]];
-        else if ([bin.op isEqualToString:@"−"]) [prog addObject:[UDInstruction op:UDOpcodeSub]];
+        else if ([bin.op isEqualToString:@"-"]) [prog addObject:[UDInstruction op:UDOpcodeSub]];
         else if ([bin.op isEqualToString:@"×"]) [prog addObject:[UDInstruction op:UDOpcodeMul]];
         else if ([bin.op isEqualToString:@"÷"]) [prog addObject:[UDInstruction op:UDOpcodeDiv]];
+        else NSLog(@"Unhandled binary op: %@", bin.op);
     }
     
     // 3. FUNCTION CALL

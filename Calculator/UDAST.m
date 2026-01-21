@@ -34,6 +34,54 @@
 @end
 
 // ---------------------------------------------------------
+#pragma mark - Constant Node
+// ---------------------------------------------------------
+@implementation UDConstantNode
++ (instancetype)value:(double)v symbol:(NSString *)sym {
+    UDConstantNode *n = [UDConstantNode new];
+    n->_symbol = sym;
+    n->_value = v;
+    return n;
+}
+
+- (UDASTPrecedence)precedence {
+    return UDASTPrecedenceValue;
+}
+
+- (NSString *)prettyPrint {
+    return self.symbol;
+}
+@end
+
+// ---------------------------------------------------------
+#pragma mark - Unary Operation Node
+// ---------------------------------------------------------
+
+@implementation UDUnaryOpNode
++ (instancetype)op:(NSString *)op child:(UDASTNode *)c {
+    UDUnaryOpNode *n = [UDUnaryOpNode new]; n->_op = op; n->_child = c; return n;
+}
+- (NSString *)prettyPrint {
+    // Logic: If child is a complex operation (5+3), wrap in parens: -(5+3)
+    NSString *cStr = [self.child prettyPrint];
+    if (self.child.precedence < self.precedence) cStr = [NSString stringWithFormat:@"(%@)", cStr];
+    return [NSString stringWithFormat:@"%@%@", self.op, cStr];
+}
+@end
+
+@implementation UDPostfixOpNode
++ (instancetype)symbol:(NSString *)sym child:(UDASTNode *)c {
+    UDPostfixOpNode *n = [UDPostfixOpNode new]; n->_symbol = sym; n->_child = c; return n;
+}
+- (NSString *)prettyPrint {
+    // Logic: (5+3)!
+    NSString *cStr = [self.child prettyPrint];
+    if (self.child.precedence < self.precedence) cStr = [NSString stringWithFormat:@"(%@)", cStr];
+    return [NSString stringWithFormat:@"%@%@", cStr, self.symbol];
+}
+@end
+
+// ---------------------------------------------------------
 #pragma mark - Binary Operation Node
 // ---------------------------------------------------------
 @implementation UDBinaryOpNode {
@@ -128,3 +176,4 @@
 }
 
 @end
+

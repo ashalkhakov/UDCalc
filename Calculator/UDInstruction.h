@@ -13,6 +13,7 @@ typedef NS_ENUM(NSInteger, UDOpcode) {
     UDOpcodeSub,
     UDOpcodeMul,
     UDOpcodeDiv,
+    UDOpcodeNeg,  // unary -
     UDOpcodeCall  // Call a named function (sin, pow, etc.)
 };
 
