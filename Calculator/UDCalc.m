@@ -12,16 +12,6 @@
 @interface UDCalc ()
 @property (strong, readwrite) NSMutableArray<UDASTNode *> *nodeStack; // Output Stack
 @property (strong) NSMutableArray<NSNumber *> *opStack;               // Operator Stack
-@property (readwrite) BOOL typing;
-@property (readwrite) double currentValue;
-@property (assign) BOOL hasDecimal;
-@property (assign) double decimalMultiplier;
-
-// EE support
-@property (assign) double mantissa;         // Stores the base (e.g., 5.0)
-@property (assign) BOOL enteringExponent;   // Are we typing after hitting EE?
-@property (assign) double exponentValue;    // Stores the typed exponent (e.g., 3)
-@property (assign) double exponentSign;     // 1.0 or -1.0
 @end
 
 @implementation UDCalc
@@ -29,6 +19,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
+        self.inputBuffer = [[UDInputBuffer alloc] init];
         [self reset];
     }
     return self;
@@ -37,129 +28,48 @@
 - (void)reset {
     _nodeStack = [NSMutableArray array];
     _opStack = [NSMutableArray array];
-    _typing = NO;
-    _currentValue = 0;
-    _enteringExponent = NO;
-    _exponentValue = 0;
+    _isRadians = NO;
+    _isTyping = NO; // start in Ready state
+    [self.inputBuffer performClearEntry];
 }
 
 #pragma mark - Input
 
-- (void)inputEE {
-    // 1. If we aren't typing, start a new number "1 E 0"
-    if (!self.typing) {
-        self.mantissa = 1.0;
-        self.typing = YES;
-    } else {
-        // Capture what the user has typed so far as the base
-        self.mantissa = self.currentValue;
+// Moves the value from InputBuffer -> NodeStack
+- (void)flushBufferToStack {
+    if (self.isTyping) {
+        double val = [self.inputBuffer finalizeValue];
+        
+        [self.nodeStack addObject:[UDNumberNode value:val]];
+        
+        [self.inputBuffer performClearEntry];
+        
+        self.isTyping = NO;
     }
+}
 
-    // 2. Switch modes
-    self.enteringExponent = YES;
-    self.exponentValue = 0.0;
-    self.exponentSign = 1.0;
-    
-    // 3. Update UI (Visual Feedback is tricky here)
-    // Since 'currentValue' is a double, it might not show "E" on the display yet.
-    // Usually, you update a separate display string, or just wait for the first digit.
+- (void)inputEE {
+    [self.inputBuffer handleEE];
 }
 
 - (void)inputDigit:(double)digit {
-    // --- CASE A: EXPONENT MODE ---
-    if (self.enteringExponent) {
-        self.typing = YES;
-
-        // Shift existing exponent left and add digit (Integer logic)
-        self.exponentValue = (self.exponentValue * 10.0) + digit;
-        
-        // Calculate the real value immediately
-        // Value = Mantissa * 10^(Sign * Exponent)
-        double totalExponent = self.exponentValue * self.exponentSign;
-        self.currentValue = self.mantissa * pow(10.0, totalExponent);
-        
-        // Update AST
-        [self updateTopNodeWithValue:self.currentValue];
-    }
-    
-    // --- CASE B: STANDARD MODE (Your existing code) ---
-    else {
-        
-        if (!self.typing) {
-            // CASE A: NEW NUMBER (Push)
-            
-            // If we have no pending operators (e.g., fresh start or after '='),
-            // typing a number should discard the old result/zero.
-            if (self.opStack.count == 0) {
-                [self.nodeStack removeAllObjects];
-            }
-            
-            self.typing = YES;
-            self.hasDecimal = NO;
-            self.decimalMultiplier = 0.1;
-            
-            self.currentValue = digit;
-            
-            // PUSH new node
-            [self.nodeStack addObject:[UDNumberNode value:self.currentValue]];
-            
-        } else {
-            // CASE B: EDITING (Replace)
-            if (self.hasDecimal) {
-                self.currentValue += (digit * self.decimalMultiplier);
-                self.decimalMultiplier /= 10.0;
-            } else {
-                self.currentValue = (self.currentValue * 10.0) + digit;
-            }
-            
-            // REPLACE top node
-            [self updateTopNodeWithValue:self.currentValue];
-        }
-    }
-}
-
-// Helper to keep AST clean
-- (void)updateTopNodeWithValue:(double)val {
-    if (self.nodeStack.count > 0 && [self.nodeStack.lastObject isKindOfClass:[UDNumberNode class]]) {
-        [self.nodeStack removeLastObject];
-    }
-    [self.nodeStack addObject:[UDNumberNode value:val]];
+    self.isTyping = YES;
+    [self.inputBuffer handleDigit:(int)digit];
 }
 
 - (void)inputDecimal {
-    // Decimal points are forbidden in the exponent (usually)
-    if (self.enteringExponent) return;
-
-    // If user hits decimal while not typing (e.g., after '=' or fresh start)
-    // We treat it as "0."
-    if (!self.typing) {
-        [self inputDigit:0]; // Start with 0
-    }
-    
-    // Enable decimal mode for subsequent digits
-    if (!self.hasDecimal) {
-        self.hasDecimal = YES;
-        self.decimalMultiplier = 0.1;
-    }
+    self.isTyping = YES;
+    [self.inputBuffer handleDecimalPoint];
 }
 
 // Used for Constants (π, e) or Memory Recall
 - (void)inputNumber:(double)number {
-    self.currentValue = number;
-    
-    // Push as a complete node
-    [self.nodeStack addObject:[UDNumberNode value:number]];
-    
-    // IMPORTANT: Set typing to NO.
-    // Why? If you press Pi, then press '5', it should start a NEW number,
-    // not append 5 to 3.14159...
-    self.typing = NO;
-    
-    // Reset decimal state just in case
-    self.hasDecimal = NO;
+    self.isTyping = YES;
+    [self.inputBuffer loadConstant:number];
 }
 
 - (void)performOperation:(UDOp)op {
+    
     // 1. INPUT MODIFIERS (EE)
     if (op == UDOpEE) {
         [self inputEE]; // Logic to start appending exponent digits
@@ -182,49 +92,54 @@
         // Evaluate current, add to memory
         double val = [self evaluateCurrentExpression];
         self.memoryRegister += val;
-        // Usually, calculators reset the "Typing" state here
-        self.typing = NO;
+        [self.inputBuffer performClearEntry];
         return;
     }
     if (op == UDOpMSub) {
         double val = [self evaluateCurrentExpression];
         self.memoryRegister -= val;
-        self.typing = NO;
+        [self.inputBuffer performClearEntry];
         return;
     }
     if (op == UDOpNegate) { // +/- Button
-        if (self.enteringExponent) {
-            // Toggle Exponent Sign only
-            self.exponentSign *= -1.0;
-            
-            // Recalculate
-            double totalExponent = self.exponentValue * self.exponentSign;
-            self.currentValue = self.mantissa * pow(10.0, totalExponent);
-        } else {
-            self.currentValue = -self.currentValue;
-        }
-        [self updateTopNodeWithValue:self.currentValue];
+        [self.inputBuffer toggleSign];
         return;
     }
-
-    // 1. EQUALS (=)
+    
+    // CLEAR
+    if (op == UDOpClear) {
+        if (self.isTyping) {
+            // C: Clear only the buffer
+            [self.inputBuffer performClearEntry];
+            // Note: We might want to keep isTyping = YES or reset it depending on UX.
+            // Usually, 'C' just resets the number to 0 but keeps you in "editing" mode.
+        } else {
+            // AC: Clear everything
+            [self.inputBuffer performClearEntry];
+            [self.nodeStack removeAllObjects];
+            [self.opStack removeAllObjects];
+        }
+        [self reset];
+        return;
+    }
+    
+    // 1. If the user was typing, save that number first!
+    if (self.isTyping) {
+        [self flushBufferToStack];
+    }
+    
+    // EQUALS (=)
     // Flush everything to build the final tree.
     if (op == UDOpEq) {
         while (self.opStack.count > 0) {
             [self reduceOp];
         }
         // Calculate the result immediately so UI can show it
-        self.currentValue = [self evaluateCurrentExpression];
-        self.typing = NO;
+        double currentValue = [self evaluateCurrentExpression];
+        [self.inputBuffer loadConstant:currentValue];
         return;
     }
     
-    // 2. CLEAR
-    if (op == UDOpClear) {
-        [self reset];
-        return;
-    }
-            
     // 1. LEFT PARENTHESIS "("
     // Push strictly to OpStack. It waits there as a marker.
     if (op == UDOpParenLeft) {
@@ -234,18 +149,16 @@
         [self.opStack addObject:@(op)];
         return;
     }
-
+    
     // 2. RIGHT PARENTHESIS ")"
     // Collapse everything back to the nearest Left Paren
     if (op == UDOpParenRight) {
-        if (self.typing) self.typing = NO;
-        
         while (self.opStack.count > 0) {
             UDOp top = [self.opStack.lastObject integerValue];
             
             if (top == UDOpParenLeft) {
                 [self.opStack removeLastObject]; // Pop the '(' and discard it
-
+                
                 // We just finished a group. Wrap the top node in explicit parens.
                 if (self.nodeStack.count > 0) {
                     UDASTNode *content = [self.nodeStack lastObject];
@@ -254,7 +167,7 @@
                     // Wrap it and push it back
                     [self.nodeStack addObject:[UDParenNode wrap:content]];
                 }
-
+                
                 return; // Done! We successfully closed the group.
             }
             
@@ -267,16 +180,10 @@
         return;
     }
     
-    // When user hits +, -, *, /
-    if (self.typing) {
-        self.typing = NO;
-        self.enteringExponent = NO; // Turn off EE mode
-    }
-
     // 3. SCIENTIFIC (Unary Postfix: sin, cos, etc.)
     // These act immediately on the node the user just typed.
     UDOpInfo *info = [[UDFrontend shared] infoForOp:op];
-
+    
     if (info.placement == UDOpPlacementPostfix) {
         // Build a Function Node wrapper around the top node
         // e.g. Node(30) becomes FuncNode("sin", args=[Node(30)])
@@ -284,25 +191,25 @@
         [self buildNode:info];
         
         // Auto-evaluate so the display updates (optional, but standard behavior)
-        self.currentValue = [self evaluateCurrentExpression];
+        double currentValue = [self evaluateCurrentExpression];
+        [self.inputBuffer loadConstant:currentValue];
         return;
     }
-
+    
     // 4. BINARY OPERATORS (+, -, *, ^)
     // Standard Shunting Yard Precedence Logic
-    if (self.typing) self.typing = NO;
-
+    
     NSInteger myPrec = info.precedence;
-
+    
     while (self.opStack.count > 0) {
         UDOp topOp = [self.opStack.lastObject integerValue];
         
         // BARRIER CHECK:
         if (topOp == UDOpParenLeft)
             break; // Stop! Don't pop the parenthesis yet.
-
+        
         UDOpInfo *topInfo = [[UDFrontend shared] infoForOp:topOp];
-
+        
         // If top operator has greater or equal precedence, pop it and build node
         if (topInfo.precedence >= myPrec) {
             [self reduceOp];
@@ -310,9 +217,10 @@
             break;
         }
     }
-
+    
     // Push new operator to wait its turn
     [self.opStack addObject:@(op)];
+    [self.inputBuffer performClearEntry];
 }
 
 #pragma mark - AST Construction (The "Reduce" Step)
@@ -333,7 +241,7 @@
         NSLog(@"No operator info supplied");
         return;
     }
-
+    
     if (info.action) {
         UDFrontendContext *context = [[UDFrontendContext alloc] init];
         
@@ -361,6 +269,29 @@
     
     // 3. Run VM (Instruction List -> Double)
     return [UDVM execute:bytecode];
+}
+
+#pragma mark - Display Logic
+
+- (double)currentInputValue {
+    // Priority 1: If user is typing, show the buffer
+    if (self.isTyping) {
+        return [self.inputBuffer finalizeValue];
+    }
+    
+    // Priority 2: If we just calculated something (or pushed an op),
+    // show the top of the stack (the running total).
+    if (self.nodeStack.count > 0) {
+        return [self evaluateCurrentExpression];
+    }
+    
+    // Priority 3: Default empty state
+    return 0;
+}
+
+- (NSString *)currentDisplayValue {
+    double value = [self currentInputValue];
+    return [NSString stringWithFormat:@"%.10g", value];
 }
 
 @end

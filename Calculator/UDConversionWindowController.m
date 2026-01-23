@@ -54,7 +54,7 @@
     NSString *to = self.toBox.stringValue;
     
     // 3. Perform conversion via the Converter object
-    double result = [self.converter convertValue:self.calc.currentValue
+    double result = [self.converter convertValue:self.calc.currentInputValue
                                         category:cat
                                         fromUnit:from
                                           toUnit:to];

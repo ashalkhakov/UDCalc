@@ -155,6 +155,17 @@
         UDASTNode *base = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         return [UDFunctionNode func:@"pow" args:@[base, exp]];
     }];
+    
+    self.table[@(UDOpPowRev)] = [UDOpInfo infoWithSymbol:@"y^x"
+                                                     tag:UDOpPowRev
+                                               placement:UDOpPlacementInfix
+                                                   assoc:UDOpAssocRight
+                                              precedence:3
+                                                  action:^UDASTNode *(UDFrontendContext *ctx) {
+        UDASTNode *base = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
+        UDASTNode *exp = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
+        return [UDFunctionNode func:@"pow" args:@[base, exp]];
+    }];
 
     // e^x -> pow(e, x)
     self.table[@(UDOpExp)] = [UDOpInfo infoWithSymbol:@"eˣ"
@@ -254,8 +265,33 @@
                                               placement:UDOpPlacementPostfix
                                                   assoc:UDOpAssocNone
                                              precedence:5
-                                                 action:[self funcOp:@"log10"]];
+                                                 action:[self funcOp:@"log_10"]];
     
+    // log2
+    self.table[@(UDOpLog2)] = [UDOpInfo infoWithSymbol:@"log"
+                                                   tag:UDOpLog2
+                                             placement:UDOpPlacementPostfix
+                                                 assoc:UDOpAssocNone
+                                            precedence:5
+                                                action:[self funcOp:@"log_2"]];
+    
+    // log y(x)
+    self.table[@(UDOpLogY)] = [UDOpInfo infoWithSymbol:@"log"
+                                                   tag:UDOpLogY
+                                             placement:UDOpPlacementPostfix
+                                                 assoc:UDOpAssocNone
+                                            precedence:5
+                                                action:^UDASTNode *(UDFrontendContext *ctx) {
+        // 7, logY, 5, =: log_5(7)=1.20...
+        
+        
+        UDASTNode *y = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject]; // y
+        UDASTNode *x = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject]; // x
+        NSString *name = [@"log_" stringByAppendingString:[y prettyPrint]]; // TODO: evaluate?
+
+        return [UDFunctionNode func:name args:@[x]];
+    }];
+
     // - (Subtract)
     self.table[@(UDOpSub)] = [UDOpInfo infoWithSymbol:@"-"
                                                   tag:UDOpSub
@@ -287,18 +323,36 @@
                                                 assoc:UDOpAssocNone
                                            precedence:4
                                                action:[self trigOp:@"sin"]];
+    self.table[@(UDOpSinInverse)] = [UDOpInfo infoWithSymbol:@"asin"
+                                                         tag:UDOpSinInverse
+                                                   placement:UDOpPlacementPostfix
+                                                       assoc:UDOpAssocNone
+                                                  precedence:4
+                                                      action:[self trigOp:@"asin"]];
     self.table[@(UDOpCos)] = [UDOpInfo infoWithSymbol:@"cos"
                                                   tag:UDOpCos
                                             placement:UDOpPlacementPostfix
                                                 assoc:UDOpAssocNone
                                            precedence:4
                                                action:[self trigOp:@"cos"]];
+    self.table[@(UDOpCosInverse)] = [UDOpInfo infoWithSymbol:@"acos"
+                                                         tag:UDOpCosInverse
+                                                   placement:UDOpPlacementPostfix
+                                                       assoc:UDOpAssocNone
+                                                  precedence:4
+                                                      action:[self trigOp:@"acos"]];
     self.table[@(UDOpTan)] = [UDOpInfo infoWithSymbol:@"tan"
                                                   tag:UDOpTan
                                             placement:UDOpPlacementPostfix
                                                 assoc:UDOpAssocNone
                                            precedence:4
                                                action:[self trigOp:@"tan"]];
+    self.table[@(UDOpTanInverse)] = [UDOpInfo infoWithSymbol:@"atan"
+                                                         tag:UDOpTanInverse
+                                                   placement:UDOpPlacementPostfix
+                                                       assoc:UDOpAssocNone
+                                                  precedence:4
+                                                      action:[self trigOp:@"atan"]];
 
     // e (Constant)
         
@@ -326,18 +380,36 @@
                                                  assoc:UDOpAssocNone
                                             precedence:4
                                                 action:[self funcOp:@"sinh"]];
+    self.table[@(UDOpSinhInverse)] = [UDOpInfo infoWithSymbol:@"asinh"
+                                                          tag:UDOpSinh
+                                                    placement:UDOpPlacementPostfix
+                                                        assoc:UDOpAssocNone
+                                                   precedence:4
+                                                       action:[self funcOp:@"asinh"]];
     self.table[@(UDOpCosh)] = [UDOpInfo infoWithSymbol:@"cosh"
                                                    tag:UDOpCosh
                                              placement:UDOpPlacementPostfix
                                                  assoc:UDOpAssocNone
                                             precedence:4
                                                 action:[self funcOp:@"cosh"]];
+    self.table[@(UDOpCoshInverse)] = [UDOpInfo infoWithSymbol:@"acosh"
+                                                          tag:UDOpCoshInverse
+                                                    placement:UDOpPlacementPostfix
+                                                        assoc:UDOpAssocNone
+                                                   precedence:4
+                                                       action:[self funcOp:@"acosh"]];
     self.table[@(UDOpTanh)] = [UDOpInfo infoWithSymbol:@"tanh"
                                                    tag:UDOpTanh
                                              placement:UDOpPlacementPostfix
                                                  assoc:UDOpAssocNone
                                             precedence:4
                                                 action:[self funcOp:@"tanh"]];
+    self.table[@(UDOpTanhInverse)] = [UDOpInfo infoWithSymbol:@"atanh"
+                                                          tag:UDOpTanhInverse
+                                                    placement:UDOpPlacementPostfix
+                                                        assoc:UDOpAssocNone
+                                                   precedence:4
+                                                       action:[self funcOp:@"atanh"]];
 
     // pi
     
@@ -458,7 +530,7 @@
 - (UDFrontendAction)trigOp:(NSString *)name {
     return ^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *arg = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        NSString *sym = [name copy];
+        NSString *sym = name;
 
         // If in Degrees, wrap arg in (arg * PI / 180)
         // OR better: Just name the function 'sinD' vs 'sin'

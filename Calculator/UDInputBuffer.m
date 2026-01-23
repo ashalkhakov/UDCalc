@@ -1,0 +1,258 @@
+//
+//  UDInputBuffer.m
+//  Calculator
+//
+//  Created by Artyom Shalkhakov on 23.01.2026.
+//
+
+#import "UDInputBuffer.h"
+
+// Safety limit to prevent long long overflow (approx 17-18 digits)
+static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
+
+@interface UDInputBuffer ()
+// Read-write versions of properties for internal use
+@property (nonatomic, assign) long long mantissaBuffer;
+@property (nonatomic, assign) long long exponentBuffer;
+@property (nonatomic, assign) NSInteger decimalShift;
+@property (nonatomic, assign) BOOL inExponentMode;
+@property (nonatomic, assign) BOOL isMantissaNegative;
+@property (nonatomic, assign) BOOL isExponentNegative;
+@property (nonatomic, assign) BOOL hasHitDecimal;
+@end
+
+@implementation UDInputBuffer
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        [self performClearEntry];
+    }
+    return self;
+}
+
+#pragma mark - Input Handling
+
+- (void)loadConstant:(double)constant {
+    // 1. Reset everything first
+    [self performClearEntry];
+
+    // 2. Handle Edge Case: Zero
+    if (constant == 0) return; // Buffer is already 0 from clearEntry
+    
+    // 3. Handle Negative Numbers
+    // We strip the sign here and apply it manually to ensure state is correct
+    if (constant < 0) {
+        self.isMantissaNegative = YES;
+        constant = -constant;
+    }
+
+    // 4. Convert to String
+    // %.15g is the standard for "General" floating point printing.
+    // It automatically switches to scientific notation (e.g., 1e+20) if the number is huge.
+    // It limits precision to 15 digits, which fits safely in our long long buffer.
+    NSString *valStr = [NSString stringWithFormat:@"%.15g", constant];
+    
+    // 5. Simulate Typing
+    for (NSUInteger i = 0; i < valStr.length; i++) {
+        unichar c = [valStr characterAtIndex:i];
+        
+        if (isdigit(c)) {
+            // It's a number 0-9
+            [self handleDigit:(c - '0')];
+        }
+        else if (c == '.') {
+            [self handleDecimalPoint];
+        }
+        else if (c == 'e' || c == 'E') {
+            [self handleEE];
+        }
+        else if (c == '-') {
+            // If we see a minus sign, it must be for the exponent (e.g. 1.2e-5)
+            // because we already stripped the main sign in step 3.
+            if (self.inExponentMode) {
+                self.isExponentNegative = YES;
+            }
+        }
+        // Note: We ignore '+' chars (e.g. "1e+5") as positive is default
+    }
+}
+
+- (void)handleDigit:(int)digit {
+    if (digit < 0 || digit > 9) return;
+
+    if (self.inExponentMode) {
+        // --- Exponent Mode ---
+        // Exponents rarely need more than 3 digits, simple check
+        if (self.exponentBuffer > 999) return;
+        
+        self.exponentBuffer = (self.exponentBuffer * 10) + digit;
+    }
+    else {
+        // --- Mantissa Mode ---
+        if (self.mantissaBuffer > MAX_DIGITS_LIMIT) return; // Overflow protection
+
+        self.mantissaBuffer = (self.mantissaBuffer * 10) + digit;
+
+        // If we are past the decimal point, we must count the shift
+        if (self.hasHitDecimal) {
+            self.decimalShift++;
+        }
+    }
+}
+
+- (void)handleDecimalPoint {
+    // Cannot add decimal if already in exponent mode
+    if (self.inExponentMode) return;
+    
+    // Cannot add decimal if already present
+    if (self.hasHitDecimal) return;
+    
+    self.hasHitDecimal = YES;
+    // Note: decimalShift remains 0 until the first digit is typed
+}
+
+- (void)handleEE {
+    // Already in EE mode? Do nothing.
+    if (self.inExponentMode) return;
+    
+    self.inExponentMode = YES;
+}
+
+- (void)toggleSign {
+    if (self.inExponentMode) {
+        self.isExponentNegative = !self.isExponentNegative;
+    } else {
+        self.isMantissaNegative = !self.isMantissaNegative;
+    }
+}
+
+#pragma mark - Editing & Deletion
+
+- (void)handleBackspace {
+    // ZONE 1: Exponent
+    if (self.inExponentMode) {
+        if (self.exponentBuffer > 0) {
+            self.exponentBuffer /= 10;
+        }
+        else if (self.isExponentNegative) {
+            // "1.5E-" -> "1.5E"
+            self.isExponentNegative = NO;
+        }
+        else {
+            // "1.5E" -> "1.5"
+            self.inExponentMode = NO;
+        }
+        return;
+    }
+
+    // ZONE 2: Mantissa
+    
+    // Check if we have digits to remove (integer or fraction)
+    // Note: decimalShift > 0 implies we have fractional digits
+    if (self.mantissaBuffer > 0 || self.decimalShift > 0) {
+        self.mantissaBuffer /= 10;
+        
+        if (self.decimalShift > 0) {
+            self.decimalShift--;
+        }
+    }
+    // Case: "0." (Buffer 0, Shift 0, HasDecimal YES) -> "0"
+    else if (self.hasHitDecimal) {
+        self.hasHitDecimal = NO;
+    }
+}
+
+- (void)performClearEntry {
+    self.mantissaBuffer = 0;
+    self.exponentBuffer = 0;
+    self.decimalShift = 0;
+    self.inExponentMode = NO;
+    self.isMantissaNegative = NO;
+    self.isExponentNegative = NO;
+    self.hasHitDecimal = NO;
+}
+
+#pragma mark - Output
+
+- (double)finalizeValue {
+    // 1. Convert Mantissa Digits
+    double value = (double)self.mantissaBuffer;
+    
+    // 2. Apply Mantissa Sign
+    if (self.isMantissaNegative) {
+        value = -value;
+    }
+    
+    // 3. Apply Decimal Shift (e.g. 123 with shift 2 -> 1.23)
+    if (self.decimalShift > 0) {
+        value = value * pow(10.0, -((double)self.decimalShift));
+    }
+    
+    // 4. Calculate Total Exponent
+    long long finalExp = self.exponentBuffer;
+    if (self.isExponentNegative) {
+        finalExp = -finalExp;
+    }
+    
+    // 5. Combine: Value * 10^Exp
+    if (finalExp != 0) {
+        value = value * pow(10.0, (double)finalExp);
+    }
+    
+    return value;
+}
+
+- (NSString *)displayString {
+    NSMutableString *display = [NSMutableString string];
+    
+    // 1. Mantissa Sign
+    if (self.isMantissaNegative) {
+        [display appendString:@"-"];
+    }
+    
+    // 2. Mantissa Digits
+    // Convert long long to string to manipulate it
+    NSString *rawDigits = [NSString stringWithFormat:@"%lld", self.mantissaBuffer];
+    
+    if (self.decimalShift == 0) {
+        // Integer Mode
+        [display appendString:rawDigits];
+        if (self.hasHitDecimal) {
+            [display appendString:@"."];
+        }
+    } else {
+        // Decimal Mode: We need to insert the dot manually
+        // Pad with leading zeros if shift > length (e.g. shift 3, digits 5 -> 0.005)
+        NSInteger length = rawDigits.length;
+        
+        if (self.decimalShift >= length) {
+            [display appendString:@"0."];
+            // Add padding zeros
+            for (NSInteger i = 0; i < (self.decimalShift - length); i++) {
+                [display appendString:@"0"];
+            }
+            [display appendString:rawDigits];
+        } else {
+            // Insert dot in middle (e.g. 1234, shift 2 -> 12.34)
+            NSInteger splitIndex = length - self.decimalShift;
+            NSString *integerPart = [rawDigits substringToIndex:splitIndex];
+            NSString *fractionPart = [rawDigits substringFromIndex:splitIndex];
+            [display appendFormat:@"%@.%@", integerPart, fractionPart];
+        }
+    }
+    
+    // 3. Exponent
+    if (self.inExponentMode) {
+        [display appendString:@"E"];
+        if (self.isExponentNegative) {
+            [display appendString:@"-"];
+        }
+        // Always show exponent digit, even if 0, for clarity
+        [display appendFormat:@"%lld", self.exponentBuffer];
+    }
+    
+    return display;
+}
+
+@end

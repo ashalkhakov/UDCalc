@@ -6,6 +6,7 @@
 //
 
 #import "AppDelegate.h"
+#import "UDCalcButton.h"
 
 @interface AppDelegate ()
 
@@ -46,6 +47,7 @@
 }
 
 #pragma mark - Button Actions
+#pragma mark - Button Actions
 
 - (IBAction)showTape:(id)sender {
     if (!self.tapeWindowController) {
@@ -56,8 +58,15 @@
 }
 
 - (IBAction)digitPressed:(NSButton *)sender {
-    // We will use the Button's "Tag" (set in XIB) to identify the number (0-9)
-    NSInteger digit = sender.tag;
+    NSString *buttonName = sender.identifier;
+    NSInteger digit = 0;
+    
+    if ([buttonName length] == 2 && [buttonName characterAtIndex:0] == 'b' && isdigit([buttonName characterAtIndex:1])) {
+        digit = [buttonName characterAtIndex:1] - '0';
+    } else {
+        NSLog(@"Unsupported button name %@", buttonName);
+        return;
+    }
     
     [self.calc inputDigit:digit];
 
@@ -75,30 +84,136 @@
 
 - (IBAction)operationPressed:(NSButton *)sender {
     NSString *opTitle = sender.identifier;
+    NSInteger tag = sender.tag;
     UDOp op = UDOpNone;
     
-    // Map button titles to Enum
-    if ([opTitle isEqualToString:@"add"]) op = UDOpAdd;
-    else if ([opTitle isEqualToString:@"sub"]) op = UDOpSub;
-    else if ([opTitle isEqualToString:@"mul"]) op = UDOpMul; // or "x" or "X"
-    else if ([opTitle isEqualToString:@"div"]) op = UDOpDiv; // or "÷"
-    else if ([opTitle isEqualToString:@"equals"]) op = UDOpEq;
-    else if ([opTitle isEqualToString:@"clear"]) op = UDOpClear;
-    else if ([opTitle isEqualToString:@"negate"]) op = UDOpNegate;
-    else if ([opTitle isEqualToString:@"percent"]) op = UDOpPercent;
-    else if ([opTitle isEqualToString:@"lparen"]) op = UDOpParenLeft;
-    else if ([opTitle isEqualToString:@"rparen"]) op = UDOpParenRight;
-    else if ([opTitle isEqualToString:@"pi"]) op = UDOpConstPi;
-    else if ([opTitle isEqualToString:@"e"]) op = UDOpConstE;
-    else if ([opTitle isEqualToString:@"rand"]) op = UDOpRand;
-    // row:
-    else if ([opTitle isEqualToString:@"sqr"]) op = UDOpSquare;
-    else if ([opTitle isEqualToString:@"pow"]) op = UDOpPow;
-    else if ([opTitle isEqualToString:@"e_pow_x"]) op = UDOpExp;
-    else if ([opTitle isEqualToString:@"_10_pow_x"]) op = UDOpPow10;
-    else if ([opTitle isEqualToString:@"_2_pow_x"]) op = UDOpPow2;
-    else if ([opTitle isEqualToString:@"rad"]) op = UDOpRad;
-    else if ([opTitle isEqualToString:@"fact"]) op = UDOpFactorial;
+    switch (tag) {
+        case CalcButtonTypeStandard:
+            // Map button titles to Enum
+            if ([opTitle isEqualToString:@"add"]) op = UDOpAdd;
+            else if ([opTitle isEqualToString:@"sub"]) op = UDOpSub;
+            else if ([opTitle isEqualToString:@"mul"]) op = UDOpMul; // or "x" or "X"
+            else if ([opTitle isEqualToString:@"div"]) op = UDOpDiv; // or "÷"
+            else if ([opTitle isEqualToString:@"equals"]) op = UDOpEq;
+            else if ([opTitle isEqualToString:@"clear"]) op = UDOpClear;
+            else if ([opTitle isEqualToString:@"negate"]) op = UDOpNegate;
+            else if ([opTitle isEqualToString:@"percent"]) op = UDOpPercent;
+            else if ([opTitle isEqualToString:@"lparen"]) op = UDOpParenLeft;
+            else if ([opTitle isEqualToString:@"rparen"]) op = UDOpParenRight;
+            else if ([opTitle isEqualToString:@"pi"]) op = UDOpConstPi;
+            else if ([opTitle isEqualToString:@"e"]) op = UDOpConstE;
+            else if ([opTitle isEqualToString:@"rand"]) op = UDOpRand;
+            // row:
+            else if ([opTitle isEqualToString:@"sqr"]) op = UDOpSquare;
+            else if ([opTitle isEqualToString:@"pow"]) op = UDOpPow;
+            else if ([opTitle isEqualToString:@"e_pow_x"]) op = UDOpExp;
+            else if ([opTitle isEqualToString:@"_10_pow_x"]) op = UDOpPow10;
+            else if ([opTitle isEqualToString:@"_2_pow_x"]) op = UDOpPow2;
+            else if ([opTitle isEqualToString:@"rad"]) op = UDOpRad;
+            else if ([opTitle isEqualToString:@"fact"]) op = UDOpFactorial;
+            else if ([opTitle isEqualToString:@"ln"]) op = UDOpLn;
+            break;
+            
+        case CalcButtonTypePi:           // Pi symbol
+            op = UDOpConstPi;
+            break;
+        case CalcButtonTypeInverse:      // 1/x
+            op = UDOpInvert;
+            break;
+
+        // --- Standard Trig ---
+        case CalcButtonTypeSin:          // sin
+            op = UDOpSin;
+            break;
+        case CalcButtonTypeCos:          // cos
+            op = UDOpCos;
+            break;
+        case CalcButtonTypeTan:          // tan
+            op = UDOpTan;
+            break;
+        case CalcButtonTypeSinh:         // sinh
+            op = UDOpSinh;
+            break;
+        case CalcButtonTypeCosh:         // cosh
+            op = UDOpCosh;
+            break;
+        case CalcButtonTypeTanh:         // tanh
+            op = UDOpTanh;
+            break;
+            
+        // Inverse Trig
+        case CalcButtonTypeSinInverse:   // sin^-1
+            op = UDOpSinInverse;
+            break;
+        case CalcButtonTypeCosInverse:   // cos^-1
+            op = UDOpCosInverse;
+            break;
+        case CalcButtonTypeTanInverse:   // tan^-1
+            op = UDOpTanInverse;
+            break;
+        case CalcButtonTypeSinhInverse:  // sinh^-1
+            op = UDOpSinhInverse;
+            break;
+        case CalcButtonTypeCoshInverse:  // cosh^-1
+            op = UDOpCoshInverse;
+            break;
+        case CalcButtonTypeTanhInverse:  // tanh^-1
+            op = UDOpTanhInverse;
+            break;
+
+        // Standard Exponents
+        case CalcButtonTypeSquare:      // x^2
+            op = UDOpSquare;
+            break;
+        case CalcButtonTypeCube:        // x^3
+            op = UDOpCube;
+            break;
+        case CalcButtonTypePower:       // x^y
+            op = UDOpPow;
+            break;
+        case CalcButtonTypePowerYtoX:   // y^x
+            op = UDOpPowRev;
+            break;
+        case CalcButtonTypePower2toX:   // 2^x
+            op = UDOpPow2;
+            break;
+        case CalcButtonTypeExp:         // e^x
+            op = UDOpExp;
+            break;
+        case CalcButtonTypeTenPower:    // 10^x
+            op = UDOpPow10;
+            break;
+        case CalcButtonType2nd:         // 2nd
+            self.isSecondFunctionActive = !self.isSecondFunctionActive;
+
+            // Visual Feedback: Make the "2nd" button look pressed/highlighted
+            sender.state = self.isSecondFunctionActive ? NSControlStateValueOn : NSControlStateValueOff;
+            
+            [self updateScientificButtons];
+            return;
+
+        // Logarithms
+        case CalcButtonTypeLog10:        // log10
+            op = UDOpLog10;
+            break;
+        case CalcButtonTypeLog2:         // log2 <-- NEW
+            op = UDOpLog2;
+            break;
+        case CalcButtonTypeLogY:         // logy <-- NEW
+            op = UDOpLogY;
+            break;
+
+        // Roots & Others
+        case CalcButtonTypeSqrt:         // sqrt(x)
+            op = UDOpSqrt;
+            break;
+        case CalcButtonTypeCubeRoot:     // 3rd root
+            op = UDOpCbrt;
+            break;
+        case CalcButtonTypeYRoot:       // y-th root
+            op = UDOpYRoot;
+            break;
+    }
     
     // CONSTANTS: Treat them as number inputs!
     if (op == UDOpConstPi) {
@@ -119,7 +234,7 @@
         // The Shunting Yard leaves exactly one node (the root) on the stack after Eq.
         UDASTNode *resultTree = [self.calc.nodeStack lastObject];
 
-        double resultVal = self.calc.currentValue;
+        double resultVal = self.calc.currentInputValue;
                 
         // 3. Log to Tape (History Update)
         if (resultTree) {
@@ -248,49 +363,42 @@
      secondBtn.highlightColor = [NSColor colorWithCalibratedWhite:0.6 alpha:1.0];
      secondBtn.textColor = [NSColor blackColor]; // Text might need to be black on light buttons
      */
-    
+
     // Helper block to swap button state
-    void (^setBtn)(NSButton*, NSString*, NSString*, NSString*, NSString*) =
-    ^(NSButton *b, NSString *normTitle, NSString *normIdentifier, NSString *secTitle, NSString *secIdentifier) {
+    void (^setBtn)(NSButton*, CalcButtonType, CalcButtonType) =
+    ^(NSButton *b, CalcButtonType norm, CalcButtonType sec) {
+        if (![b isKindOfClass:[UDCalcButton class]]) {
+            NSLog(@"wrong kind of button");
+            return;
+        }
+        
+        UDCalcButton *calcButton = (UDCalcButton *)b;
+        
         if (second) {
-            b.title = secTitle;
-            b.identifier = secIdentifier;
+            calcButton.symbolType = sec;
         } else {
-            b.title = normTitle;
-            b.identifier = normIdentifier;
+            calcButton.symbolType = norm;
         }
     };
     
-    // Apply changes
-    
-    setBtn(self.exButton, @"eˣ", @"e_pow_x", @"yˣ", @"y_pow_x");
-    setBtn(self._10xButton, @"10ˣ", @"_10_pow_x", @"2ˣ", @"2_pow_x");
-    setBtn(self.lnButton, @"ln", @"ln", @"logᵧ", @"log_y");
-    setBtn(self._log10Button, @"log10", @"log₁₀", @"log2", @"log₂");
-    /*
-    else if ([opTitle isEqualToString:@"sqr"]) op = UDOpSquare;
-    else if ([opTitle isEqualToString:@"pow"]) op = UDOpPow;
-    else if ([opTitle isEqualToString:@"e_pow_x"]) op = UDOpExp;
-    else if ([opTitle isEqualToString:@"_10_pow_x"]) op = UDOpPow10;
-    else if ([opTitle isEqualToString:@"_2_pow_x"]) op = UDOpPow2;*/
-
-    // e^x / y^x
-    // 10^x / 2^x
-    // ln / log y
-    // log 10 / log 2
-    // sin / sin -1
-    // cos / cos -1
-    // tan / tan -1
-    // sinh / sinh -1
-    // cosh / cosh -1
-    // tanh / tanh -1
-    
-    /*setBtn(self._log10Button, @"log", @"log10", @"10ˣ", @"pow10");
-    setBtn(self.lnButton,  @"ln",  @"ln",    @"log y",  UDOpExp);
-
-    setBtn(self.sinButton, @"sin", @"sin", @"sin⁻¹", @"sinh");
-    setBtn(self.cosButton, @"cos", @"cos", @"cos⁻¹", @"cosh");
-    setBtn(self.tanButton, @"tan", @"tan", @"tan⁻¹", @"tanh");*/
+    setBtn(self.expButton, CalcButtonTypeExp, CalcButtonTypePowerYtoX);
+    setBtn(self.xthPowerOf10Button, CalcButtonTypeTenPower, CalcButtonTypePower2toX);
+    if ([self.lnButton isKindOfClass:[UDCalcButton class]]) {
+        if (second) {
+            self.lnButton.title = @"";
+            ((UDCalcButton *)self.lnButton).symbolType = CalcButtonTypeLogY;
+        } else {
+            self.lnButton.title = @"ln";
+            ((UDCalcButton *)self.lnButton).symbolType = CalcButtonTypeStandard;
+        }
+    }
+    setBtn(self.log10Button, CalcButtonTypeLog10, CalcButtonTypeLog2);
+    setBtn(self.sinButton, CalcButtonTypeSin, CalcButtonTypeSinInverse);
+    setBtn(self.cosButton, CalcButtonTypeCos, CalcButtonTypeCosInverse);
+    setBtn(self.tanButton, CalcButtonTypeTan, CalcButtonTypeTanInverse);
+    setBtn(self.sinhButton, CalcButtonTypeSinh, CalcButtonTypeSinhInverse);
+    setBtn(self.coshButton, CalcButtonTypeCosh, CalcButtonTypeCoshInverse);
+    setBtn(self.tanhButton, CalcButtonTypeTanh, CalcButtonTypeTanhInverse);
 }
 
 - (IBAction)conversionMenuClicked:(NSMenuItem *)sender {
@@ -299,7 +407,7 @@
         NSDictionary *data = sender.representedObject;
         
         // 1. Use the UnitConverter directly
-        double result = [self.unitConverter convertValue:self.calc.currentValue
+        double result = [self.unitConverter convertValue:self.calc.currentInputValue
                                                 category:data[@"cat"]
                                                 fromUnit:data[@"from"]
                                                   toUnit:data[@"to"]];
@@ -364,7 +472,7 @@
         [self.displayField setStringValue:self.calc.errorMessage];
     } else*/ {
         // %g removes trailing zeros for us
-        [self.displayField setStringValue:[NSString stringWithFormat:@"%g", self.calc.currentValue]];
+        [self.displayField setStringValue:[NSString stringWithFormat:@"%g", self.calc.currentInputValue]];
     }
 }
 
@@ -373,7 +481,7 @@
 - (void)copy:(id)sender {
     // 1. Get the current display value
     // We format it to ensure we don't copy "5.0000" but just "5"
-    NSString *stringToCopy = [NSString stringWithFormat:@"%g", self.calc.currentValue];
+    NSString *stringToCopy = [NSString stringWithFormat:@"%g", self.calc.currentInputValue];
 
     // 2. Clear and write to Pasteboard
     NSPasteboard *pb = [NSPasteboard generalPasteboard];

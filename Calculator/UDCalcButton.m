@@ -40,6 +40,11 @@
     self.symbolType = (CalcButtonType)self.tag;
 }
 
+- (void)setSymbolType:(CalcButtonType)newSymbolType {
+    _symbolType = newSymbolType;
+    [self setNeedsDisplay:YES];
+}
+
 #pragma mark - Main Draw Loop
 
 - (void)drawRect:(NSRect)dirtyRect {
@@ -123,89 +128,166 @@
 }
 
 - (void)drawSuperscriptBase:(NSString *)base exponent:(NSString *)exp {
-    // If base is long (sinh), shrink font
-    BOOL isLong = (base.length > 2);
-    CGFloat baseFontSize = isLong ? 16.0 : 22.0;
-    CGFloat expFontSize = isLong ? 10.0 : 14.0;
+    // 1. Detect Coordinate Direction
+    // Standard (Bottom-Left): dir = 1.0  (Add Y to go Up)
+    // Flipped  (Top-Left):    dir = -1.0 (Subtract Y to go Up)
+    CGFloat dir = [self isFlipped] ? -1.0 : 1.0;
+
+    // 2. Setup Fonts & Attributes
+    BOOL isLongBase = (base.length > 2); // Shrink font for things like "sinh"
+    CGFloat baseFontSize = isLongBase ? 16.0 : 22.0;
+    CGFloat expFontSize  = isLongBase ? 10.0 : 14.0;
     
     NSDictionary *baseAttrs = [self attributesWithSize:baseFontSize];
-    NSDictionary *expAttrs = [self attributesWithSize:expFontSize];
+    NSDictionary *expAttrs  = [self attributesWithSize:expFontSize];
     
     NSSize baseDim = [base sizeWithAttributes:baseAttrs];
-    NSSize expDim = [exp sizeWithAttributes:expAttrs];
+    NSSize expDim  = [exp sizeWithAttributes:expAttrs];
     
+    // 3. Layout (Centering)
     CGFloat totalWidth = baseDim.width + expDim.width;
     CGFloat startX = (self.bounds.size.width - totalWidth) / 2.0;
     CGFloat centerY = (self.bounds.size.height - baseDim.height) / 2.0;
     
+    // 4. Draw Base Text
     [base drawAtPoint:NSMakePoint(startX, centerY) withAttributes:baseAttrs];
     
-    // Lift the exponent. If font is smaller, lift less.
-    CGFloat lift = isLong ? 6.0 : 8.0;
-    [exp drawAtPoint:NSMakePoint(startX + baseDim.width, centerY + lift) withAttributes:expAttrs];
+    // 5. Draw Exponent
+    // We calculate the Y position relative to the base text's center.
+    // "lift" determines how many pixels visually UP we move.
+    CGFloat lift = isLongBase ? 5.0 : 6.0;
+    
+    // Apply direction:
+    // If flipped, this becomes (centerY - 9.0), moving towards top (0.0). Correct.
+    // If standard, this becomes (centerY + 9.0), moving away from bottom (0.0). Correct.
+    CGFloat expY = centerY + (lift * dir);
+    CGFloat expX = startX + baseDim.width + 1.0; // +1.0 for a tiny bit of breathing room
+    
+    [exp drawAtPoint:NSMakePoint(expX, expY) withAttributes:expAttrs];
 }
 
 - (void)drawLogWithBase:(NSString *)subscript {
+    // 1. Detect Coordinate Direction (Standard vs Flipped)
+    CGFloat dir = [self isFlipped] ? -1.0 : 1.0;
+
     NSString *mainText = @"log";
     
-    NSDictionary *mainAttrs = [self attributesWithSize:16.0];
-    NSDictionary *subAttrs = [self attributesWithSize:10.0];
+    // 2. Setup Fonts
+    // Log is usually regular weight, not bold
+    NSDictionary *mainAttrs = [self attributesWithSize:22.0];
+    NSDictionary *subAttrs = [self attributesWithSize:13.0];
     
     NSSize mainDim = [mainText sizeWithAttributes:mainAttrs];
     NSSize subDim = [subscript sizeWithAttributes:subAttrs];
     
+    // 3. Layout
+    // Calculate total width
     CGFloat totalWidth = mainDim.width + subDim.width;
     CGFloat startX = (self.bounds.size.width - totalWidth) / 2.0;
+    
+    // Calculate vertical center based on the main "log" text
     CGFloat centerY = (self.bounds.size.height - mainDim.height) / 2.0;
     
-    // Draw 'log' slightly higher
-    [mainText drawAtPoint:NSMakePoint(startX, centerY + 2) withAttributes:mainAttrs];
+    // 4. Draw "log"
+    [mainText drawAtPoint:NSMakePoint(startX, centerY) withAttributes:mainAttrs];
     
-    // Draw subscript slightly lower
-    [subscript drawAtPoint:NSMakePoint(startX + mainDim.width, centerY - 4) withAttributes:subAttrs];
+    // 5. Draw Subscript (Base)
+    // We want the subscript to sit lower than the main text.
+    // In standard coordinates (Up is +), we subtract.
+    // In flipped coordinates (Down is +), we add.
+    // We use 'dir' to inverse the logic automatically.
+    
+    // 8.0 is the visual offset downwards
+    CGFloat subY = centerY - (10.0 * dir);
+    
+    // Move slightly right to sit next to the 'g'
+    CGFloat subX = startX + mainDim.width + 1.0;
+    
+    [subscript drawAtPoint:NSMakePoint(subX, subY) withAttributes:subAttrs];
 }
 
 - (void)drawRootWithIndex:(NSString *)indexText {
-    NSString *content = @"x";
-    NSDictionary *contentAttrs = [self attributesWithSize:20.0];
-    NSSize contentSize = [content sizeWithAttributes:contentAttrs];
+    // 1. Detect Coordinate System Direction
+    CGFloat dir = [self isFlipped] ? -1.0 : 1.0;
     
-    CGFloat padding = 4.0;
-    CGFloat radicalWidth = 14.0;
+    // 2. Setup Fonts
+    NSFont *baseFont = [NSFont systemFontOfSize:24.0 weight:NSFontWeightBold];
+    NSFont *indexFont = [NSFont systemFontOfSize:13.0 weight:NSFontWeightBold];
     
-    // Calculate total width including index if present
-    CGFloat totalWidth = radicalWidth + contentSize.width + padding;
-    if (indexText) totalWidth += 6.0;
+    NSDictionary *baseAttrs = @{NSFontAttributeName: baseFont, NSForegroundColorAttributeName: self.textColor};
+    NSDictionary *indexAttrs = @{NSFontAttributeName: indexFont, NSForegroundColorAttributeName: self.textColor};
+    
+    NSString *baseText = @"x";
+    NSSize baseSize = [baseText sizeWithAttributes:baseAttrs];
+    NSSize indexSize = indexText ? [indexText sizeWithAttributes:indexAttrs] : NSZeroSize;
+    
+    // 3. Layout Geometry
+    CGFloat radicalLeftPadding = 5.0; // Reduced padding slightly
+    CGFloat strokeWidth = 2.5;
+    
+    CGFloat totalWidth = baseSize.width + radicalLeftPadding + 6.0;
+    if (indexText) totalWidth += (indexSize.width * 0.6);
     
     CGFloat startX = (self.bounds.size.width - totalWidth) / 2.0;
-    if (indexText) startX += 6.0;
+    CGFloat centerY = (self.bounds.size.height - baseSize.height) / 2.0;
     
-    CGFloat centerY = (self.bounds.size.height - contentSize.height) / 2.0;
+    // 4. Draw Text
+    // Base 'x'
+    CGFloat xTextX = startX + totalWidth - baseSize.width;
+    [baseText drawAtPoint:NSMakePoint(xTextX, centerY) withAttributes:baseAttrs];
     
-    // Draw Index (3 or y)
+    // Index '3' or 'y' (Superscripted)
     if (indexText) {
-        NSDictionary *indexAttrs = [self attributesWithSize:10.0];
-        [indexText drawAtPoint:NSMakePoint(startX - 8, centerY + 10) withAttributes:indexAttrs];
+        CGFloat indexX = xTextX - radicalLeftPadding - indexSize.width + 3.0;
+        CGFloat indexY = centerY + (4.0 * dir);
+        [indexText drawAtPoint:NSMakePoint(indexX, indexY) withAttributes:indexAttrs];
     }
     
-    // Draw 'x' content
-    NSRect textRect = NSMakeRect(startX + radicalWidth, centerY - 2, contentSize.width, contentSize.height);
-    [content drawInRect:textRect withAttributes:contentAttrs];
-    
-    // Draw Vector Radical Path
+    // 5. Draw Radical Geometry (The Checkmark)
     [self.textColor setStroke];
     NSBezierPath *path = [NSBezierPath bezierPath];
-    [path setLineWidth:1.5];
+    [path setLineWidth:strokeWidth];
     [path setLineCapStyle:NSLineCapStyleRound];
     [path setLineJoinStyle:NSLineJoinStyleRound];
     
-    CGFloat baseline = centerY;
-    CGFloat height = contentSize.height;
+    // Vertical Offsets (Relative to Center)
+    CGFloat baseY = centerY + (baseSize.height / 2.0);
+
+    // TWEAKED: Lowered tick start slightly to make the angle look more 45-ish
+    CGFloat tickYOffset   = 0.0;     // Was 3.0
+    CGFloat bottomYOffset = -6.0;   // Deep valley
+    CGFloat topYOffset    = 9.0;    // High bar
     
-    [path moveToPoint:NSMakePoint(startX, baseline + 8)];
-    [path lineToPoint:NSMakePoint(startX + 4, baseline + 2)];
-    [path lineToPoint:NSMakePoint(startX + 10, baseline + height + 2)];
-    [path lineToPoint:NSMakePoint(startX + radicalWidth + contentSize.width + 2, baseline + height + 2)];
+    CGFloat tickY   = baseY + (tickYOffset * dir);
+    CGFloat bottomY = baseY + (bottomYOffset * dir);
+    CGFloat topY    = baseY + (topYOffset * dir);
+    
+    // Horizontal Coordinates (The "Tightness")
+    // TWEAKED: Adjusted these to steepen the rise and shorten the tick
+    
+    // 1. The Bar starts very close to the X
+    CGFloat barStartX = xTextX - 0.5;
+    CGFloat barEndX   = xTextX + baseSize.width;
+
+    // 2. The Valley (Bottom of V)
+    // Closer to barStartX = Steeper Rise.
+    // Gap is now 3.5px (was 4.0px) for a 21px rise -> Very steep.
+    CGFloat bottomPointX = xTextX - 5.0;
+    
+    // 3. The Tick Start
+    // Closer to bottomPointX = Shorter Tick.
+    // Gap is now 3.0px (was 4.0px).
+    CGFloat tickStartX = xTextX - 8.0;
+
+    // Handle index overlap
+    if (indexText) tickStartX -= 2.0;
+
+    // Draw Path
+    [path moveToPoint:NSMakePoint(tickStartX, tickY)];
+    [path lineToPoint:NSMakePoint(bottomPointX, bottomY)];
+    [path lineToPoint:NSMakePoint(barStartX, topY)];
+    [path lineToPoint:NSMakePoint(barEndX, topY)];
+    
     [path stroke];
 }
 

@@ -70,19 +70,32 @@
         double res = 0;
         
         if ([name isEqualToString:@"sqrt"]) res = sqrt(val);
-        if ([name isEqualToString:@"ln"]) res = log(val);
-        if ([name isEqualToString:@"sinD"]) res = sin(val * M_PI / 180.0);
-        if ([name isEqualToString:@"cosD"]) res = cos(val * M_PI / 180.0);
-        if ([name isEqualToString:@"tanD"]) res = tan(val * M_PI / 180.0);
+        else if ([name isEqualToString:@"ln"]) res = log(val);
 
-        if ([name isEqualToString:@"sinh"]) res = sinh(val);
-        if ([name isEqualToString:@"cosh"]) res = cosh(val);
-        if ([name isEqualToString:@"tanh"]) res = tanh(val);
+        else if ([name isEqualToString:@"sin"]) res = sin(val);
+        else if ([name isEqualToString:@"sinD"]) res = sin(val * M_PI / 180.0);
+        else if ([name isEqualToString:@"asin"]) res = asin(val);
+        else if ([name isEqualToString:@"asinD"]) res = sin(val * M_PI / 180.0);
+        else if ([name isEqualToString:@"cos"]) res = cos(val);
+        else if ([name isEqualToString:@"cosD"]) res = cos(val * M_PI / 180.0);
+        else if ([name isEqualToString:@"acos"]) res = acos(val);
+        else if ([name isEqualToString:@"acosD"]) res = acos(val * M_PI / 180.0);
+        else if ([name isEqualToString:@"tan"]) res = tan(val);
+        else if ([name isEqualToString:@"tanD"]) res = tan(val * M_PI / 180.0);
+        else if ([name isEqualToString:@"atan"]) res = atan(val);
+        else if ([name isEqualToString:@"atanD"]) res = atan(val * M_PI / 180.0);
 
-        if ([name isEqualToString:@"log10"]) res = log10(val);
-        if ([name isEqualToString:@"ln"])    res = log(val);
+        else if ([name isEqualToString:@"sinh"]) res = sinh(val);
+        else if ([name isEqualToString:@"asinh"]) res = asinh(val);
+        else if ([name isEqualToString:@"cosh"]) res = cosh(val);
+        else if ([name isEqualToString:@"acosh"]) res = acosh(val);
+        else if ([name isEqualToString:@"tanh"]) res = tanh(val);
+        else if ([name isEqualToString:@"atanh"]) res = atanh(val);
 
-        if ([name isEqualToString:@"fact"])  res = tgamma(val + 1); // Gamma function for factorial
+        else if ([name isEqualToString:@"log10"]) res = log10(val);
+
+        else if ([name isEqualToString:@"fact"])  res = tgamma(val + 1); // Gamma function for factorial
+        else NSLog(@"Unhandled function call %@", name);
 
         [stack addObject:@(res)];
         return;

@@ -25,6 +25,7 @@ typedef NS_ENUM(NSInteger, UDOp) {
     UDOpSquare,     // x^2
     UDOpCube,       // x^3
     UDOpPow,        // x^y (Binary)
+    UDOpPowRev,     // y^x (Binary)
     UDOpExp,        // e^x
     UDOpPow10,      // 10^x
     UDOpPow2,       // 2^x
@@ -36,19 +37,27 @@ typedef NS_ENUM(NSInteger, UDOp) {
     UDOpYRoot,      // root(x, y) (Binary)
     UDOpLn,         // ln
     UDOpLog10,      // log 10
+    UDOpLog2,       // log 2
+    UDOpLogY,       // log y(x)
     
     // --- ROW 4 (Trig) ---
     UDOpFactorial,  // x!
     UDOpSin,
+    UDOpSinInverse,
     UDOpCos,
+    UDOpCosInverse,
     UDOpTan,
+    UDOpTanInverse,
     UDOpConstE,     // Constant e
     UDOpEE,         // Scientific Notation (Advanced)
     
     // --- ROW 5 (Hyperbolic & Misc) ---
     UDOpSinh,
+    UDOpSinhInverse,
     UDOpCosh,
+    UDOpCoshInverse,
     UDOpTanh,
+    UDOpTanhInverse,
     UDOpConstPi,    // Constant π
     UDOpRand,       // Random Number
     UDOpRad,        // Rad/Deg Switch

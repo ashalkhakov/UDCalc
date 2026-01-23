@@ -8,16 +8,17 @@
 #import <Foundation/Foundation.h>
 #import "UDFrontend.h"
 #import "UDAST.h"        // The AST Nodes
+#import "UDInputBuffer.h"
 
 @interface UDCalc : NSObject
 
 // State
-@property (assign, readonly) double currentValue;
-@property (assign, readonly) BOOL typing;
-
-@property (nonatomic, assign) BOOL isRadians; // Toggled by 'Rad'
-@property (nonatomic, assign) BOOL isEEActive; // Toggled by 'EE'
+@property (nonatomic, strong) UDInputBuffer *inputBuffer;
+@property (nonatomic, assign) BOOL isRadians;
 @property (nonatomic, assign) double memoryRegister; // The 'M' value
+// YES = User is editing the buffer.
+// NO = User just hit an Op/Equals, buffer is "fresh".
+@property (nonatomic, assign) BOOL isTyping;
 
 // The "Forest" of trees.
 // Usually holds just 1 item if the equation is done.
@@ -30,6 +31,10 @@
 - (void)inputNumber:(double)number;
 - (void)performOperation:(UDOp)op;
 - (void)reset;
+
+// Returns what should currently be on screen (Buffer string OR Result string)
+- (double)currentInputValue;
+- (NSString *)currentDisplayValue;
 
 // The "Run" Button
 // Compiles the current AST and executes it on the VM.
