@@ -6,6 +6,7 @@
 //
 
 #import "AppDelegate.h"
+#import <QuartzCore/QuartzCore.h>
 #import "UDCalcButton.h"
 
 @interface AppDelegate ()
@@ -23,11 +24,16 @@
     self.historyManager = [[UDConversionHistoryManager alloc] init];
     self.tape = [[UDTape alloc] init];
 
+    // 1. Store the designed width of the scientific pane
+    self.standardScientificWidth = self.scientificWidthConstraint.constant;
+    
+    // 2. Default to Basic Mode on launch (Optional)
+    [self setCalculatorMode:CalculatorModeBasic animate:NO];
+
     [self updateScientificButtons];
     [self updateUI];
     [self updateRecentMenu];
 }
-
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
     // Insert code here to tear down your application
@@ -47,7 +53,69 @@
 }
 
 #pragma mark - Button Actions
-#pragma mark - Button Actions
+
+- (IBAction)changeMode:(NSMenuItem *)sender {
+    // Tag 1 = Basic, Tag 2 = Scientific
+    [self setCalculatorMode:(CalculatorMode)sender.tag animate:YES];
+}
+
+- (void) setCalculatorMode:(CalculatorMode)mode animate:(BOOL)animate {
+    switch (mode) {
+        case CalculatorModeBasic:
+            [self setScientificModeVisible:NO animate:animate];
+            break;
+        case CalculatorModeScientific:
+            [self setScientificModeVisible:YES animate:animate];
+            break;
+        default:
+            break;
+    }
+}
+
+- (void)setScientificModeVisible:(BOOL)showScientific animate:(BOOL)animate {
+    // If state isn't changing, do nothing
+    BOOL isCurrentlyVisible = !self.scientificView.hidden;
+    if (showScientific == isCurrentlyVisible) return;
+
+    NSWindow *window = self.scientificView.window;
+    NSRect currentFrame = window.frame;
+    CGFloat widthDelta = self.standardScientificWidth;
+    
+    // Calculate new Frame (Expand/Shrink to the LEFT)
+    NSRect newFrame = currentFrame;
+    
+    if (showScientific) {
+        // EXPAND: Width increases, Origin.x moves Left
+        newFrame.size.width += widthDelta;
+        newFrame.origin.x -= widthDelta;
+        self.scientificView.hidden = NO; // Show before animating
+    } else {
+        // SHRINK: Width decreases, Origin.x moves Right
+        newFrame.size.width -= widthDelta;
+        newFrame.origin.x += widthDelta;
+    }
+    
+    // The Animation Block
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
+        context.duration = animate ? 0.25 : 0.0;
+        context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        
+        // 1. Animate the Window Frame
+        [[window animator] setFrame:newFrame display:YES];
+        
+        // 2. Animate the Constraint (The Drawer Effect)
+        // If showing, restore width. If hiding, crush to 0.
+        [[self.scientificWidthConstraint animator] setConstant:(showScientific ? self.standardScientificWidth : 0)];
+        
+        // 3. Force layout update within animation
+        [self.scientificView layoutSubtreeIfNeeded];
+        
+    } completionHandler:^{
+        if (!showScientific) {
+            self.scientificView.hidden = YES; // Hide strictly after animation
+        }
+    }];
+}
 
 - (IBAction)showTape:(id)sender {
     if (!self.tapeWindowController) {

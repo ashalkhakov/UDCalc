@@ -23,6 +23,8 @@
                 <outlet property="lnButton" destination="t9c-jI-xhF" id="yZs-av-tTP"/>
                 <outlet property="log10Button" destination="6gf-Td-peJ" id="W63-tb-a9m"/>
                 <outlet property="recentMenu" destination="aXa-aM-Jaq" id="55J-1a-QDd"/>
+                <outlet property="scientificView" destination="kLg-Td-5Lq" id="h6a-O9-8Wj"/>
+                <outlet property="scientificWidthConstraint" destination="tqj-2d-W2y" id="kkA-bf-Dab"/>
                 <outlet property="sinButton" destination="Dn2-9e-Tzc" id="d2v-7r-eZm"/>
                 <outlet property="sinhButton" destination="1pu-T8-jqY" id="8LT-kt-enl"/>
                 <outlet property="tanButton" destination="T89-BN-VlJ" id="eY5-sP-9fp"/>
@@ -364,16 +366,14 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="View" id="HyV-fh-RgO">
                         <items>
-                            <menuItem title="Show Toolbar" keyEquivalent="t" id="snW-S8-Cw5">
-                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                            <menuItem title="Basic Mode" tag="1" keyEquivalent="1" id="snW-S8-Cw5">
                                 <connections>
-                                    <action selector="toggleToolbarShown:" target="-1" id="BXY-wc-z0C"/>
+                                    <action selector="changeMode:" target="Voe-Tx-rLC" id="3b2-Dx-Svr"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Customize Toolbar…" id="1UK-8n-QPP">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Scientific Mode" tag="2" keyEquivalent="2" id="1UK-8n-QPP">
                                 <connections>
-                                    <action selector="runToolbarCustomizationPalette:" target="-1" id="pQI-g3-MTW"/>
+                                    <action selector="changeMode:" target="Voe-Tx-rLC" id="EHK-Ko-xqe"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>
@@ -520,6 +520,9 @@
                 <subviews>
                     <gridView xPlacement="fill" yPlacement="fill" rowAlignment="none" rowSpacing="1" columnSpacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="kLg-Td-5Lq">
                         <rect key="frame" x="2" y="1" width="365" height="254"/>
+                        <constraints>
+                            <constraint firstAttribute="width" priority="750" constant="365" id="tqj-2d-W2y"/>
+                        </constraints>
                         <rows>
                             <gridRow height="50" id="zFx-Np-4Hp"/>
                             <gridRow height="50" id="sZY-wc-xXA"/>
@@ -1222,13 +1225,13 @@ DQ
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="qxC-eF-BBQ" secondAttribute="trailing" constant="1" id="4Mj-ds-1pP"/>
                     <constraint firstItem="qxC-eF-BBQ" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="8kC-tg-oxJ"/>
-                    <constraint firstAttribute="bottom" secondItem="kLg-Td-5Lq" secondAttribute="bottom" constant="1" id="INe-QR-dm9"/>
+                    <constraint firstAttribute="bottom" secondItem="kLg-Td-5Lq" secondAttribute="bottom" priority="750" constant="1" id="INe-QR-dm9"/>
                     <constraint firstAttribute="trailing" secondItem="PXV-Xm-VeB" secondAttribute="trailing" constant="1" id="S6H-xt-OBk"/>
                     <constraint firstAttribute="bottom" secondItem="PXV-Xm-VeB" secondAttribute="bottom" constant="1" id="ZHB-Ur-ArS"/>
-                    <constraint firstItem="PXV-Xm-VeB" firstAttribute="leading" secondItem="kLg-Td-5Lq" secondAttribute="trailing" constant="1" id="aSR-rs-2mq"/>
+                    <constraint firstItem="PXV-Xm-VeB" firstAttribute="leading" secondItem="kLg-Td-5Lq" secondAttribute="trailing" priority="750" constant="1" id="aSR-rs-2mq"/>
                     <constraint firstItem="PXV-Xm-VeB" firstAttribute="top" secondItem="qxC-eF-BBQ" secondAttribute="bottom" constant="1" id="lZT-6O-ErZ"/>
                     <constraint firstItem="qxC-eF-BBQ" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="1" id="pvF-vs-CGR"/>
-                    <constraint firstItem="kLg-Td-5Lq" firstAttribute="top" secondItem="qxC-eF-BBQ" secondAttribute="bottom" constant="1" id="v97-n9-p4d"/>
+                    <constraint firstItem="kLg-Td-5Lq" firstAttribute="top" secondItem="qxC-eF-BBQ" secondAttribute="bottom" priority="750" constant="1" id="v97-n9-p4d"/>
                 </constraints>
             </view>
             <point key="canvasLocation" x="156" y="448"/>

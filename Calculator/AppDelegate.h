@@ -13,6 +13,12 @@
 #import "UDTape.h"
 #import "UDTapeWindowController.h"
 
+typedef NS_ENUM(NSInteger, CalculatorMode) {
+    CalculatorModeBasic         = 1,
+    CalculatorModeScientific    = 2,
+    CalculatorModeProgrammer    = 3
+};
+
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
 @property (weak) IBOutlet NSTextField *displayField;
@@ -22,12 +28,17 @@
 @property (strong) UDConversionHistoryManager *historyManager;
 @property (strong) UDTape *tape;
 
+@property (weak) IBOutlet NSLayoutConstraint *scientificWidthConstraint;
+@property (weak) IBOutlet NSView *scientificView;
+@property (assign) CGFloat standardScientificWidth; // To remember the size
+
 @property (strong) UDConversionWindowController *converterWindow;
 @property (strong) UDTapeWindowController *tapeWindowController;
 
 @property (assign) BOOL isSecondFunctionActive;
 
 // Actions (Methods linked to buttons)
+- (IBAction)changeMode:(NSMenuItem *)sender;
 - (IBAction)digitPressed:(NSButton *)sender;
 - (IBAction)operationPressed:(NSButton *)sender;
 - (IBAction)decimalPressed:(NSButton *)sender;
@@ -54,6 +65,7 @@
 @property (weak) IBOutlet NSMenu *recentMenu;
 
 - (IBAction)conversionMenuClicked:(NSMenuItem *)sender;
+- (void)setCalculatorMode:(CalculatorMode)mode animate:(BOOL)animate;
 
 @end
 
