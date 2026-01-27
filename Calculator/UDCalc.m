@@ -108,7 +108,6 @@
     
     // -------------------------------------------------------------------------
     // CATEGORY 1: NEUTRAL OPS
-    // Do not affect calculation flow or reset state flags.
     // -------------------------------------------------------------------------
     if (op == UDOpMC || op == UDOpNegate || op == UDOpRad || op == UDOpEE || op == UDOpMR) {
         switch (op) {
@@ -116,7 +115,7 @@
             case UDOpRad: self.isRadians = !self.isRadians; break;
             case UDOpMC: self.memoryRegister = 0; break;
             case UDOpNegate: [self.inputBuffer toggleSign]; break;
-            case UDOpMR: [self inputNumber:self.memoryRegister]; break; // Routes to inputNumber
+            case UDOpMR: [self inputNumber:self.memoryRegister]; break;
             default: break;
         }
         return;
@@ -128,7 +127,6 @@
     if (op == UDOpClear) {
         if (self.isTyping) {
             [self.inputBuffer performClearEntry];
-            // 'C' does not reset the parser state logic, just the current buffer
         } else {
             [self reset];
         }
@@ -137,7 +135,6 @@
 
     // -------------------------------------------------------------------------
     // CATEGORY 3: TERMINATORS (=, M+, M-)
-    // Calculate result, STORE IT, then flag for "Soft Reset".
     // -------------------------------------------------------------------------
     if (op == UDOpEq || op == UDOpMAdd || op == UDOpMSub) {
         if (self.isTyping) [self flushBufferToStack];
@@ -154,19 +151,17 @@
             self.memoryRegister -= result;
         }
         
-        // CRITICAL: Reload result into buffer so calculator stays "alive".
-        // Allows "Ans + 2" (Continues) or "Ans 2" (Resets).
+        // Reload result so "Ans + 2" works
         [self.inputBuffer loadConstant:result];
-        self.isTyping = YES;
+        self.isTyping = NO; // do NOT  treat result as if user typed it
         
         self.expectingOperator = YES;
-        self.shouldResetOnDigit = YES;
+        self.shouldResetOnDigit = YES; // If they type a number now, clear Ans
         return;
     }
     
     // -------------------------------------------------------------------------
     // CATEGORY 4: CONSTRUCTIVE OPS
-    // Any other operator means we are continuing the calculation.
     // -------------------------------------------------------------------------
     self.shouldResetOnDigit = NO;
 
@@ -180,7 +175,7 @@
         }
         
         [self.opStack addObject:@(op)];
-        self.expectingOperator = NO;
+        self.expectingOperator = NO; // We now expect a Number, not an Op
         return;
     }
 
@@ -199,22 +194,18 @@
                     [self.nodeStack addObject:[UDParenNode wrap:content]];
                 }
                 
-                // Group is a Value. Next input is operator.
-                self.expectingOperator = YES;
+                self.expectingOperator = YES; // Group is a value
                 return;
             }
             [self reduceOp];
         }
-        // If loop exits, we have mismatched parens (ignore or error)
-        return;
+        return; // Mismatched parens
     }
 
     // --- POSTFIX & BINARY (INFIX) ---
     UDOpInfo *info = [[UDFrontend shared] infoForOp:op];
 
-    // Capture typing state BEFORE flushing!
-    // We need to know if the user JUST finished typing a number (like "3")
-    // or if they are chaining operators (like "+ *").
+    // Capture typing state BEFORE flushing
     BOOL wasTyping = self.isTyping;
     [self flushBufferToStack];
 
@@ -227,16 +218,38 @@
         [self.inputBuffer loadConstant:val];
         self.isTyping = NO;
         
-        // Postfix result is a Value. "3! *" is valid.
         self.expectingOperator = YES;
         return;
     }
     
     // Sub-Category: Standard Binary Logic (Infix)
-    
-    // 1. REPLACEMENT CHECK (Must happen BEFORE reduction)
-    // Scenario: User types "2 *" then changes mind to "+".
-    // We must swap * for + immediately.
+
+    // SMART GUARD CLAUSE
+    // If we are NOT expecting an operator, generally we should ignore this input.
+    // EXCEPT when we want to REPLACE the previous operator.
+    if (info.placement == UDOpPlacementInfix && !self.expectingOperator) {
+        
+        // Check what is currently on top of the stack
+        BOOL canReplace = NO;
+        if (self.opStack.count > 0) {
+            UDOp topOp = [self.opStack.lastObject integerValue];
+            
+            // If the top is NOT a parenthesis, it is an operator we can potentially replace.
+            // Example: stack has "+", user types "*". We allow this to pass through to the replacement logic.
+            if (topOp != UDOpParenLeft) {
+                canReplace = YES;
+            }
+        }
+        
+        // If we can't replace (e.g., stack empty, or top is '('), ignore this input.
+        if (!canReplace) {
+            return;
+        }
+    }
+
+    // REPLACEMENT LOGIC
+    // Scenario: User types "2 *" (Stack: *) then changes mind to "+".
+    // "wasTyping" is NO because they haven't typed a number in between.
     if (!wasTyping && self.opStack.count > 0) {
         UDOp topOp = [self.opStack.lastObject integerValue];
         UDOpInfo *topInfo = [[UDFrontend shared] infoForOp:topOp];
@@ -250,7 +263,7 @@
         }
     }
     
-    // 2. PRECEDENCE LOOP
+    // 3. PRECEDENCE LOOP
     NSInteger myPrec = info.precedence;
     while (self.opStack.count > 0) {
         UDOp topOp = [self.opStack.lastObject integerValue];
@@ -264,11 +277,12 @@
         }
     }
     
-    // 3. PUSH NEW OP
+    // 4. PUSH NEW OP
     [self.opStack addObject:@(op)];
     [self.inputBuffer performClearEntry];
+    
     self.isTyping = NO;
-    self.expectingOperator = NO;
+    self.expectingOperator = NO; // After "+", we expect a Number
 }
 
 #pragma mark - AST Construction & Exec

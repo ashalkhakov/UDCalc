@@ -10,6 +10,14 @@
 @implementation UDASTNode
 - (UDASTPrecedence)precedence { return UDASTPrecedenceNone; }
 - (NSString *)prettyPrint { return @"?"; }
+
+// Base equality implementation (fails safe)
+- (BOOL)isEqual:(id)object {
+    return [object isKindOfClass:[self class]];
+}
+- (NSUInteger)hash {
+    return [self.prettyPrint hash];
+}
 @end
 
 // ---------------------------------------------------------
@@ -31,6 +39,17 @@
     // %.8g uses significant digits, usually cleanest for calcs
     return [NSString stringWithFormat:@"%.8g", self.value];
 }
+
+- (BOOL)isEqual:(id)object {
+    if (![object isKindOfClass:[UDNumberNode class]]) return NO;
+    UDNumberNode *other = (UDNumberNode *)object;
+    // Use a small epsilon for double comparison to avoid floating point issues
+    return fabs(self.value - other.value) < 0.0000001;
+}
+
+- (NSUInteger)hash {
+    return [[NSNumber numberWithDouble:self.value] hash];
+}
 @end
 
 // ---------------------------------------------------------
@@ -51,6 +70,16 @@
 - (NSString *)prettyPrint {
     return self.symbol;
 }
+
+- (BOOL)isEqual:(id)object {
+    if (![object isKindOfClass:[UDConstantNode class]]) return NO;
+    UDConstantNode *other = (UDConstantNode *)object;
+    return [self.symbol isEqualToString:other.symbol]; // Value is implied by symbol
+}
+
+- (NSUInteger)hash {
+    return [self.symbol hash];
+}
 @end
 
 // ---------------------------------------------------------
@@ -67,6 +96,16 @@
     if (self.child.precedence < self.precedence) cStr = [NSString stringWithFormat:@"(%@)", cStr];
     return [NSString stringWithFormat:@"%@%@", self.op, cStr];
 }
+
+- (BOOL)isEqual:(id)object {
+    if (![object isKindOfClass:[UDUnaryOpNode class]]) return NO;
+    UDUnaryOpNode *other = (UDUnaryOpNode *)object;
+    return [self.op isEqualToString:other.op] && [self.child isEqual:other.child];
+}
+
+- (NSUInteger)hash {
+    return [self.op hash] ^ [self.child hash];
+}
 @end
 
 @implementation UDPostfixOpNode
@@ -78,6 +117,16 @@
     NSString *cStr = [self.child prettyPrint];
     if (self.child.precedence < self.precedence) cStr = [NSString stringWithFormat:@"(%@)", cStr];
     return [NSString stringWithFormat:@"%@%@", cStr, self.symbol];
+}
+
+- (BOOL)isEqual:(id)object {
+    if (![object isKindOfClass:[UDPostfixOpNode class]]) return NO;
+    UDPostfixOpNode *other = (UDPostfixOpNode *)object;
+    return [self.symbol isEqualToString:other.symbol] && [self.child isEqual:other.child];
+}
+
+- (NSUInteger)hash {
+    return [self.symbol hash] ^ [self.child hash];
 }
 @end
 
@@ -114,7 +163,7 @@
     if (self.left.precedence < self.precedence) {
         lhs = [NSString stringWithFormat:@"(%@)", lhs];
     }
-
+    
     // Special handling for Right Associativity (like ^) or subtraction
     // usually requires stricter checks, but < works for standard PEMDAS.
     if (self.right.precedence < self.precedence) {
@@ -123,6 +172,19 @@
     
     return [NSString stringWithFormat:@"%@ %@ %@", lhs, self.op, rhs];
 }
+
+- (BOOL)isEqual:(id)object {
+    if (![object isKindOfClass:[UDBinaryOpNode class]]) return NO;
+    UDBinaryOpNode *other = (UDBinaryOpNode *)object;
+    return [self.op isEqualToString:other.op] &&
+        [self.left isEqual:other.left] &&
+        [self.right isEqual:other.right];
+}
+
+- (NSUInteger)hash {
+    return [self.op hash] ^ [self.left hash] ^ [self.right hash];
+}
+
 @end
 
 // ---------------------------------------------------------
@@ -151,6 +213,17 @@
     // Format: name(arg1, arg2)
     return [NSString stringWithFormat:@"%@(%@)", self.name, [argStrings componentsJoinedByString:@", "]];
 }
+
+- (BOOL)isEqual:(id)object {
+    if (![object isKindOfClass:[UDFunctionNode class]]) return NO;
+    UDFunctionNode *other = (UDFunctionNode *)object;
+    return [self.name isEqualToString:other.name] && [self.args isEqualToArray:other.args];
+}
+
+- (NSUInteger)hash {
+    return [self.name hash] ^ [self.args hash];
+}
+
 @end
 
 // ---------------------------------------------------------
@@ -173,6 +246,16 @@
 - (NSString *)prettyPrint {
     // Force the brackets!
     return [NSString stringWithFormat:@"(%@)", [self.child prettyPrint]];
+}
+
+- (BOOL)isEqual:(id)object {
+    if (![object isKindOfClass:[UDParenNode class]]) return NO;
+    UDParenNode *other = (UDParenNode *)object;
+    return [self.child isEqual:other.child];
+}
+
+- (NSUInteger)hash {
+    return [self.child hash];
 }
 
 @end

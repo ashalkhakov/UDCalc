@@ -97,14 +97,14 @@
             // In a pure stack, it's hidden.
             // Workaround: We define % in this context to return (Current/100) * BasePlaceholder
             // Ideally, your parser supports peeking. Assuming we construct: 50 * (10/100)
-            UDASTNode *fraction = [UDBinaryOpNode op:@"÷" left:current right:[UDNumberNode value:100] precedence:5];
+            UDASTNode *fraction = [UDBinaryOpNode op:@"/" left:current right:[UDNumberNode value:100] precedence:5];
             // For the sake of this AST, we treat it as a Scalar multiplication for now to keep it simple,
             // or implement a specific UDPercentOfNode if you want perfect history.
             return [UDPostfixOpNode symbol:@"%" child:current];
         }
         
         // Standard: Current / 100
-        return [UDBinaryOpNode op:@"÷" left:current right:[UDNumberNode value:100] precedence:5];
+        return [UDBinaryOpNode op:@"/" left:current right:[UDNumberNode value:100] precedence:5];
     }];
 
     // ÷ (Divide)
@@ -113,7 +113,7 @@
                                             placement:UDOpPlacementInfix
                                                 assoc:UDOpAssocLeft
                                            precedence:2
-                                               action:[self binaryOp:@"÷" prec:2]];
+                                               action:[self binaryOp:@"/" prec:2]];
 
 
     // ==========================================
@@ -195,14 +195,14 @@
                                             placement:UDOpPlacementInfix
                                                 assoc:UDOpAssocLeft
                                            precedence:2
-                                               action:[self binaryOp:@"×" prec:2]];
+                                               action:[self binaryOp:@"*" prec:2]];
 
 
     // ==========================================
     // ROW 3: 1/x ²√x ³√x y√x ln log10 4 5 6 -
     // ==========================================
     
-    // 1/x -> 1 ÷ x
+    // 1/x -> 1 / x
     self.table[@(UDOpInvert)] = [UDOpInfo infoWithSymbol:@"⁻¹"
                                                      tag:UDOpInvert
                                                placement:UDOpPlacementPostfix
@@ -210,7 +210,7 @@
                                               precedence:5
                                                   action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *denom = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        return [UDBinaryOpNode op:@"÷" left:[UDNumberNode value:1] right:denom precedence:5];
+        return [UDBinaryOpNode op:@"/" left:[UDNumberNode value:1] right:denom precedence:5];
     }];
         
     // ²√x (Sqrt)
@@ -233,7 +233,7 @@
                                                 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *arg = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         // Using pow(x, 1/3) is safer for the VM
-        UDASTNode *oneThird = [UDBinaryOpNode op:@"÷" left:[UDNumberNode value:1] right:[UDNumberNode value:3] precedence:5];
+        UDASTNode *oneThird = [UDBinaryOpNode op:@"/" left:[UDNumberNode value:1] right:[UDNumberNode value:3] precedence:5];
         return [UDFunctionNode func:@"pow" args:@[arg, oneThird]];
     }];
         
@@ -247,7 +247,7 @@
         UDASTNode *root = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject]; // y
         UDASTNode *base = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject]; // x
         
-        UDASTNode *invRoot = [UDBinaryOpNode op:@"÷" left:[UDNumberNode value:1] right:root precedence:5];
+        UDASTNode *invRoot = [UDBinaryOpNode op:@"/" left:[UDNumberNode value:1] right:root precedence:5];
         return [UDFunctionNode func:@"pow" args:@[base, invRoot]];
     }];
         

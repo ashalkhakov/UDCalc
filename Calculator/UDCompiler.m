@@ -49,8 +49,8 @@
         // Emit Opcode
         if ([bin.op isEqualToString:@"+"]) [prog addObject:[UDInstruction op:UDOpcodeAdd]];
         else if ([bin.op isEqualToString:@"-"]) [prog addObject:[UDInstruction op:UDOpcodeSub]];
-        else if ([bin.op isEqualToString:@"×"]) [prog addObject:[UDInstruction op:UDOpcodeMul]];
-        else if ([bin.op isEqualToString:@"÷"]) [prog addObject:[UDInstruction op:UDOpcodeDiv]];
+        else if ([bin.op isEqualToString:@"*"]) [prog addObject:[UDInstruction op:UDOpcodeMul]];
+        else if ([bin.op isEqualToString:@"/"]) [prog addObject:[UDInstruction op:UDOpcodeDiv]];
         else NSLog(@"Unhandled binary op: %@", bin.op);
     }
     
