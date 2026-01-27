@@ -38,6 +38,7 @@
 - (IBAction)openConverter:(id)sender;
 - (IBAction)secondFunctionPressed:(NSButton *)sender;
 
+@property (weak) IBOutlet NSButton *acButton;
 @property (weak) IBOutlet NSButton *expButton;
 @property (weak) IBOutlet NSButton *xthPowerOf10Button;
 @property (weak) IBOutlet NSButton *lnButton;

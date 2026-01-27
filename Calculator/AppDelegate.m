@@ -112,6 +112,10 @@
             else if ([opTitle isEqualToString:@"rad"]) op = UDOpRad;
             else if ([opTitle isEqualToString:@"fact"]) op = UDOpFactorial;
             else if ([opTitle isEqualToString:@"ln"]) op = UDOpLn;
+            else if ([opTitle isEqualToString:@"mc"]) op = UDOpMC;
+            else if ([opTitle isEqualToString:@"mplus"]) op = UDOpMAdd;
+            else if ([opTitle isEqualToString:@"mminus"]) op = UDOpMSub;
+            else if ([opTitle isEqualToString:@"mr"]) op = UDOpMR;
             break;
             
         case CalcButtonTypePi:           // Pi symbol
@@ -220,9 +224,6 @@
         [self.calc inputNumber:M_PI]; // You'll need to add this method
     } else if (op == UDOpConstE) {
         [self.calc inputNumber:M_E];
-    } else if (op == UDOpClear) {
-        // 1. Handle CLEAR separately
-        [self.calc reset]; // Or performOperation:UDOpClear
     } else if (op == UDOpEq) {
 
         // CASE 1: EQUALS (=)
@@ -471,6 +472,13 @@
     /*if (self.calc.errorMessage) {
         [self.displayField setStringValue:self.calc.errorMessage];
     } else*/ {
+        
+        if (self.calc.isTyping) {
+            [self.acButton setTitle:@"C"];
+        } else {
+            [self.acButton setTitle:@"AC"];
+        }
+        
         // %g removes trailing zeros for us
         [self.displayField setStringValue:[NSString stringWithFormat:@"%g", self.calc.currentInputValue]];
     }

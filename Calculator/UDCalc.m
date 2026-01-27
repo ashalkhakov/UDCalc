@@ -10,8 +10,10 @@
 #import "UDVM.h"
 
 @interface UDCalc ()
-@property (strong, readwrite) NSMutableArray<UDASTNode *> *nodeStack; // Output Stack
-@property (strong) NSMutableArray<NSNumber *> *opStack;               // Operator Stack
+@property (strong, readwrite) NSMutableArray<UDASTNode *> *nodeStack;
+@property (strong) NSMutableArray<NSNumber *> *opStack;
+@property (nonatomic, assign) BOOL expectingOperator;
+@property (nonatomic, assign) BOOL shouldResetOnDigit;
 @end
 
 @implementation UDCalc
@@ -29,21 +31,28 @@
     _nodeStack = [NSMutableArray array];
     _opStack = [NSMutableArray array];
     _isRadians = NO;
-    _isTyping = NO; // start in Ready state
+    _isTyping = NO;
+    _expectingOperator = NO;
+    _shouldResetOnDigit = NO;
     [self.inputBuffer performClearEntry];
+}
+
+- (void)performSoftReset {
+    [self.nodeStack removeAllObjects];
+    [self.opStack removeAllObjects];
+    [self.inputBuffer performClearEntry];
+    self.expectingOperator = NO;
+    self.shouldResetOnDigit = NO;
+    self.isTyping = NO;
 }
 
 #pragma mark - Input
 
-// Moves the value from InputBuffer -> NodeStack
 - (void)flushBufferToStack {
     if (self.isTyping) {
         double val = [self.inputBuffer finalizeValue];
-        
         [self.nodeStack addObject:[UDNumberNode value:val]];
-        
         [self.inputBuffer performClearEntry];
-        
         self.isTyping = NO;
     }
 }
@@ -53,164 +62,201 @@
 }
 
 - (void)inputDigit:(double)digit {
+    // 1. SOFT RESET (Start new calc after =, M+, M-)
+    if (self.shouldResetOnDigit) {
+        [self performSoftReset];
+    }
+
+    // 2. IMPLICIT MULTIPLICATION (Bridging: "3! 2", ") 2")
+    if (!self.isTyping && self.expectingOperator) {
+        [self.opStack addObject:@(UDOpMul)];
+    }
+
     self.isTyping = YES;
     [self.inputBuffer handleDigit:(int)digit];
+    
+    // We have a digit, so next we expect an operator.
+    self.expectingOperator = YES;
 }
 
 - (void)inputDecimal {
+    if (self.shouldResetOnDigit) {
+        [self performSoftReset];
+    }
     self.isTyping = YES;
     [self.inputBuffer handleDecimalPoint];
+    _expectingOperator = NO;
 }
 
-// Used for Constants (π, e) or Memory Recall
+// Used for Constants (π, e) and MR
 - (void)inputNumber:(double)number {
+    if (self.shouldResetOnDigit) {
+        [self performSoftReset];
+    }
+    
+    // Constants and MR also trigger implicit multiplication (e.g. "2 PI" -> "2 * PI")
+    if (!self.isTyping && self.expectingOperator) {
+        [self.opStack addObject:@(UDOpMul)];
+    }
+    
     self.isTyping = YES;
     [self.inputBuffer loadConstant:number];
+    _expectingOperator = YES;
 }
 
 - (void)performOperation:(UDOp)op {
     
-    // 1. INPUT MODIFIERS (EE)
-    if (op == UDOpEE) {
-        [self inputEE]; // Logic to start appending exponent digits
+    // -------------------------------------------------------------------------
+    // CATEGORY 1: NEUTRAL OPS
+    // Do not affect calculation flow or reset state flags.
+    // -------------------------------------------------------------------------
+    if (op == UDOpMC || op == UDOpNegate || op == UDOpRad || op == UDOpEE || op == UDOpMR) {
+        switch (op) {
+            case UDOpEE: [self inputEE]; break;
+            case UDOpRad: self.isRadians = !self.isRadians; break;
+            case UDOpMC: self.memoryRegister = 0; break;
+            case UDOpNegate: [self.inputBuffer toggleSign]; break;
+            case UDOpMR: [self inputNumber:self.memoryRegister]; break; // Routes to inputNumber
+            default: break;
+        }
         return;
     }
     
-    // 2. STATE TOGGLES (Rad, 2nd)
-    if (op == UDOpRad) {
-        self.isRadians = !self.isRadians;
-        // Update UI button label "Rad" <-> "Deg"
-        return;
-    }
-    
-    // 3. MEMORY COMMANDS (Immediate Side Effects)
-    if (op == UDOpMC) {
-        self.memoryRegister = 0;
-        return;
-    }
-    if (op == UDOpMAdd) {
-        // Evaluate current, add to memory
-        double val = [self evaluateCurrentExpression];
-        self.memoryRegister += val;
-        [self.inputBuffer performClearEntry];
-        return;
-    }
-    if (op == UDOpMSub) {
-        double val = [self evaluateCurrentExpression];
-        self.memoryRegister -= val;
-        [self.inputBuffer performClearEntry];
-        return;
-    }
-    if (op == UDOpNegate) { // +/- Button
-        [self.inputBuffer toggleSign];
-        return;
-    }
-    
-    // CLEAR
+    // -------------------------------------------------------------------------
+    // CATEGORY 2: CLEAR OPS
+    // -------------------------------------------------------------------------
     if (op == UDOpClear) {
         if (self.isTyping) {
-            // C: Clear only the buffer
             [self.inputBuffer performClearEntry];
-            // Note: We might want to keep isTyping = YES or reset it depending on UX.
-            // Usually, 'C' just resets the number to 0 but keeps you in "editing" mode.
+            // 'C' does not reset the parser state logic, just the current buffer
         } else {
-            // AC: Clear everything
-            [self.inputBuffer performClearEntry];
-            [self.nodeStack removeAllObjects];
-            [self.opStack removeAllObjects];
+            [self reset];
         }
-        [self reset];
         return;
     }
-    
-    // 1. If the user was typing, save that number first!
-    if (self.isTyping) {
-        [self flushBufferToStack];
-    }
-    
-    // EQUALS (=)
-    // Flush everything to build the final tree.
-    if (op == UDOpEq) {
+
+    // -------------------------------------------------------------------------
+    // CATEGORY 3: TERMINATORS (=, M+, M-)
+    // Calculate result, STORE IT, then flag for "Soft Reset".
+    // -------------------------------------------------------------------------
+    if (op == UDOpEq || op == UDOpMAdd || op == UDOpMSub) {
+        if (self.isTyping) [self flushBufferToStack];
+        
         while (self.opStack.count > 0) {
             [self reduceOp];
         }
-        // Calculate the result immediately so UI can show it
-        double currentValue = [self evaluateCurrentExpression];
-        [self.inputBuffer loadConstant:currentValue];
+        
+        double result = [self evaluateCurrentExpression];
+        
+        if (op == UDOpMAdd) {
+            self.memoryRegister += result;
+        } else if (op == UDOpMSub) {
+            self.memoryRegister -= result;
+        }
+        
+        // CRITICAL: Reload result into buffer so calculator stays "alive".
+        // Allows "Ans + 2" (Continues) or "Ans 2" (Resets).
+        [self.inputBuffer loadConstant:result];
+        self.isTyping = YES;
+        
+        self.expectingOperator = YES;
+        self.shouldResetOnDigit = YES;
         return;
     }
     
-    // 1. LEFT PARENTHESIS "("
-    // Push strictly to OpStack. It waits there as a marker.
+    // -------------------------------------------------------------------------
+    // CATEGORY 4: CONSTRUCTIVE OPS
+    // Any other operator means we are continuing the calculation.
+    // -------------------------------------------------------------------------
+    self.shouldResetOnDigit = NO;
+
+    // --- LEFT PARENTHESIS ---
     if (op == UDOpParenLeft) {
-        // Optional: Implicit Multiply?
-        // If user typed "5" then "(", we could inject a * here.
-        // For now, let's keep it simple.
+        if (self.isTyping) [self flushBufferToStack];
+        
+        // Implicit Multiply: "2 (" -> "2 * ("
+        if (self.expectingOperator) {
+            [self.opStack addObject:@(UDOpMul)];
+        }
+        
         [self.opStack addObject:@(op)];
+        self.expectingOperator = NO;
         return;
     }
-    
-    // 2. RIGHT PARENTHESIS ")"
-    // Collapse everything back to the nearest Left Paren
+
+    // --- RIGHT PARENTHESIS ---
     if (op == UDOpParenRight) {
+        [self flushBufferToStack];
         while (self.opStack.count > 0) {
             UDOp top = [self.opStack.lastObject integerValue];
-            
             if (top == UDOpParenLeft) {
-                [self.opStack removeLastObject]; // Pop the '(' and discard it
+                [self.opStack removeLastObject]; // Pop '('
                 
-                // We just finished a group. Wrap the top node in explicit parens.
+                // Wrap content in ParenNode
                 if (self.nodeStack.count > 0) {
                     UDASTNode *content = [self.nodeStack lastObject];
                     [self.nodeStack removeLastObject];
-                    
-                    // Wrap it and push it back
                     [self.nodeStack addObject:[UDParenNode wrap:content]];
                 }
                 
-                return; // Done! We successfully closed the group.
+                // Group is a Value. Next input is operator.
+                self.expectingOperator = YES;
+                return;
             }
-            
-            [self reduceOp]; // Build the tree node
+            [self reduceOp];
         }
-        
-        // If loop finishes without returning, we missed a '('.
-        // (User typed "5 + 2 )"). usually ignore or error.
-        NSLog(@"Syntax Error: Mismatched Parentheses");
+        // If loop exits, we have mismatched parens (ignore or error)
         return;
     }
-    
-    // 3. SCIENTIFIC (Unary Postfix: sin, cos, etc.)
-    // These act immediately on the node the user just typed.
+
+    // --- POSTFIX & BINARY (INFIX) ---
     UDOpInfo *info = [[UDFrontend shared] infoForOp:op];
-    
+
+    // Capture typing state BEFORE flushing!
+    // We need to know if the user JUST finished typing a number (like "3")
+    // or if they are chaining operators (like "+ *").
+    BOOL wasTyping = self.isTyping;
+    [self flushBufferToStack];
+
+    // Sub-Category: Postfix (Factorial, Square, Percent)
     if (info.placement == UDOpPlacementPostfix) {
-        // Build a Function Node wrapper around the top node
-        // e.g. Node(30) becomes FuncNode("sin", args=[Node(30)])
-        //[self buildUnaryNode:info.symbol];
         [self buildNode:info];
         
-        // Auto-evaluate so the display updates (optional, but standard behavior)
-        double currentValue = [self evaluateCurrentExpression];
-        [self.inputBuffer loadConstant:currentValue];
+        // Auto-evaluate for display
+        double val = [self evaluateCurrentExpression];
+        [self.inputBuffer loadConstant:val];
+        self.isTyping = NO;
+        
+        // Postfix result is a Value. "3! *" is valid.
+        self.expectingOperator = YES;
         return;
     }
     
-    // 4. BINARY OPERATORS (+, -, *, ^)
-    // Standard Shunting Yard Precedence Logic
+    // Sub-Category: Standard Binary Logic (Infix)
     
-    NSInteger myPrec = info.precedence;
-    
-    while (self.opStack.count > 0) {
+    // 1. REPLACEMENT CHECK (Must happen BEFORE reduction)
+    // Scenario: User types "2 *" then changes mind to "+".
+    // We must swap * for + immediately.
+    if (!wasTyping && self.opStack.count > 0) {
         UDOp topOp = [self.opStack.lastObject integerValue];
-        
-        // BARRIER CHECK:
-        if (topOp == UDOpParenLeft)
-            break; // Stop! Don't pop the parenthesis yet.
-        
         UDOpInfo *topInfo = [[UDFrontend shared] infoForOp:topOp];
         
-        // If top operator has greater or equal precedence, pop it and build node
+        // Only replace INFIX operators (don't delete parens!)
+        if (topOp != UDOpParenLeft &&
+            topInfo.placement == UDOpPlacementInfix &&
+            info.placement == UDOpPlacementInfix) {
+            
+            [self.opStack removeLastObject];
+        }
+    }
+    
+    // 2. PRECEDENCE LOOP
+    NSInteger myPrec = info.precedence;
+    while (self.opStack.count > 0) {
+        UDOp topOp = [self.opStack.lastObject integerValue];
+        if (topOp == UDOpParenLeft) break;
+        
+        UDOpInfo *topInfo = [[UDFrontend shared] infoForOp:topOp];
         if (topInfo.precedence >= myPrec) {
             [self reduceOp];
         } else {
@@ -218,80 +264,51 @@
         }
     }
     
-    // Push new operator to wait its turn
+    // 3. PUSH NEW OP
     [self.opStack addObject:@(op)];
     [self.inputBuffer performClearEntry];
+    self.isTyping = NO;
+    self.expectingOperator = NO;
 }
 
-#pragma mark - AST Construction (The "Reduce" Step)
+#pragma mark - AST Construction & Exec
 
 - (void)reduceOp {
     if (self.opStack.count == 0) return;
-    
     UDOp op = [self.opStack.lastObject integerValue];
     [self.opStack removeLastObject];
-    
     UDOpInfo *info = [[UDFrontend shared] infoForOp:op];
-    
     [self buildNode:info];
 }
 
 -(void)buildNode:(UDOpInfo *)info {
-    if (!info) {
-        NSLog(@"No operator info supplied");
-        return;
-    }
+    if (!info || !info.action) return;
     
-    if (info.action) {
-        UDFrontendContext *context = [[UDFrontendContext alloc] init];
-        
-        context.nodeStack = self.nodeStack;
-        context.pendingOp = UDOpNone;
-        context.isRadians = self.isRadians;
-        context.memoryValue = self.memoryRegister;
-        
-        UDASTNode *node = info.action(context);
-        
-        [self.nodeStack addObject:node];
-    }
+    UDFrontendContext *context = [[UDFrontendContext alloc] init];
+    context.nodeStack = self.nodeStack;
+    context.pendingOp = UDOpNone;
+    context.isRadians = self.isRadians;
+    context.memoryValue = self.memoryRegister;
+    
+    UDASTNode *node = info.action(context);
+    if (node) [self.nodeStack addObject:node];
 }
-
-#pragma mark - Execution Pipeline
 
 - (double)evaluateCurrentExpression {
     if (self.nodeStack.count == 0) return 0.0;
-    
-    // 1. Get the Tree (Root is top of stack)
     UDASTNode *root = [self.nodeStack lastObject];
-    
-    // 2. Compile (Tree -> Instruction List)
     NSArray *bytecode = [UDCompiler compile:root];
-    
-    // 3. Run VM (Instruction List -> Double)
     return [UDVM execute:bytecode];
 }
 
-#pragma mark - Display Logic
-
 - (double)currentInputValue {
-    // Priority 1: If user is typing, show the buffer
-    if (self.isTyping) {
-        return [self.inputBuffer finalizeValue];
-    }
-    
-    // Priority 2: If we just calculated something (or pushed an op),
-    // show the top of the stack (the running total).
-    if (self.nodeStack.count > 0) {
-        return [self evaluateCurrentExpression];
-    }
-    
-    // Priority 3: Default empty state
+    if (self.isTyping) return [self.inputBuffer finalizeValue];
+    if (self.nodeStack.count > 0) return [self evaluateCurrentExpression];
     return 0;
 }
 
 - (NSString *)currentDisplayValue {
-    double value = [self currentInputValue];
-    return [NSString stringWithFormat:@"%.10g", value];
+    return [NSString stringWithFormat:@"%.10g", [self currentInputValue]];
 }
 
 @end

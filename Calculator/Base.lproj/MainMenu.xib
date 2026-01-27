@@ -15,6 +15,7 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
+                <outlet property="acButton" destination="odQ-MV-PK1" id="TW0-T7-uLh"/>
                 <outlet property="cosButton" destination="BTd-3D-D2B" id="tp6-5L-btc"/>
                 <outlet property="coshButton" destination="fi6-yy-jTj" id="2Ad-Mb-NcH"/>
                 <outlet property="displayField" destination="qxC-eF-BBQ" id="eT6-jK-GDc"/>
@@ -570,6 +571,9 @@
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="rYM-KW-lLW"/>
+                                    </connections>
                                 </button>
                             </gridCell>
                             <gridCell row="zFx-Np-4Hp" column="OjK-qR-CRu" id="3A1-HS-bxK">
@@ -579,6 +583,9 @@
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="ehm-Qu-c7C"/>
+                                    </connections>
                                 </button>
                             </gridCell>
                             <gridCell row="zFx-Np-4Hp" column="DuK-oq-oUX" id="LTc-tj-8eH">
@@ -588,6 +595,9 @@
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="bhr-aX-Bdl"/>
+                                    </connections>
                                 </button>
                             </gridCell>
                             <gridCell row="zFx-Np-4Hp" column="usK-v6-WsW" id="hC9-aa-lHG">
@@ -597,6 +607,9 @@
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
+                                    <connections>
+                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="K2r-ky-mVg"/>
+                                    </connections>
                                 </button>
                             </gridCell>
                             <gridCell row="sZY-wc-xXA" column="yb3-cr-MhU" id="U10-5G-wXK">

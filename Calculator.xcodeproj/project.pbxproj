@@ -24,11 +24,38 @@
 		9A7B95032F1BF7CE00ED7306 /* ConversionWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A7B95022F1BF7CE00ED7306 /* ConversionWindow.xib */; };
 		9A7B95052F1C08E500ED7306 /* UDUnitConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B95042F1C08E500ED7306 /* UDUnitConverter.m */; };
 		9A7B95082F1C0E0700ED7306 /* UDConversionHistoryManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B95072F1C0E0700ED7306 /* UDConversionHistoryManager.m */; };
+		9AC4C6052F27CA3000CD3AD4 /* UDCalcTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC4C6042F27CA3000CD3AD4 /* UDCalcTests.m */; };
+		9AC4C60B2F27CA7C00CD3AD4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B94ED2F1BB18600ED7306 /* AppDelegate.m */; };
+		9AC4C60C2F27CA8300CD3AD4 /* UDCalc.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B94FC2F1BE4FF00ED7306 /* UDCalc.m */; };
+		9AC4C60D2F27CA8600CD3AD4 /* UDConversionWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B94FF2F1BF69500ED7306 /* UDConversionWindowController.m */; };
+		9AC4C60E2F27CA8900CD3AD4 /* UDUnitConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B95042F1C08E500ED7306 /* UDUnitConverter.m */; };
+		9AC4C60F2F27CA8C00CD3AD4 /* UDConversionHistoryManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B95072F1C0E0700ED7306 /* UDConversionHistoryManager.m */; };
+		9AC4C6102F27CA8F00CD3AD4 /* UDTape.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CA42F1D1D9F005A27B7 /* UDTape.m */; };
+		9AC4C6112F27CA9200CD3AD4 /* UDTapeToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CA72F1D1E75005A27B7 /* UDTapeToken.m */; };
+		9AC4C6122F27CA9500CD3AD4 /* UDTapeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CAA2F1D2085005A27B7 /* UDTapeWindowController.m */; };
+		9AC4C6132F27CA9800CD3AD4 /* UDFrontend.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CAE2F1D493A005A27B7 /* UDFrontend.m */; };
+		9AC4C6142F27CA9B00CD3AD4 /* UDAST.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F67C2F1EA14800E1CFCF /* UDAST.m */; };
+		9AC4C6152F27CA9D00CD3AD4 /* UDInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F67F2F1EA9AA00E1CFCF /* UDInstruction.m */; };
+		9AC4C6162F27CAA000CD3AD4 /* UDCompiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F6822F1EA9F300E1CFCF /* UDCompiler.m */; };
+		9AC4C6172F27CAA300CD3AD4 /* UDVM.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F6852F1EAB1F00E1CFCF /* UDVM.m */; };
+		9AC4C6182F27CAA600CD3AD4 /* UDFrontendContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5589852F1FFDA500159E7B /* UDFrontendContext.m */; };
+		9AC4C6192F27CAA900CD3AD4 /* UDCalcButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4496B42F2143980024B55F /* UDCalcButton.m */; };
+		9AC4C61A2F27CAAB00CD3AD4 /* UDInputBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0D01C12F234AD000FE2946 /* UDInputBuffer.m */; };
 		9AE3F67D2F1EA14800E1CFCF /* UDAST.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F67C2F1EA14800E1CFCF /* UDAST.m */; };
 		9AE3F6802F1EA9AA00E1CFCF /* UDInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F67F2F1EA9AA00E1CFCF /* UDInstruction.m */; };
 		9AE3F6832F1EA9F300E1CFCF /* UDCompiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F6822F1EA9F300E1CFCF /* UDCompiler.m */; };
 		9AE3F6862F1EAB1F00E1CFCF /* UDVM.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F6852F1EAB1F00E1CFCF /* UDVM.m */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9AC4C6062F27CA3000CD3AD4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9A7B94E12F1BB18600ED7306 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9A7B94E82F1BB18600ED7306;
+			remoteInfo = Calculator;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		9A0D01C02F234AA900FE2946 /* UDInputBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDInputBuffer.h; sourceTree = "<group>"; };
@@ -62,6 +89,8 @@
 		9A7B95062F1C091D00ED7306 /* UDUnitConverter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDUnitConverter.h; sourceTree = "<group>"; };
 		9A7B95072F1C0E0700ED7306 /* UDConversionHistoryManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDConversionHistoryManager.m; sourceTree = "<group>"; };
 		9A7B95092F1C0E1A00ED7306 /* UDConversionHistoryManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDConversionHistoryManager.h; sourceTree = "<group>"; };
+		9AC4C6022F27CA3000CD3AD4 /* CalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9AC4C6042F27CA3000CD3AD4 /* UDCalcTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCalcTests.m; sourceTree = "<group>"; };
 		9AE3F67B2F1EA12D00E1CFCF /* UDAST.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDAST.h; sourceTree = "<group>"; };
 		9AE3F67C2F1EA14800E1CFCF /* UDAST.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDAST.m; sourceTree = "<group>"; };
 		9AE3F67E2F1EA99300E1CFCF /* UDInstruction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDInstruction.h; sourceTree = "<group>"; };
@@ -80,6 +109,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9AC4C5FF2F27CA3000CD3AD4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -87,6 +123,7 @@
 			isa = PBXGroup;
 			children = (
 				9A7B94EB2F1BB18600ED7306 /* Calculator */,
+				9AC4C6032F27CA3000CD3AD4 /* CalculatorTests */,
 				9A7B94EA2F1BB18600ED7306 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -95,6 +132,7 @@
 			isa = PBXGroup;
 			children = (
 				9A7B94E92F1BB18600ED7306 /* Calculator.app */,
+				9AC4C6022F27CA3000CD3AD4 /* CalculatorTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -144,6 +182,14 @@
 			path = Calculator;
 			sourceTree = "<group>";
 		};
+		9AC4C6032F27CA3000CD3AD4 /* CalculatorTests */ = {
+			isa = PBXGroup;
+			children = (
+				9AC4C6042F27CA3000CD3AD4 /* UDCalcTests.m */,
+			);
+			path = CalculatorTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -164,6 +210,24 @@
 			productReference = 9A7B94E92F1BB18600ED7306 /* Calculator.app */;
 			productType = "com.apple.product-type.application";
 		};
+		9AC4C6012F27CA3000CD3AD4 /* CalculatorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9AC4C60A2F27CA3000CD3AD4 /* Build configuration list for PBXNativeTarget "CalculatorTests" */;
+			buildPhases = (
+				9AC4C5FE2F27CA3000CD3AD4 /* Sources */,
+				9AC4C5FF2F27CA3000CD3AD4 /* Frameworks */,
+				9AC4C6002F27CA3000CD3AD4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9AC4C6072F27CA3000CD3AD4 /* PBXTargetDependency */,
+			);
+			name = CalculatorTests;
+			productName = CalculatorTests;
+			productReference = 9AC4C6022F27CA3000CD3AD4 /* CalculatorTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -175,6 +239,10 @@
 				TargetAttributes = {
 					9A7B94E82F1BB18600ED7306 = {
 						CreatedOnToolsVersion = 14.2;
+					};
+					9AC4C6012F27CA3000CD3AD4 = {
+						CreatedOnToolsVersion = 14.2;
+						TestTargetID = 9A7B94E82F1BB18600ED7306;
 					};
 				};
 			};
@@ -192,6 +260,7 @@
 			projectRoot = "";
 			targets = (
 				9A7B94E82F1BB18600ED7306 /* Calculator */,
+				9AC4C6012F27CA3000CD3AD4 /* CalculatorTests */,
 			);
 		};
 /* End PBXProject section */
@@ -205,6 +274,13 @@
 				9A7B94F02F1BB18800ED7306 /* Assets.xcassets in Resources */,
 				9A7B94F32F1BB18800ED7306 /* MainMenu.xib in Resources */,
 				9A7B95032F1BF7CE00ED7306 /* ConversionWindow.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9AC4C6002F27CA3000CD3AD4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,7 +311,39 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9AC4C5FE2F27CA3000CD3AD4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9AC4C60D2F27CA8600CD3AD4 /* UDConversionWindowController.m in Sources */,
+				9AC4C6192F27CAA900CD3AD4 /* UDCalcButton.m in Sources */,
+				9AC4C60B2F27CA7C00CD3AD4 /* AppDelegate.m in Sources */,
+				9AC4C6122F27CA9500CD3AD4 /* UDTapeWindowController.m in Sources */,
+				9AC4C6052F27CA3000CD3AD4 /* UDCalcTests.m in Sources */,
+				9AC4C60E2F27CA8900CD3AD4 /* UDUnitConverter.m in Sources */,
+				9AC4C6152F27CA9D00CD3AD4 /* UDInstruction.m in Sources */,
+				9AC4C6112F27CA9200CD3AD4 /* UDTapeToken.m in Sources */,
+				9AC4C6182F27CAA600CD3AD4 /* UDFrontendContext.m in Sources */,
+				9AC4C61A2F27CAAB00CD3AD4 /* UDInputBuffer.m in Sources */,
+				9AC4C6142F27CA9B00CD3AD4 /* UDAST.m in Sources */,
+				9AC4C6132F27CA9800CD3AD4 /* UDFrontend.m in Sources */,
+				9AC4C6172F27CAA300CD3AD4 /* UDVM.m in Sources */,
+				9AC4C6102F27CA8F00CD3AD4 /* UDTape.m in Sources */,
+				9AC4C60C2F27CA8300CD3AD4 /* UDCalc.m in Sources */,
+				9AC4C60F2F27CA8C00CD3AD4 /* UDConversionHistoryManager.m in Sources */,
+				9AC4C6162F27CAA000CD3AD4 /* UDCompiler.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9AC4C6072F27CA3000CD3AD4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9A7B94E82F1BB18600ED7306 /* Calculator */;
+			targetProxy = 9AC4C6062F27CA3000CD3AD4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		9A7B94F12F1BB18800ED7306 /* MainMenu.xib */ = {
@@ -410,6 +518,38 @@
 			};
 			name = Release;
 		};
+		9AC4C6082F27CA3000CD3AD4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H5GRGUR75L;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.underivable.CalculatorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Calculator.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Calculator";
+			};
+			name = Debug;
+		};
+		9AC4C6092F27CA3000CD3AD4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H5GRGUR75L;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.underivable.CalculatorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Calculator.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Calculator";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -427,6 +567,15 @@
 			buildConfigurations = (
 				9A7B94FA2F1BB18800ED7306 /* Debug */,
 				9A7B94FB2F1BB18800ED7306 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9AC4C60A2F27CA3000CD3AD4 /* Build configuration list for PBXNativeTarget "CalculatorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9AC4C6082F27CA3000CD3AD4 /* Debug */,
+				9AC4C6092F27CA3000CD3AD4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
