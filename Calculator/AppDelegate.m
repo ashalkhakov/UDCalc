@@ -59,6 +59,31 @@
     [self setCalculatorMode:(CalculatorMode)sender.tag animate:YES];
 }
 
+- (IBAction)changeRPNMode:(NSMenuItem *)sender {
+    self.calc.isRPNMode = !self.calc.isRPNMode;
+    
+    sender.state = self.calc.isRPNMode ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    [self updateUIForRPNMode:self.calc.isRPNMode];
+}
+
+- (void)updateUIForRPNMode:(BOOL)isRPNMode {
+    
+    // 1. Switch the Display View (0 = Standard, 1 = RPN)
+    NSInteger tabIndex = isRPNMode ? 1 : 0;
+    [self.displayTabView selectTabViewItemAtIndex:tabIndex];
+
+    // 2. Toggle "Enter" vs "=" Button Title
+    self.equalsButton.title = isRPNMode ? @"enter" : @"=";
+
+    // 3. Disable Parens in RPN
+    self.parenLeftButton.enabled = !isRPNMode;
+    self.parenRightButton.enabled = !isRPNMode;
+
+    // 4. Refresh Data
+    [self updateUI];
+}
+
 - (void) setCalculatorMode:(CalculatorMode)mode animate:(BOOL)animate {
     switch (mode) {
         case CalculatorModeBasic:
@@ -70,6 +95,7 @@
         default:
             break;
     }
+    self.calcMode = mode;
 }
 
 - (void)setScientificModeVisible:(BOOL)showScientific animate:(BOOL)animate {
@@ -184,6 +210,11 @@
             else if ([opTitle isEqualToString:@"mplus"]) op = UDOpMAdd;
             else if ([opTitle isEqualToString:@"mminus"]) op = UDOpMSub;
             else if ([opTitle isEqualToString:@"mr"]) op = UDOpMR;
+            // stack ops
+            else if ([opTitle isEqualToString:@"swap"]) op = UDOpSwap;
+            else if ([opTitle isEqualToString:@"rolldown"]) op = UDOpRollDown;
+            else if ([opTitle isEqualToString:@"rollup"]) op = UDOpRollUp;
+            else if ([opTitle isEqualToString:@"drop"]) op = UDOpDrop;
             break;
             
         case CalcButtonTypePi:           // Pi symbol
@@ -321,44 +352,60 @@
     // 3. Update Display
     [self updateUI];
 }
-
-// Connect 'mc' button here
-- (IBAction)memoryClearPressed:(id)sender {
-    //[self.calc memClear];
-    [self.calc performOperation:UDOpMC];
-
-    // Optional: Flash the display or show "M" indicator on Tape?
-    [self updateUI];
-}
-
-// Connect 'm+' button here
-- (IBAction)memoryAddPressed:(id)sender {
-   // [self.calc memAdd];
-    [self.calc performOperation:UDOpMAdd];
-
-    // Standard behavior: Add current display value to memory
-    // If user is typing "5", add 5. If result is "10", add 10.
-    //self.calc.memoryValue += self.calc.currentValue;
-    [self updateUI];
-}
-
-// Connect 'm-' button here
-- (IBAction)memorySubPressed:(id)sender {
-    [self.calc performOperation:UDOpMSub];
-//    self.calc.memoryValue -= self.calc.currentValue;
-    //[self.calc memSub];
-    [self updateUI];
-}
-
-// Connect 'mr' button here
-- (IBAction)memoryRecallPressed:(id)sender {
-    // Treat this exactly like typing a number
-    //[self.calc memRecall];
-    [self.calc performOperation:UDOpMR];
+/*
+- (void)setRPNMode:(BOOL)isRPN {
+    _isRPNMode = isRPN;
     
-    //[self.tape updateDraftValue:self.calc.memoryValue];
-    [self updateUI];
+    // Toggle Button Title
+    if (isRPN) {
+        self.equalsButton.title = @"ENTER";
+        // Show the extra stack lines
+        self.stackView.hidden = NO;
+    } else {
+        self.equalsButton.title = @"=";
+        // Hide stack lines (Standard calc only shows current input)
+        self.stackView.hidden = YES;
+    }
+    
+    // Clear state so we don't mix modes awkwardly
+    [self.calc reset];
 }
+
+- (void)refreshDisplayFromStack {
+    // 1. Determine what to show in the Main Display (Register X)
+    if (self.isTyping) {
+        // If typing, X is the buffer (not on stack yet)
+        self.displayLabel.stringValue = [self.calc currentDisplayValue];
+        // The stack starts at Y
+        [self updateStackLinesOffset:0];
+    } else {
+        // If not typing, X is stack.lastObject
+        if (self.nodeStack.count > 0) {
+            double val = [self evaluateNode:[self.nodeStack lastObject]];
+            self.displayLabel.stringValue = [self formatDouble:val];
+        } else {
+            self.displayLabel.stringValue = @"0";
+        }
+        // The visible stack lines show Y, Z, T... (offset by 1)
+        [self updateStackLinesOffset:1];
+    }
+}
+
+- (void)updateStackLinesOffset:(NSInteger)offsetFromTop {
+    // stackLabels[0] is usually the line ABOVE the main display (Y register)
+    NSInteger stackIndex = self.nodeStack.count - 1 - offsetFromTop;
+    
+    for (NSTextField *label in self.stackLabels) {
+        if (stackIndex >= 0) {
+            UDASTNode *node = self.nodeStack[stackIndex];
+            double val = [self evaluateNode:node];
+            label.stringValue = [self formatDouble:val];
+        } else {
+            label.stringValue = @""; // Clear empty lines
+        }
+        stackIndex--;
+    }
+}*/
 
 -(void)createConverterWindow {
     if (!self.converterWindow) {
@@ -534,21 +581,88 @@
     [self updateRecentMenu];
 }
 
+#pragma mark - NSTableViewDataSource and NSTableViewDelegate Delegate
+
+- (NSString *)formatDouble:(double)val {
+    return [NSString stringWithFormat:@"%.10g", val];
+}
+
+// 1. Data Source: How many rows?
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
+    NSInteger count = self.calc.currentStackValues.count;
+    return count;
+}
+
+// 2. View For Row: What to display?
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+    
+    // Get a reusable cell view (Standard Cocoa pattern)
+    NSTableCellView *cell = [tableView makeViewWithIdentifier:@"StackCell" owner:self];
+    
+    if (!cell) {
+        // If IB didn't create one, make it manually (Safe for simple tables)
+        cell = [[NSTableCellView alloc] initWithFrame:NSMakeRect(0, 0, 100, 20)];
+        NSTextField *tf = [NSTextField labelWithString:@""];
+        tf.alignment = NSTextAlignmentRight;
+        tf.font = [NSFont systemFontOfSize:18]; // Nice readable font
+        tf.translatesAutoresizingMaskIntoConstraints = NO;
+        [cell addSubview:tf];
+        cell.textField = tf;
+        
+        // Pin text field to cell edges
+        [cell addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[tf]|" options:0 metrics:nil views:@{@"tf":tf}]];
+        [cell addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[tf]|" options:0 metrics:nil views:@{@"tf":tf}]];
+    }
+    
+    // FETCH DATA
+    // Note: currentStackValues[0] is usually bottom of stack (history).
+    // Apple's UI usually puts X (Top of Stack) at the BOTTOM visually.
+    // So Row 0 = Deep History. Row Last = X Register.
+    NSArray *values = [self.calc currentStackValues];
+
+    if (row < values.count) {
+        double val = [values[row] doubleValue];
+        cell.textField.stringValue = [self formatDouble:val];
+        
+        // Styling: The last row is always the X Register (Active) -> Bold
+        // If we are typing, the Buffer (handled above) is X.
+        // If not typing, the last stack item is X.
+        BOOL isXRegister = (row == values.count - 1);
+        
+        if (isXRegister) {
+            cell.textField.font = [NSFont boldSystemFontOfSize:22];
+            cell.textField.textColor = [NSColor labelColor];
+        } else {
+            cell.textField.font = [NSFont systemFontOfSize:18];
+            cell.textField.textColor = [NSColor secondaryLabelColor]; // Dim history
+        }
+    }
+
+    return cell;
+}
+
 #pragma mark - Helper
 
 - (void)updateUI {
-    /*if (self.calc.errorMessage) {
-        [self.displayField setStringValue:self.calc.errorMessage];
-    } else*/ {
-        
-        if (self.calc.isTyping) {
-            [self.acButton setTitle:@"C"];
-        } else {
-            [self.acButton setTitle:@"AC"];
+       
+    if (self.calc.isTyping) {
+        [self.acButton setTitle:@"C"];
+    } else {
+        [self.acButton setTitle:@"AC"];
+    }
+    
+    if (self.calc.isRPNMode) {
+        // --- RPN TABLE UPDATE ---
+        [self.stackTableView reloadData];
+            
+        // Auto-scroll to the bottom (The X Register)
+        NSInteger rowCount = [self.stackTableView numberOfRows];
+        if (rowCount > 0) {
+            [self.stackTableView scrollRowToVisible:rowCount - 1];
         }
-        
+    } else {
         // %g removes trailing zeros for us
-        [self.displayField setStringValue:[NSString stringWithFormat:@"%g", self.calc.currentInputValue]];
+        [self.displayField setStringValue:[self formatDouble:self.calc.currentInputValue]];
     }
 }
 

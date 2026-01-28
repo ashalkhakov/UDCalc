@@ -15,9 +15,16 @@
 - (BOOL)isEqual:(id)object {
     return [object isKindOfClass:[self class]];
 }
+
 - (NSUInteger)hash {
     return [self.prettyPrint hash];
 }
+
+- (id)copyWithZone:(NSZone *)zone {
+    // Base implementation or Abstract
+    return self;
+}
+
 @end
 
 // ---------------------------------------------------------
@@ -50,6 +57,12 @@
 - (NSUInteger)hash {
     return [[NSNumber numberWithDouble:self.value] hash];
 }
+
+- (id)copyWithZone:(NSZone *)zone {
+    UDNumberNode *copy = [UDNumberNode value:self.value];
+    return copy;
+}
+
 @end
 
 // ---------------------------------------------------------
@@ -80,6 +93,12 @@
 - (NSUInteger)hash {
     return [self.symbol hash];
 }
+
+-(id)copyWithZone:(NSZone *)zone {
+    UDConstantNode *copy = [UDConstantNode value:self.value symbol:self.symbol];
+    return copy;
+}
+
 @end
 
 // ---------------------------------------------------------
@@ -106,6 +125,12 @@
 - (NSUInteger)hash {
     return [self.op hash] ^ [self.child hash];
 }
+
+- (id)copyWithZone:(NSZone *)zone {
+    UDUnaryOpNode *copy = [UDUnaryOpNode op:self.op child:[self.child copy]];
+    return copy;
+}
+
 @end
 
 @implementation UDPostfixOpNode
@@ -128,6 +153,12 @@
 - (NSUInteger)hash {
     return [self.symbol hash] ^ [self.child hash];
 }
+
+- (id)copyWithZone:(NSZone *)zone {
+    UDPostfixOpNode *copy = [UDPostfixOpNode symbol:self.symbol child:[self.child copy]];
+    return copy;
+}
+
 @end
 
 // ---------------------------------------------------------
@@ -185,6 +216,14 @@
     return [self.op hash] ^ [self.left hash] ^ [self.right hash];
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+    UDBinaryOpNode *copy = [UDBinaryOpNode op:self.op
+                                         left:[self.left copy]
+                                        right:[self.right copy]
+                                   precedence:self.precedence];
+    return copy;
+}
+
 @end
 
 // ---------------------------------------------------------
@@ -222,6 +261,13 @@
 
 - (NSUInteger)hash {
     return [self.name hash] ^ [self.args hash];
+}
+
+- (id)copyWithZone:(NSZone *)zone {
+    NSArray *deepCopiedArgs = [[NSArray alloc] initWithArray:self.args copyItems:YES];
+    UDFunctionNode *copy = [UDFunctionNode func:self.name
+                                           args:deepCopiedArgs];
+    return copy;
 }
 
 @end

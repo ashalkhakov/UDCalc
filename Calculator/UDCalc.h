@@ -15,6 +15,7 @@
 // State
 @property (nonatomic, strong) UDInputBuffer *inputBuffer;
 @property (nonatomic, assign) BOOL isRadians;
+@property (nonatomic, assign) BOOL isRPNMode;
 @property (nonatomic, assign) double memoryRegister; // The 'M' value
 // YES = User is editing the buffer.
 // NO = User just hit an Op/Equals, buffer is "fresh".
@@ -35,9 +36,11 @@
 // Returns what should currently be on screen (Buffer string OR Result string)
 - (double)currentInputValue;
 - (NSString *)currentDisplayValue;
+- (NSArray<NSNumber *> *)currentStackValues; // Returns evaluated numbers for X, Y, Z...
 
 // The "Run" Button
 // Compiles the current AST and executes it on the VM.
+- (double)evaluateNode:(UDASTNode *)node;
 - (double)evaluateCurrentExpression;
 
 @end

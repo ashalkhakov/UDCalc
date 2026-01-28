@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		9A0D01C22F234AD000FE2946 /* UDInputBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0D01C12F234AD000FE2946 /* UDInputBuffer.m */; };
+		9A20771D2F291BFE00A28E88 /* UDCalcRPNTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A20771C2F291BFE00A28E88 /* UDCalcRPNTests.m */; };
 		9A4496B52F2143980024B55F /* UDCalcButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4496B42F2143980024B55F /* UDCalcButton.m */; };
 		9A5589862F1FFDA500159E7B /* UDFrontendContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5589852F1FFDA500159E7B /* UDFrontendContext.m */; };
 		9A717CA52F1D1D9F005A27B7 /* UDTape.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CA42F1D1D9F005A27B7 /* UDTape.m */; };
@@ -60,6 +61,7 @@
 /* Begin PBXFileReference section */
 		9A0D01C02F234AA900FE2946 /* UDInputBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDInputBuffer.h; sourceTree = "<group>"; };
 		9A0D01C12F234AD000FE2946 /* UDInputBuffer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDInputBuffer.m; sourceTree = "<group>"; };
+		9A20771C2F291BFE00A28E88 /* UDCalcRPNTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCalcRPNTests.m; sourceTree = "<group>"; };
 		9A4496B32F2143790024B55F /* UDCalcButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDCalcButton.h; sourceTree = "<group>"; };
 		9A4496B42F2143980024B55F /* UDCalcButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCalcButton.m; sourceTree = "<group>"; };
 		9A5589842F1FFD8A00159E7B /* UDFrontendContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDFrontendContext.h; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 			isa = PBXGroup;
 			children = (
 				9AC4C6042F27CA3000CD3AD4 /* UDCalcTests.m */,
+				9A20771C2F291BFE00A28E88 /* UDCalcRPNTests.m */,
 			);
 			path = CalculatorTests;
 			sourceTree = "<group>";
@@ -325,6 +328,7 @@
 				9AC4C6112F27CA9200CD3AD4 /* UDTapeToken.m in Sources */,
 				9AC4C6182F27CAA600CD3AD4 /* UDFrontendContext.m in Sources */,
 				9AC4C61A2F27CAAB00CD3AD4 /* UDInputBuffer.m in Sources */,
+				9A20771D2F291BFE00A28E88 /* UDCalcRPNTests.m in Sources */,
 				9AC4C6142F27CA9B00CD3AD4 /* UDAST.m in Sources */,
 				9AC4C6132F27CA9800CD3AD4 /* UDFrontend.m in Sources */,
 				9AC4C6172F27CAA300CD3AD4 /* UDVM.m in Sources */,

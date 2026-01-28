@@ -104,35 +104,7 @@
     _expectingOperator = YES;
 }
 
-- (void)performOperation:(UDOp)op {
-    
-    // -------------------------------------------------------------------------
-    // CATEGORY 1: NEUTRAL OPS
-    // -------------------------------------------------------------------------
-    if (op == UDOpMC || op == UDOpNegate || op == UDOpRad || op == UDOpEE || op == UDOpMR) {
-        switch (op) {
-            case UDOpEE: [self inputEE]; break;
-            case UDOpRad: self.isRadians = !self.isRadians; break;
-            case UDOpMC: self.memoryRegister = 0; break;
-            case UDOpNegate: [self.inputBuffer toggleSign]; break;
-            case UDOpMR: [self inputNumber:self.memoryRegister]; break;
-            default: break;
-        }
-        return;
-    }
-    
-    // -------------------------------------------------------------------------
-    // CATEGORY 2: CLEAR OPS
-    // -------------------------------------------------------------------------
-    if (op == UDOpClear) {
-        if (self.isTyping) {
-            [self.inputBuffer performClearEntry];
-        } else {
-            [self reset];
-        }
-        return;
-    }
-
+- (void)performOperationShuntingYard:(UDOp)op {
     // -------------------------------------------------------------------------
     // CATEGORY 3: TERMINATORS (=, M+, M-)
     // -------------------------------------------------------------------------
@@ -160,6 +132,7 @@
         return;
     }
     
+
     // -------------------------------------------------------------------------
     // CATEGORY 4: CONSTRUCTIVE OPS
     // -------------------------------------------------------------------------
@@ -285,6 +258,202 @@
     self.expectingOperator = NO; // After "+", we expect a Number
 }
 
+- (void)performOperationRPN:(UDOp)op {
+    // -------------------------------------------------------------------------
+    // CATEGORY 1: STACK MANIPULATION OPS
+    // -------------------------------------------------------------------------
+
+    // ENTER (Commit or Duplicate)
+    if (op == UDOpEnter) {
+        
+        // Case 1: Committing user input
+        // User types "5" -> Buffer has "5"
+        // User hits Enter -> Stack gets Node(5), Buffer clears.
+        if (self.isTyping) {
+            [self flushBufferToStack];
+            self.isTyping = NO;
+            // Note: We don't need to "push" anything else.
+            // flushBufferToStack moves the buffer value to self.nodeStack.
+            return;
+        }
+        
+        // Case 2: Duplicating X (Standard HP behavior)
+        // User hits Enter again -> Stack gets another copy of Top.
+        // Stack: [5] -> [5, 5]
+        if (self.nodeStack.count > 0) {
+            UDASTNode *topNode = [self.nodeStack lastObject];
+            
+            // IMPORTANT: Create a COPY of the node.
+            // If nodes are shared pointers, modifying one might affect the other
+            // in complex operations. If your nodes assume immutability,
+            // sharing the pointer is fine, but copy is safer.
+            UDASTNode *newNode;
+            if ([topNode conformsToProtocol:@protocol(NSCopying)]) {
+                newNode = [topNode copy];
+            } else {
+                // Fallback if NSCopying isn't implemented (Assuming immutable number node)
+                // Ideally, implement NSCopying on UDASTNode subclasses.
+                newNode = topNode;
+            }
+            
+            [self.nodeStack addObject:newNode];
+        }
+        
+        return;
+    }
+
+    // DROP (Pop X)
+    if (op == UDOpDrop) {
+        // If user is typing "123", Drop acts like Backspace/Clear Entry first
+        if (self.isTyping) {
+            [self.inputBuffer performClearEntry];
+            self.isTyping = NO;
+            return;
+        }
+        
+        // Remove the X register (Top of stack)
+        if (self.nodeStack.count > 0) {
+            [self.nodeStack removeLastObject];
+        }
+
+        return;
+    }
+
+    // SWAP (X <-> Y)
+    if (op == UDOpSwap) {
+        // Ensure inputs are committed
+        if (self.isTyping) {
+            [self flushBufferToStack];
+            self.isTyping = NO;
+        }
+        
+        if (self.nodeStack.count >= 2) {
+            NSInteger count = self.nodeStack.count;
+            [self.nodeStack exchangeObjectAtIndex:(count - 1)
+                                withObjectAtIndex:(count - 2)];
+        }
+        return;
+    }
+    
+    // ROLL DOWN (X moves to Top/History)
+    // [A, B, C, D] -> [D, A, B, C]
+    if (op == UDOpRollDown) {
+        if (self.isTyping) { [self flushBufferToStack]; self.isTyping = NO; }
+        
+        if (self.nodeStack.count > 1) {
+            // Take X (Last)
+            UDASTNode *xNode = [self.nodeStack lastObject];
+            // Remove it
+            [self.nodeStack removeLastObject];
+            // Insert it at Bottom (Index 0)
+            [self.nodeStack insertObject:xNode atIndex:0];
+        }
+        return;
+    }
+
+    // ROLL UP (Top/History moves to X)
+    // [A, B, C, D] -> [B, C, D, A]
+    if (op == UDOpRollUp) {
+        if (self.isTyping) { [self flushBufferToStack]; self.isTyping = NO; }
+        
+        if (self.nodeStack.count > 1) {
+            // Take Top (Index 0)
+            UDASTNode *topNode = [self.nodeStack objectAtIndex:0];
+            // Remove it
+            [self.nodeStack removeObjectAtIndex:0];
+            // Add to X (End)
+            [self.nodeStack addObject:topNode];
+        }
+        return;
+    }
+    
+    // -------------------------------------------------------------------------
+    // CATEGORY 2: CONSTRUCTIVE OPS
+    // -------------------------------------------------------------------------
+
+    UDOpInfo *info = [[UDFrontend shared] infoForOp:op];
+
+    // -------------------------------------------------------------------------
+    // CASE 1: BINARY OPERATORS (+, -, *, /, ^)
+    // Needs 2 operands. Consumes them, pushes result.
+    // -------------------------------------------------------------------------
+    if (info.placement == UDOpPlacementInfix) {
+        
+        // 1. Implicit Enter: "3 Enter 4 +" -> "+" acts as Enter for "4" first.
+        if (self.isTyping) {
+            [self flushBufferToStack];
+            self.isTyping = NO;
+        }
+        
+        // 2. Safety Check (Stack Underflow)
+        if (self.nodeStack.count < 2) {
+            // Optional: Blink display or beep
+            return;
+        }
+
+        [self buildNode:info];
+        
+        // 5. Update UI Data (Result acts as 'X')
+        // We do NOT set isTyping=YES. Result is ready to be used by next op.
+        return;
+    }
+
+    // -------------------------------------------------------------------------
+    // CASE 2: UNARY / POSTFIX / FUNCTION (sin, cos, !, √)
+    // Needs 1 operand. Consumes it, pushes result.
+    // -------------------------------------------------------------------------
+
+        
+    // 1. Implicit Enter
+    if (self.isTyping) {
+        [self flushBufferToStack];
+        self.isTyping = NO;
+    }
+        
+    // 2. Safety Check
+    if (self.nodeStack.count < 1) {
+        return;
+    }
+    
+    [self buildNode:info];
+}
+
+- (void)performOperation:(UDOp)op {
+    
+    // -------------------------------------------------------------------------
+    // CATEGORY 1: NEUTRAL OPS
+    // -------------------------------------------------------------------------
+    if (op == UDOpMC || op == UDOpNegate || op == UDOpRad || op == UDOpEE || op == UDOpMR) {
+        switch (op) {
+            case UDOpEE: [self inputEE]; break;
+            case UDOpRad: self.isRadians = !self.isRadians; break;
+            case UDOpMC: self.memoryRegister = 0; break;
+            case UDOpNegate: [self.inputBuffer toggleSign]; break;
+            case UDOpMR: [self inputNumber:self.memoryRegister]; break;
+            default: break;
+        }
+        return;
+    }
+    
+    // -------------------------------------------------------------------------
+    // CATEGORY 2: CLEAR OPS
+    // -------------------------------------------------------------------------
+    if (op == UDOpClear) {
+        if (self.isTyping) {
+            [self.inputBuffer performClearEntry];
+        } else {
+            [self reset];
+        }
+        return;
+    }
+
+    if (self.isRPNMode) {
+        [self performOperationRPN:op];
+    } else {
+        [self performOperationShuntingYard:op];
+    }
+}
+
 #pragma mark - AST Construction & Exec
 
 - (void)reduceOp {
@@ -308,11 +477,15 @@
     if (node) [self.nodeStack addObject:node];
 }
 
+- (double)evaluateNode:(UDASTNode *)node {
+    NSArray *bytecode = [UDCompiler compile:node];
+    return [UDVM execute:bytecode];
+}
+
 - (double)evaluateCurrentExpression {
     if (self.nodeStack.count == 0) return 0.0;
     UDASTNode *root = [self.nodeStack lastObject];
-    NSArray *bytecode = [UDCompiler compile:root];
-    return [UDVM execute:bytecode];
+    return [self evaluateNode:root];
 }
 
 - (double)currentInputValue {
@@ -323,6 +496,21 @@
 
 - (NSString *)currentDisplayValue {
     return [NSString stringWithFormat:@"%.10g", [self currentInputValue]];
+}
+
+- (NSArray<NSNumber *> *)currentStackValues {
+    NSMutableArray<NSNumber *> *values = [NSMutableArray array];
+    
+    // Iterate through the entire node stack
+    for (UDASTNode *node in self.nodeStack) {
+        // Resolve the tree (e.g., "3 + 5") into a number (8.0)
+        double val = [self evaluateNode:node];
+        [values addObject:@(val)];
+    }
+
+    [values addObject:@([self.inputBuffer finalizeValue])];
+    
+    return [values copy];
 }
 
 @end

@@ -13,64 +13,71 @@
 typedef NS_ENUM(NSInteger, UDOp) {
     UDOpNone = 0,
     UDOpAdd = 1,
-    UDOpSub,
-    UDOpMul,
-    UDOpDiv,
-    UDOpEq,
-    UDOpClear,
-    UDOpPercent,
-    UDOpNegate,
+    UDOpSub = 2,
+    UDOpMul = 3,
+    UDOpDiv = 4,
+    UDOpEq = 5,
+    UDOpClear = 6,
+    UDOpPercent = 7,
+    UDOpNegate = 8,
 
     // --- ROW 2 (Powers) ---
-    UDOpSquare,     // x^2
-    UDOpCube,       // x^3
-    UDOpPow,        // x^y (Binary)
-    UDOpPowRev,     // y^x (Binary)
-    UDOpExp,        // e^x
-    UDOpPow10,      // 10^x
-    UDOpPow2,       // 2^x
+    UDOpSquare = 9,     // x^2
+    UDOpCube = 10,      // x^3
+    UDOpPow = 11,       // x^y (Binary)
+    UDOpPowRev = 12,    // y^x (Binary)
+    UDOpExp = 13,       // e^x
+    UDOpPow10 = 14,     // 10^x
+    UDOpPow2 = 15,      // 2^x
     
     // --- ROW 3 (Roots & Logs) ---
-    UDOpInvert,     // 1/x
-    UDOpSqrt,       // sqrt x
-    UDOpCbrt,       // cbrt x
-    UDOpYRoot,      // root(x, y) (Binary)
-    UDOpLn,         // ln
-    UDOpLog10,      // log 10
-    UDOpLog2,       // log 2
-    UDOpLogY,       // log y(x)
+    UDOpInvert = 16,   // 1/x
+    UDOpSqrt = 17,     // sqrt x
+    UDOpCbrt = 18,     // cbrt x
+    UDOpYRoot = 19,    // root(x, y) (Binary)
+    UDOpLn = 20,       // ln
+    UDOpLog10 = 21,    // log 10
+    UDOpLog2 = 22,     // log 2
+    UDOpLogY = 23,     // log y(x)
     
     // --- ROW 4 (Trig) ---
-    UDOpFactorial,  // x!
-    UDOpSin,
-    UDOpSinInverse,
-    UDOpCos,
-    UDOpCosInverse,
-    UDOpTan,
-    UDOpTanInverse,
-    UDOpConstE,     // Constant e
-    UDOpEE,         // Scientific Notation (Advanced)
+    UDOpFactorial = 24,  // x!
+    UDOpSin = 25,
+    UDOpSinInverse = 26,
+    UDOpCos = 27,
+    UDOpCosInverse = 28,
+    UDOpTan = 29,
+    UDOpTanInverse = 30,
+    UDOpConstE = 31,     // Constant e
+    UDOpEE = 32,         // Scientific Notation (Advanced)
     
     // --- ROW 5 (Hyperbolic & Misc) ---
-    UDOpSinh,
-    UDOpSinhInverse,
-    UDOpCosh,
-    UDOpCoshInverse,
-    UDOpTanh,
-    UDOpTanhInverse,
-    UDOpConstPi,    // Constant π
-    UDOpRand,       // Random Number
-    UDOpRad,        // Rad/Deg Switch
+    UDOpSinh = 33,
+    UDOpSinhInverse = 34,
+    UDOpCosh = 35,
+    UDOpCoshInverse = 36,
+    UDOpTanh = 37,
+    UDOpTanhInverse = 38,
+    UDOpConstPi = 39,    // Constant π
+    UDOpRand = 40,       // Random Number
+    UDOpRad = 41,        // Rad/Deg Switch
     
     // Memory
-    UDOpMR,
-    UDOpMC,
-    UDOpMAdd,
-    UDOpMSub,
+    UDOpMR = 42,
+    UDOpMC = 43,
+    UDOpMAdd = 44,
+    UDOpMSub = 45,
 
     // --- SPECIAL ---
-    UDOpParenLeft,  // (
-    UDOpParenRight,  // )
+    UDOpParenLeft = 46,  // (
+    UDOpParenRight = 47,  // )
+    
+    // --- RPN ---
+    UDOpEnter = 48,
+    UDOpSwap = 49,
+    UDOpDrop = 50,
+    UDOpRollDown = 51,
+    UDOpRollUp = 52
 };
 
 @interface UDFrontendContext : NSObject

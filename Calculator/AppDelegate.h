@@ -19,50 +19,53 @@ typedef NS_ENUM(NSInteger, CalculatorMode) {
     CalculatorModeProgrammer    = 3
 };
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate, NSTableViewDataSource, NSTableViewDelegate>
 
-@property (weak) IBOutlet NSTextField *displayField;
+@property (nonatomic, weak) IBOutlet NSTextField *displayField;
 
-@property (strong) UDCalc *calc;
-@property (strong) UDUnitConverter *unitConverter;
-@property (strong) UDConversionHistoryManager *historyManager;
-@property (strong) UDTape *tape;
-
-@property (weak) IBOutlet NSLayoutConstraint *scientificWidthConstraint;
-@property (weak) IBOutlet NSView *scientificView;
-@property (assign) CGFloat standardScientificWidth; // To remember the size
-
-@property (strong) UDConversionWindowController *converterWindow;
-@property (strong) UDTapeWindowController *tapeWindowController;
-
-@property (assign) BOOL isSecondFunctionActive;
+@property (nonatomic, strong) UDCalc *calc;
+@property (nonatomic, strong) UDUnitConverter *unitConverter;
+@property (nonatomic, strong) UDConversionHistoryManager *historyManager;
+@property (nonatomic, strong) UDTape *tape;
+@property (nonatomic, assign) CalculatorMode calcMode;
+@property (nonatomic, assign) BOOL isSecondFunctionActive;
 
 // Actions (Methods linked to buttons)
 - (IBAction)changeMode:(NSMenuItem *)sender;
+- (IBAction)changeRPNMode:(NSMenuItem *)sender;
 - (IBAction)digitPressed:(NSButton *)sender;
 - (IBAction)operationPressed:(NSButton *)sender;
 - (IBAction)decimalPressed:(NSButton *)sender;
-- (IBAction)memoryClearPressed:(NSButton *)sender;
-- (IBAction)memoryAddPressed:(NSButton *)sender;
-- (IBAction)memorySubPressed:(NSButton *)sender;
-- (IBAction)memoryRecallPressed:(NSButton *)sender;
 - (IBAction)openConverter:(id)sender;
 - (IBAction)secondFunctionPressed:(NSButton *)sender;
 
-@property (weak) IBOutlet NSButton *acButton;
-@property (weak) IBOutlet NSButton *expButton;
-@property (weak) IBOutlet NSButton *xthPowerOf10Button;
-@property (weak) IBOutlet NSButton *lnButton;
-@property (weak) IBOutlet NSButton *log10Button;
+@property (nonatomic, weak) IBOutlet NSTabView *displayTabView;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *scientificWidthConstraint;
+@property (nonatomic, weak) IBOutlet NSView *scientificView;
+@property (nonatomic, assign) CGFloat standardScientificWidth; // To remember the size
 
-@property (weak) IBOutlet NSButton *sinButton;
-@property (weak) IBOutlet NSButton *cosButton;
-@property (weak) IBOutlet NSButton *tanButton;
-@property (weak) IBOutlet NSButton *sinhButton;
-@property (weak) IBOutlet NSButton *coshButton;
-@property (weak) IBOutlet NSButton *tanhButton;
+@property (nonatomic, weak) IBOutlet NSTableView *stackTableView;
 
-@property (weak) IBOutlet NSMenu *recentMenu;
+@property (nonatomic, strong) UDConversionWindowController *converterWindow;
+@property (nonatomic, strong) UDTapeWindowController *tapeWindowController;
+
+@property (nonatomic, weak) IBOutlet NSButton *parenLeftButton;
+@property (nonatomic, weak) IBOutlet NSButton *parenRightButton;
+@property (nonatomic, weak) IBOutlet NSButton *acButton;
+@property (nonatomic, weak) IBOutlet NSButton *expButton;
+@property (nonatomic, weak) IBOutlet NSButton *xthPowerOf10Button;
+@property (nonatomic, weak) IBOutlet NSButton *lnButton;
+@property (nonatomic, weak) IBOutlet NSButton *log10Button;
+@property (nonatomic, weak) IBOutlet NSButton *equalsButton;
+
+@property (nonatomic, weak) IBOutlet NSButton *sinButton;
+@property (nonatomic, weak) IBOutlet NSButton *cosButton;
+@property (nonatomic, weak) IBOutlet NSButton *tanButton;
+@property (nonatomic, weak) IBOutlet NSButton *sinhButton;
+@property (nonatomic, weak) IBOutlet NSButton *coshButton;
+@property (nonatomic, weak) IBOutlet NSButton *tanhButton;
+
+@property (nonatomic, weak) IBOutlet NSMenu *recentMenu;
 
 - (IBAction)conversionMenuClicked:(NSMenuItem *)sender;
 - (void)setCalculatorMode:(CalculatorMode)mode animate:(BOOL)animate;
