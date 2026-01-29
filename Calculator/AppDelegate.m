@@ -188,7 +188,7 @@
             else if ([opTitle isEqualToString:@"sub"]) op = UDOpSub;
             else if ([opTitle isEqualToString:@"mul"]) op = UDOpMul; // or "x" or "X"
             else if ([opTitle isEqualToString:@"div"]) op = UDOpDiv; // or "÷"
-            else if ([opTitle isEqualToString:@"equals"]) op = UDOpEq;
+            else if ([opTitle isEqualToString:@"equals"]) op = self.calc.isRPNMode ? UDOpEnter : UDOpEq;
             else if ([opTitle isEqualToString:@"clear"]) op = UDOpClear;
             else if ([opTitle isEqualToString:@"negate"]) op = UDOpNegate;
             else if ([opTitle isEqualToString:@"percent"]) op = UDOpPercent;

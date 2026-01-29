@@ -14,6 +14,7 @@
 @property (strong) NSMutableArray<NSNumber *> *opStack;
 @property (nonatomic, assign) BOOL expectingOperator;
 @property (nonatomic, assign) BOOL shouldResetOnDigit;
+@property (nonatomic, assign) BOOL shouldPushOnDigit;
 @end
 
 @implementation UDCalc
@@ -34,15 +35,19 @@
     _isTyping = NO;
     _expectingOperator = NO;
     _shouldResetOnDigit = NO;
+    _shouldPushOnDigit = NO;
     [self.inputBuffer performClearEntry];
 }
 
 - (void)performSoftReset {
-    [self.nodeStack removeAllObjects];
-    [self.opStack removeAllObjects];
+    if (!self.isRPNMode) {
+        [self.nodeStack removeAllObjects];
+        [self.opStack removeAllObjects];
+    }
     [self.inputBuffer performClearEntry];
     self.expectingOperator = NO;
     self.shouldResetOnDigit = NO;
+    self.shouldPushOnDigit = NO;
     self.isTyping = NO;
 }
 
@@ -57,6 +62,28 @@
     }
 }
 
+- (void)moveBufferToStack {
+    if (self.isTyping) {
+        double val = [self.inputBuffer finalizeValue];
+        [self.nodeStack addObject:[UDNumberNode value:val]];
+    }
+}
+
+// put whatever is now on top of stack onto the input buffer
+- (void)moveStackToBuffer:(BOOL)pushOnDigit {
+    if (self.nodeStack.count > 0) {
+        UDASTNode *topNode = self.nodeStack.lastObject;
+        [self.nodeStack removeLastObject];
+
+        double val = [self evaluateNode:topNode];
+        [self.inputBuffer loadConstant:val];
+        self.isTyping = YES;
+        self.expectingOperator = YES;
+        self.shouldPushOnDigit = pushOnDigit;
+        self.shouldResetOnDigit = YES;
+    }
+}
+
 - (void)inputEE {
     [self.inputBuffer handleEE];
 }
@@ -65,6 +92,10 @@
     // 1. SOFT RESET (Start new calc after =, M+, M-)
     if (self.shouldResetOnDigit) {
         [self performSoftReset];
+    }
+    if (self.shouldPushOnDigit) {
+        [self flushBufferToStack];
+        self.shouldPushOnDigit = NO;
     }
 
     // 2. IMPLICIT MULTIPLICATION (Bridging: "3! 2", ") 2")
@@ -83,6 +114,11 @@
     if (self.shouldResetOnDigit) {
         [self performSoftReset];
     }
+    if (self.shouldPushOnDigit) {
+        [self flushBufferToStack];
+        self.shouldPushOnDigit = NO;
+    }
+
     self.isTyping = YES;
     [self.inputBuffer handleDecimalPoint];
     _expectingOperator = NO;
@@ -92,6 +128,10 @@
 - (void)inputNumber:(double)number {
     if (self.shouldResetOnDigit) {
         [self performSoftReset];
+    }
+    if (self.shouldPushOnDigit) {
+        [self flushBufferToStack];
+        self.shouldPushOnDigit = NO;
     }
     
     // Constants and MR also trigger implicit multiplication (e.g. "2 PI" -> "2 * PI")
@@ -270,10 +310,8 @@
         // User types "5" -> Buffer has "5"
         // User hits Enter -> Stack gets Node(5), Buffer clears.
         if (self.isTyping) {
-            [self flushBufferToStack];
-            self.isTyping = NO;
-            // Note: We don't need to "push" anything else.
-            // flushBufferToStack moves the buffer value to self.nodeStack.
+            [self moveBufferToStack];
+            self.shouldResetOnDigit = YES; // If they type a number now, clear Ans
             return;
         }
         
@@ -297,40 +335,38 @@
             }
             
             [self.nodeStack addObject:newNode];
+            self.shouldResetOnDigit = YES; // If they type a number now, clear Ans
+            return;
         }
         
+        // duplicate a zero
+        [self.nodeStack addObject:[UDNumberNode value:0.0]];
         return;
     }
 
     // DROP (Pop X)
     if (op == UDOpDrop) {
-        // If user is typing "123", Drop acts like Backspace/Clear Entry first
-        if (self.isTyping) {
-            [self.inputBuffer performClearEntry];
-            self.isTyping = NO;
-            return;
-        }
-        
+        [self flushBufferToStack];
+
         // Remove the X register (Top of stack)
         if (self.nodeStack.count > 0) {
             [self.nodeStack removeLastObject];
         }
 
+        [self moveStackToBuffer:NO];
         return;
     }
 
     // SWAP (X <-> Y)
     if (op == UDOpSwap) {
-        // Ensure inputs are committed
-        if (self.isTyping) {
-            [self flushBufferToStack];
-            self.isTyping = NO;
-        }
-        
+        [self flushBufferToStack];
+
         if (self.nodeStack.count >= 2) {
             NSInteger count = self.nodeStack.count;
             [self.nodeStack exchangeObjectAtIndex:(count - 1)
                                 withObjectAtIndex:(count - 2)];
+            
+            [self moveStackToBuffer:NO];
         }
         return;
     }
@@ -338,7 +374,7 @@
     // ROLL DOWN (X moves to Top/History)
     // [A, B, C, D] -> [D, A, B, C]
     if (op == UDOpRollDown) {
-        if (self.isTyping) { [self flushBufferToStack]; self.isTyping = NO; }
+        [self flushBufferToStack];
         
         if (self.nodeStack.count > 1) {
             // Take X (Last)
@@ -347,6 +383,8 @@
             [self.nodeStack removeLastObject];
             // Insert it at Bottom (Index 0)
             [self.nodeStack insertObject:xNode atIndex:0];
+            
+            [self moveStackToBuffer:NO];
         }
         return;
     }
@@ -354,7 +392,7 @@
     // ROLL UP (Top/History moves to X)
     // [A, B, C, D] -> [B, C, D, A]
     if (op == UDOpRollUp) {
-        if (self.isTyping) { [self flushBufferToStack]; self.isTyping = NO; }
+        [self flushBufferToStack];
         
         if (self.nodeStack.count > 1) {
             // Take Top (Index 0)
@@ -363,6 +401,8 @@
             [self.nodeStack removeObjectAtIndex:0];
             // Add to X (End)
             [self.nodeStack addObject:topNode];
+
+            [self moveStackToBuffer:NO];
         }
         return;
     }
@@ -379,22 +419,22 @@
     // -------------------------------------------------------------------------
     if (info.placement == UDOpPlacementInfix) {
         
-        // 1. Implicit Enter: "3 Enter 4 +" -> "+" acts as Enter for "4" first.
-        if (self.isTyping) {
-            [self flushBufferToStack];
-            self.isTyping = NO;
-        }
-        
-        // 2. Safety Check (Stack Underflow)
-        if (self.nodeStack.count < 2) {
+        // Safety Check (Stack Underflow)
+        if (self.nodeStack.count == 0) {
             // Optional: Blink display or beep
             return;
         }
 
+        // Implicit Enter: "3 Enter 4 +" -> "+" acts as Enter for "4" first.
+        if (!self.isTyping) {
+            [self.nodeStack addObject:[UDNumberNode value:0.0]];
+        } else {
+            [self flushBufferToStack];
+        }
+
         [self buildNode:info];
-        
-        // 5. Update UI Data (Result acts as 'X')
-        // We do NOT set isTyping=YES. Result is ready to be used by next op.
+        // Auto-evaluate for display
+        [self moveStackToBuffer:YES];
         return;
     }
 
@@ -416,6 +456,9 @@
     }
     
     [self buildNode:info];
+    
+    // Auto-evaluate for display
+    [self moveStackToBuffer:YES];
 }
 
 - (void)performOperation:(UDOp)op {
@@ -441,6 +484,7 @@
     if (op == UDOpClear) {
         if (self.isTyping) {
             [self.inputBuffer performClearEntry];
+            self.isTyping = NO;
         } else {
             [self reset];
         }
@@ -464,8 +508,8 @@
     [self buildNode:info];
 }
 
--(void)buildNode:(UDOpInfo *)info {
-    if (!info || !info.action) return;
+-(UDASTNode *)createNode:(UDOpInfo *)info {
+    if (!info || !info.action) return nil;
     
     UDFrontendContext *context = [[UDFrontendContext alloc] init];
     context.nodeStack = self.nodeStack;
@@ -474,6 +518,11 @@
     context.memoryValue = self.memoryRegister;
     
     UDASTNode *node = info.action(context);
+    return node;
+}
+
+-(void)buildNode:(UDOpInfo *)info {
+    UDASTNode *node = [self createNode:info];
     if (node) [self.nodeStack addObject:node];
 }
 
@@ -508,7 +557,11 @@
         [values addObject:@(val)];
     }
 
-    [values addObject:@([self.inputBuffer finalizeValue])];
+    if (self.isTyping) {
+        [values addObject:@([self.inputBuffer finalizeValue])];
+    } else {
+        [values addObject:@(0.0)];
+    }
     
     return [values copy];
 }
