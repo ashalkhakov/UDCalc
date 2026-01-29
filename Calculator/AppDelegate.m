@@ -352,60 +352,6 @@
     // 3. Update Display
     [self updateUI];
 }
-/*
-- (void)setRPNMode:(BOOL)isRPN {
-    _isRPNMode = isRPN;
-    
-    // Toggle Button Title
-    if (isRPN) {
-        self.equalsButton.title = @"ENTER";
-        // Show the extra stack lines
-        self.stackView.hidden = NO;
-    } else {
-        self.equalsButton.title = @"=";
-        // Hide stack lines (Standard calc only shows current input)
-        self.stackView.hidden = YES;
-    }
-    
-    // Clear state so we don't mix modes awkwardly
-    [self.calc reset];
-}
-
-- (void)refreshDisplayFromStack {
-    // 1. Determine what to show in the Main Display (Register X)
-    if (self.isTyping) {
-        // If typing, X is the buffer (not on stack yet)
-        self.displayLabel.stringValue = [self.calc currentDisplayValue];
-        // The stack starts at Y
-        [self updateStackLinesOffset:0];
-    } else {
-        // If not typing, X is stack.lastObject
-        if (self.nodeStack.count > 0) {
-            double val = [self evaluateNode:[self.nodeStack lastObject]];
-            self.displayLabel.stringValue = [self formatDouble:val];
-        } else {
-            self.displayLabel.stringValue = @"0";
-        }
-        // The visible stack lines show Y, Z, T... (offset by 1)
-        [self updateStackLinesOffset:1];
-    }
-}
-
-- (void)updateStackLinesOffset:(NSInteger)offsetFromTop {
-    // stackLabels[0] is usually the line ABOVE the main display (Y register)
-    NSInteger stackIndex = self.nodeStack.count - 1 - offsetFromTop;
-    
-    for (NSTextField *label in self.stackLabels) {
-        if (stackIndex >= 0) {
-            UDASTNode *node = self.nodeStack[stackIndex];
-            double val = [self evaluateNode:node];
-            label.stringValue = [self formatDouble:val];
-        } else {
-            label.stringValue = @""; // Clear empty lines
-        }
-        stackIndex--;
-    }
-}*/
 
 -(void)createConverterWindow {
     if (!self.converterWindow) {
@@ -587,14 +533,41 @@
     return [NSString stringWithFormat:@"%.10g", val];
 }
 
+// Calculate how many filler rows are needed
+- (NSInteger)calculateFillerRows:(NSTableView *)tableView forActualRows:(NSInteger)actualRows {
+    CGFloat tableHeight = NSHeight(tableView.enclosingScrollView.documentVisibleRect);
+    CGFloat rowHeight = tableView.rowHeight; // Or use your custom row height
+    
+    NSInteger visibleRows = (NSInteger)floor(tableHeight / rowHeight);
+    
+    return MAX(0, visibleRows - actualRows);
+}
+
 // 1. Data Source: How many rows?
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
     NSInteger count = self.calc.currentStackValues.count;
-    return count;
+    return count + [self calculateFillerRows:tableView forActualRows:count];
 }
 
 // 2. View For Row: What to display?
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+
+    NSArray *values = [self.calc currentStackValues];
+
+    NSInteger fillerRowCount = [self calculateFillerRows:tableView forActualRows:values.count];
+    
+    // Check if this is a filler row
+    if (row < fillerRowCount) {
+        // Return an empty cell for filler rows
+        NSTableCellView *cellView = [tableView makeViewWithIdentifier:@"FillerCell" owner:self];
+        if (!cellView) {
+            cellView = [[NSTableCellView alloc] init];
+            cellView.identifier = @"FillerCell";
+        }
+        return cellView;
+    }
+    
+    row -= fillerRowCount;
     
     // Get a reusable cell view (Standard Cocoa pattern)
     NSTableCellView *cell = [tableView makeViewWithIdentifier:@"StackCell" owner:self];
@@ -618,7 +591,6 @@
     // Note: currentStackValues[0] is usually bottom of stack (history).
     // Apple's UI usually puts X (Top of Stack) at the BOTTOM visually.
     // So Row 0 = Deep History. Row Last = X Register.
-    NSArray *values = [self.calc currentStackValues];
 
     if (row < values.count) {
         double val = [values[row] doubleValue];
@@ -654,7 +626,7 @@
     if (self.calc.isRPNMode) {
         // --- RPN TABLE UPDATE ---
         [self.stackTableView reloadData];
-            
+
         // Auto-scroll to the bottom (The X Register)
         NSInteger rowCount = [self.stackTableView numberOfRows];
         if (rowCount > 0) {
