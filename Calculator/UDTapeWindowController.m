@@ -6,6 +6,7 @@
 //
 
 #import "UDTapeWindowController.h"
+#import "UDCalcViewController.h"
 
 @interface UDTapeWindowController ()
 
@@ -18,7 +19,7 @@
 
 - (void)windowDidLoad {
     [super windowDidLoad];
-    
+
     // Set a nice monospaced font so numbers align perfectly
     //[self.textView setFont:[NSFont monospacedDigitSystemFontOfSize:14.0 weight:NSFontWeightRegular]];
 }

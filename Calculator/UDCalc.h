@@ -10,9 +10,17 @@
 #import "UDAST.h"        // The AST Nodes
 #import "UDInputBuffer.h"
 
+@class UDCalc;
+
+@protocol UDCalcDelegate <NSObject>
+@optional
+- (void)calculator:(UDCalc *)calc didCalculateResult:(double)result forTree:(UDASTNode *)tree;
+@end
+
 @interface UDCalc : NSObject
 
 // State
+@property (nonatomic, weak) id<UDCalcDelegate> delegate;
 @property (nonatomic, strong) UDInputBuffer *inputBuffer;
 @property (nonatomic, assign) BOOL isRadians;
 @property (nonatomic, assign) BOOL isRPNMode;

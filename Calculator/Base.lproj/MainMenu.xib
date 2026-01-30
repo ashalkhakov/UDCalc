@@ -15,27 +15,8 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
-                <outlet property="acButton" destination="odQ-MV-PK1" id="TW0-T7-uLh"/>
-                <outlet property="cosButton" destination="BTd-3D-D2B" id="tp6-5L-btc"/>
-                <outlet property="coshButton" destination="fi6-yy-jTj" id="2Ad-Mb-NcH"/>
-                <outlet property="displayField" destination="qxC-eF-BBQ" id="eT6-jK-GDc"/>
-                <outlet property="displayTabView" destination="sxD-4X-VlH" id="lPQ-x2-zd0"/>
-                <outlet property="equalsButton" destination="aJe-pW-wvv" id="zFH-Pw-6e5"/>
-                <outlet property="expButton" destination="xS4-FP-ghO" id="gBC-px-R3K"/>
-                <outlet property="lnButton" destination="t9c-jI-xhF" id="yZs-av-tTP"/>
-                <outlet property="log10Button" destination="6gf-Td-peJ" id="W63-tb-a9m"/>
-                <outlet property="parenLeftButton" destination="Cpg-Kw-IoK" id="Ezj-cL-t6P"/>
-                <outlet property="parenRightButton" destination="5n6-05-B0U" id="E8M-bs-VOD"/>
                 <outlet property="recentMenu" destination="aXa-aM-Jaq" id="55J-1a-QDd"/>
-                <outlet property="scientificView" destination="kLg-Td-5Lq" id="h6a-O9-8Wj"/>
-                <outlet property="scientificWidthConstraint" destination="tqj-2d-W2y" id="kkA-bf-Dab"/>
-                <outlet property="sinButton" destination="Dn2-9e-Tzc" id="d2v-7r-eZm"/>
-                <outlet property="sinhButton" destination="1pu-T8-jqY" id="8LT-kt-enl"/>
-                <outlet property="stackTableView" destination="89B-JB-qEm" id="d4F-Ic-zwR"/>
-                <outlet property="tanButton" destination="T89-BN-VlJ" id="eY5-sP-9fp"/>
-                <outlet property="tanhButton" destination="iyF-Ht-ybE" id="0LF-IN-bwD"/>
-                <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
-                <outlet property="xthPowerOf10Button" destination="WnU-bm-c3Q" id="Vey-P4-J88"/>
+                <outlet property="window" destination="QvC-M9-y7g" id="l2l-L2-C5x"/>
             </connections>
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
@@ -184,18 +165,18 @@
                         <items>
                             <menuItem title="Basic Mode" tag="1" keyEquivalent="1" id="snW-S8-Cw5">
                                 <connections>
-                                    <action selector="changeMode:" target="Voe-Tx-rLC" id="3b2-Dx-Svr"/>
+                                    <action selector="changeMode:" target="-1" id="bNn-mp-cFm"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Scientific Mode" tag="2" keyEquivalent="2" id="1UK-8n-QPP">
                                 <connections>
-                                    <action selector="changeMode:" target="Voe-Tx-rLC" id="EHK-Ko-xqe"/>
+                                    <action selector="changeMode:" target="-1" id="kGq-ba-xyb"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>
                             <menuItem title="RPN Mode" tag="2" keyEquivalent="r" id="l56-dn-s0o">
                                 <connections>
-                                    <action selector="changeRPNMode:" target="Voe-Tx-rLC" id="dmH-U2-uKa"/>
+                                    <action selector="changeRPNMode:" target="-1" id="ER9-27-j5m"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="ZuE-Dk-mfB"/>
@@ -225,61 +206,61 @@
                             <menuItem title="Area..." identifier="convArea" id="ZM1-6Q-yy1">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="conversionMenuClicked:" target="Voe-Tx-rLC" id="SIP-i8-rLI"/>
+                                    <action selector="conversionMenuClicked:" target="-1" id="hrm-HF-WNr"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Energy or Work..." identifier="convEnergy" id="VIY-Ag-zcb">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="conversionMenuClicked:" target="Voe-Tx-rLC" id="UlG-q6-KrN"/>
+                                    <action selector="conversionMenuClicked:" target="-1" id="dZq-uN-Qkz"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Length..." identifier="convLength" id="J5U-5w-g23">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="conversionMenuClicked:" target="Voe-Tx-rLC" id="mI6-y7-S8U"/>
+                                    <action selector="conversionMenuClicked:" target="-1" id="Uou-rB-9a0"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Power..." identifier="convPower" id="wb2-vD-lq4">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="conversionMenuClicked:" target="Voe-Tx-rLC" id="bhX-Ez-Pg6"/>
+                                    <action selector="conversionMenuClicked:" target="-1" id="ofX-q5-sZ3"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Pressure..." identifier="convPressure" id="H1b-Si-o9J">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="conversionMenuClicked:" target="Voe-Tx-rLC" id="xSt-De-e6J"/>
+                                    <action selector="conversionMenuClicked:" target="-1" id="XAG-4T-g9O"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Speed..." identifier="convSpeed" id="vLm-3I-IUL">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="conversionMenuClicked:" target="Voe-Tx-rLC" id="raJ-uG-ebE"/>
+                                    <action selector="conversionMenuClicked:" target="-1" id="iHC-Qj-hhD"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Temperature..." identifier="convTemperature" id="MkV-Pr-PK5">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="conversionMenuClicked:" target="Voe-Tx-rLC" id="OeJ-nd-0EE"/>
+                                    <action selector="conversionMenuClicked:" target="-1" id="cWW-yY-9F2"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Time..." identifier="convTime" id="LVM-kO-fVI">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="conversionMenuClicked:" target="Voe-Tx-rLC" id="Ess-Dr-CzX"/>
+                                    <action selector="conversionMenuClicked:" target="-1" id="IMf-v2-EPw"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Volume..." identifier="convVolume" id="Fal-I4-PZk">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="conversionMenuClicked:" target="Voe-Tx-rLC" id="pbD-IF-jV1"/>
+                                    <action selector="conversionMenuClicked:" target="-1" id="9uY-ns-gCu"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Weights and Masses..." identifier="convMass" id="LVe-uD-Xp5">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="conversionMenuClicked:" target="Voe-Tx-rLC" id="mf1-26-0T8"/>
+                                    <action selector="conversionMenuClicked:" target="-1" id="Ecb-rw-hpT"/>
                                 </connections>
                             </menuItem>
                         </items>
@@ -310,7 +291,7 @@
                             <menuItem isSeparatorItem="YES" id="WhA-BT-XRN"/>
                             <menuItem title="Paper Tape" keyEquivalent="t" id="N1R-2r-oRX">
                                 <connections>
-                                    <action selector="showTape:" target="Voe-Tx-rLC" id="kpG-Kp-Qzt"/>
+                                    <action selector="showTape:" target="-1" id="b2O-cj-wth"/>
                                 </connections>
                             </menuItem>
                         </items>
@@ -336,897 +317,9 @@
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="612" height="288"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
-            <view key="contentView" autoresizesSubviews="NO" misplaced="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="612" height="360"/>
+            <view key="contentView" autoresizesSubviews="NO" id="EiT-Mj-1SZ">
+                <rect key="frame" x="0.0" y="0.0" width="612" height="288"/>
                 <autoresizingMask key="autoresizingMask"/>
-                <subviews>
-                    <gridView xPlacement="fill" yPlacement="fill" rowAlignment="none" rowSpacing="1" columnSpacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="kLg-Td-5Lq">
-                        <rect key="frame" x="2" y="1" width="365" height="254"/>
-                        <constraints>
-                            <constraint firstAttribute="width" priority="750" constant="365" id="tqj-2d-W2y"/>
-                        </constraints>
-                        <rows>
-                            <gridRow height="50" id="zFx-Np-4Hp"/>
-                            <gridRow height="50" id="sZY-wc-xXA"/>
-                            <gridRow height="50" id="T6E-9v-uHL"/>
-                            <gridRow height="50" id="kJb-nX-cD9"/>
-                            <gridRow height="50" id="X3J-o0-1sx"/>
-                        </rows>
-                        <columns>
-                            <gridColumn width="60" id="yb3-cr-MhU"/>
-                            <gridColumn width="60" id="JBl-fj-AWM"/>
-                            <gridColumn width="60" id="bv2-qR-CCh"/>
-                            <gridColumn width="60" id="OjK-qR-CRu"/>
-                            <gridColumn width="60" id="DuK-oq-oUX"/>
-                            <gridColumn width="60" id="usK-v6-WsW"/>
-                        </columns>
-                        <gridCells>
-                            <gridCell row="zFx-Np-4Hp" column="yb3-cr-MhU" id="frI-Kq-GKg">
-                                <button key="contentView" identifier="lparen" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Cpg-Kw-IoK" customClass="UDCalcButton">
-                                    <rect key="frame" x="0.0" y="204" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="(" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="MNX-RV-sLG">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                        <string key="keyEquivalent">9</string>
-                                        <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="f3I-QS-OQE"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="zFx-Np-4Hp" column="JBl-fj-AWM" id="DwO-CX-TUS">
-                                <button key="contentView" identifier="rparen" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5n6-05-B0U" customClass="UDCalcButton">
-                                    <rect key="frame" x="61" y="204" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title=")" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Q75-7D-1Sk">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                        <string key="keyEquivalent">0</string>
-                                        <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="IDj-Fx-AC5"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="zFx-Np-4Hp" column="bv2-qR-CCh" id="o67-me-bin">
-                                <button key="contentView" identifier="mc" toolTip="Clear the memory" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="H1x-3f-Nxs" customClass="UDCalcButton">
-                                    <rect key="frame" x="122" y="204" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="mc" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="34t-kF-IAv">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="rYM-KW-lLW"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="zFx-Np-4Hp" column="OjK-qR-CRu" id="3A1-HS-bxK">
-                                <button key="contentView" identifier="mplus" toolTip="Add the displayed value to the memory" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vjF-cs-VdM" customClass="UDCalcButton">
-                                    <rect key="frame" x="183" y="204" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="m+" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="14b-uA-Wgz">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="ehm-Qu-c7C"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="zFx-Np-4Hp" column="DuK-oq-oUX" id="LTc-tj-8eH">
-                                <button key="contentView" identifier="mminus" toolTip="Subtract the displayed value from the memory" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4sB-DO-kzF" customClass="UDCalcButton">
-                                    <rect key="frame" x="244" y="204" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="m-" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="AXL-Kh-XkF">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="bhr-aX-Bdl"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="zFx-Np-4Hp" column="usK-v6-WsW" id="hC9-aa-lHG">
-                                <button key="contentView" identifier="mr" toolTip="Recall the value stored in memory" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oyM-gT-xY6" customClass="UDCalcButton">
-                                    <rect key="frame" x="305" y="204" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="mr" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="aTa-lm-8Kg">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="K2r-ky-mVg"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="sZY-wc-xXA" column="yb3-cr-MhU" id="U10-5G-wXK">
-                                <button key="contentView" identifier="second" toolTip="Change some buttons to alternative functions" verticalHuggingPriority="750" tag="22" translatesAutoresizingMaskIntoConstraints="NO" id="zTC-tc-rNg" customClass="UDCalcButton">
-                                    <rect key="frame" x="0.0" y="153" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="2nd" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="e3h-xZ-WyA">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="secondFunctionPressed:" target="Voe-Tx-rLC" id="yY4-Bo-KOF"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="sZY-wc-xXA" column="JBl-fj-AWM" id="pPb-yY-ifr">
-                                <button key="contentView" identifier="sqr" toolTip="Square the displayed value" verticalHuggingPriority="750" tag="15" translatesAutoresizingMaskIntoConstraints="NO" id="v61-gg-J8Q" customClass="UDCalcButton">
-                                    <rect key="frame" x="61" y="153" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="x²" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="8pf-cT-b1S">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="Rxf-PV-L9D"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="sZY-wc-xXA" column="bv2-qR-CCh" id="d3g-2J-8ix">
-                                <button key="contentView" identifier="cube" toolTip="Cube the displayed value" verticalHuggingPriority="750" tag="16" translatesAutoresizingMaskIntoConstraints="NO" id="KJp-Mq-0ZQ" customClass="UDCalcButton">
-                                    <rect key="frame" x="122" y="153" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="x³" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xue-Tq-5Sh">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="fEv-EB-nas"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="sZY-wc-xXA" column="OjK-qR-CRu" id="Rf9-ed-tpZ">
-                                <button key="contentView" identifier="pow" toolTip="Raise the displayed value to the power of the next value entered" verticalHuggingPriority="750" tag="17" translatesAutoresizingMaskIntoConstraints="NO" id="3PT-Ts-sCJ" customClass="UDCalcButton">
-                                    <rect key="frame" x="183" y="153" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="x^y" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2uT-JN-LRD">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="cSR-sa-EWN"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="sZY-wc-xXA" column="DuK-oq-oUX" id="Mj2-au-UNi">
-                                <button key="contentView" identifier="e_pow_x" toolTip="Calculate e to the power of the displayed value" verticalHuggingPriority="750" tag="20" translatesAutoresizingMaskIntoConstraints="NO" id="xS4-FP-ghO" customClass="UDCalcButton">
-                                    <rect key="frame" x="244" y="153" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="eˣ" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="jmO-O9-6L8">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="6jH-We-40L"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="sZY-wc-xXA" column="usK-v6-WsW" id="l1z-ek-mGw">
-                                <button key="contentView" identifier="_10_pow_x" toolTip="Calculate 10 to the power of the displayed value" verticalHuggingPriority="750" tag="21" translatesAutoresizingMaskIntoConstraints="NO" id="WnU-bm-c3Q" customClass="UDCalcButton">
-                                    <rect key="frame" x="305" y="153" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="10ˣ" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HPK-Tg-gdG">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="rXR-vJ-tUL"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="T6E-9v-uHL" column="yb3-cr-MhU" id="xoe-VS-2Xs">
-                                <button key="contentView" identifier="invert" toolTip="Calculate the Inverse of the displayed value" verticalHuggingPriority="750" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="nP9-7F-fqS" customClass="UDCalcButton">
-                                    <rect key="frame" x="0.0" y="102" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="1/x" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Hf-p2-83C">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="Fyl-lT-Hhq"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="T6E-9v-uHL" column="JBl-fj-AWM" id="zni-Sb-FMy">
-                                <button key="contentView" identifier="sqrt" toolTip="Calculate the square root of the displayed value" verticalHuggingPriority="750" tag="26" translatesAutoresizingMaskIntoConstraints="NO" id="1d9-1P-Rdu" customClass="UDCalcButton">
-                                    <rect key="frame" x="61" y="102" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="sqrt(x)" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="fdq-ES-eBZ">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="4oA-Es-hmS"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="T6E-9v-uHL" column="bv2-qR-CCh" id="oka-69-ML3">
-                                <button key="contentView" identifier="cbrt" toolTip="Calculate the cube root of the displayed value" verticalHuggingPriority="750" tag="27" translatesAutoresizingMaskIntoConstraints="NO" id="SzX-O0-bmm" customClass="UDCalcButton">
-                                    <rect key="frame" x="122" y="102" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="cbrt(x)" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ig6-4x-cLu">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="OMO-9W-H9r"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="T6E-9v-uHL" column="OjK-qR-CRu" id="5eB-mK-s3s">
-                                <button key="contentView" identifier="yroot" toolTip="Compute the nth root of the displayed value, where n is the next value entered" verticalHuggingPriority="750" tag="28" translatesAutoresizingMaskIntoConstraints="NO" id="YXE-b8-XHm" customClass="UDCalcButton">
-                                    <rect key="frame" x="183" y="102" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="yroot" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="jgs-0A-gho">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="bYj-vM-CC5"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="T6E-9v-uHL" column="DuK-oq-oUX" id="2TM-Tc-7F7">
-                                <button key="contentView" identifier="ln" toolTip="Calculate the natural logarithm of the displayed value" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="t9c-jI-xhF" customClass="UDCalcButton">
-                                    <rect key="frame" x="244" y="102" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="ln" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="mHW-fl-4C9">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="MQb-ND-VcR"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="T6E-9v-uHL" column="usK-v6-WsW" id="l8G-2d-bRT">
-                                <button key="contentView" identifier="log10" toolTip="Calculate the base 10 logarithm of the displayed value" verticalHuggingPriority="750" tag="23" translatesAutoresizingMaskIntoConstraints="NO" id="6gf-Td-peJ" customClass="UDCalcButton">
-                                    <rect key="frame" x="305" y="102" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="log10" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="hFK-gp-7lL">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="8tz-qg-MS9"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="kJb-nX-cD9" column="yb3-cr-MhU" id="ou5-nG-FHY">
-                                <button key="contentView" identifier="fact" toolTip="Calculate the factorial of the displayed value" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fmg-EM-76M" customClass="UDCalcButton">
-                                    <rect key="frame" x="0.0" y="51" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="x!" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Yfa-wx-I0D">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="cZ8-5O-rpj"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="kJb-nX-cD9" column="JBl-fj-AWM" id="fwc-yw-OLG">
-                                <button key="contentView" identifier="sin" toolTip="Calculate the sine of the displayed value" verticalHuggingPriority="750" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="Dn2-9e-Tzc" customClass="UDCalcButton">
-                                    <rect key="frame" x="61" y="51" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="sin" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2Fe-gf-ag4">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="ZkP-Wk-Qmd"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="kJb-nX-cD9" column="bv2-qR-CCh" id="6fh-L9-mhJ">
-                                <button key="contentView" identifier="cos" toolTip="Calculate the cosine of the displayed value" verticalHuggingPriority="750" tag="4" translatesAutoresizingMaskIntoConstraints="NO" id="BTd-3D-D2B" customClass="UDCalcButton">
-                                    <rect key="frame" x="122" y="51" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="cos" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xcF-SK-aIb">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="qJJ-aH-3w6"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="kJb-nX-cD9" column="OjK-qR-CRu" id="4UM-RI-IpK">
-                                <button key="contentView" identifier="tan" toolTip="Calculate the tangent of the displayed value" verticalHuggingPriority="750" tag="5" translatesAutoresizingMaskIntoConstraints="NO" id="T89-BN-VlJ" customClass="UDCalcButton">
-                                    <rect key="frame" x="183" y="51" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="tan" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HFB-bZ-htK">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="iza-JV-wjT"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="kJb-nX-cD9" column="DuK-oq-oUX" id="FO1-d5-4DJ">
-                                <button key="contentView" identifier="e" toolTip="Enter e (2.71828...)" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oQV-Hk-45X" customClass="UDCalcButton">
-                                    <rect key="frame" x="244" y="51" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="e" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QeH-ff-Sfq">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="7rU-Ec-D4u"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="kJb-nX-cD9" column="usK-v6-WsW" id="mcs-iF-KWf">
-                                <button key="contentView" identifier="ee" toolTip="Exponential notation" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8Sx-dC-XsR" customClass="UDCalcButton">
-                                    <rect key="frame" x="305" y="51" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="EE" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="T9s-zD-TsB">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="NAP-02-JL3"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="X3J-o0-1sx" column="yb3-cr-MhU" id="P3r-XO-pWT">
-                                <button key="contentView" identifier="rad" toolTip="Toggle between degrees and radians" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Iyd-tT-U3R" customClass="UDCalcButton">
-                                    <rect key="frame" x="0.0" y="0.0" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="Rad" alternateTitle="Deg" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="D0V-6u-W7X">
-                                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="Rsn-Xc-bmj"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="X3J-o0-1sx" column="JBl-fj-AWM" id="2GU-Sd-7Sq">
-                                <button key="contentView" identifier="sinh" toolTip="Calculate the hyperbolic sine of the displayed value" verticalHuggingPriority="750" tag="6" translatesAutoresizingMaskIntoConstraints="NO" id="1pu-T8-jqY" customClass="UDCalcButton">
-                                    <rect key="frame" x="61" y="0.0" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="sinh" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="lXR-HN-cZa">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="yEM-6Y-eSk"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="X3J-o0-1sx" column="bv2-qR-CCh" id="0X5-Xo-dem">
-                                <button key="contentView" identifier="cosh" toolTip="Calculate the hyperbolic cosine of the displayed value" verticalHuggingPriority="750" tag="7" translatesAutoresizingMaskIntoConstraints="NO" id="fi6-yy-jTj" customClass="UDCalcButton">
-                                    <rect key="frame" x="122" y="0.0" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="cosh" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="h5w-1W-6Mw">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="hAr-sg-Jhm"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="X3J-o0-1sx" column="OjK-qR-CRu" id="eBF-f8-kin">
-                                <button key="contentView" identifier="tanh" toolTip="Calculate the hyperbolic tangent of the displayed value" verticalHuggingPriority="750" tag="8" translatesAutoresizingMaskIntoConstraints="NO" id="iyF-Ht-ybE" customClass="UDCalcButton">
-                                    <rect key="frame" x="183" y="0.0" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="tanh" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="JP0-gw-Ftb">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="gBQ-eQ-SQA"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="X3J-o0-1sx" column="DuK-oq-oUX" id="TeT-ba-XHZ">
-                                <button key="contentView" identifier="pi" toolTip="Enter Pi (3.14159...)" verticalHuggingPriority="750" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="2e2-Wz-gPr" customClass="UDCalcButton">
-                                    <rect key="frame" x="244" y="0.0" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="Pi" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="mbd-Cn-Ykh">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="Q02-rL-FEn"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="X3J-o0-1sx" column="usK-v6-WsW" id="lpF-qc-ICH">
-                                <button key="contentView" identifier="rand" toolTip="Generate a random number between 0 and 1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f2n-44-z4m" customClass="UDCalcButton">
-                                    <rect key="frame" x="305" y="0.0" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="Rand" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="MnE-Z7-DHh">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="TKm-KA-fqH"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                        </gridCells>
-                    </gridView>
-                    <tabView type="noTabsNoBorder" translatesAutoresizingMaskIntoConstraints="NO" id="sxD-4X-VlH">
-                        <rect key="frame" x="1" y="256" width="610" height="103"/>
-                        <font key="font" metaFont="system"/>
-                        <tabViewItems>
-                            <tabViewItem label="Standard" identifier="" id="6sW-Ds-gLk">
-                                <view key="view" id="l1h-FN-zIj">
-                                    <rect key="frame" x="0.0" y="0.0" width="610" height="31"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <textField identifier="display" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qxC-eF-BBQ">
-                                            <rect key="frame" x="0.0" y="0.0" width="610" height="31"/>
-                                            <textFieldCell key="cell" controlSize="large" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" drawsBackground="YES" usesSingleLineMode="YES" id="Gsp-OC-y7R">
-                                                <font key="font" textStyle="largeTitle" name=".SFNS-Regular"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstAttribute="bottom" secondItem="qxC-eF-BBQ" secondAttribute="bottom" id="MUR-Md-z7w"/>
-                                        <constraint firstItem="qxC-eF-BBQ" firstAttribute="leading" secondItem="l1h-FN-zIj" secondAttribute="leading" id="Ubs-lV-IWX"/>
-                                        <constraint firstAttribute="trailing" secondItem="qxC-eF-BBQ" secondAttribute="trailing" id="ew4-dM-TP3"/>
-                                        <constraint firstItem="qxC-eF-BBQ" firstAttribute="top" secondItem="l1h-FN-zIj" secondAttribute="top" id="ocE-zB-NSX"/>
-                                    </constraints>
-                                </view>
-                            </tabViewItem>
-                            <tabViewItem label="RPN" identifier="" id="Unm-aG-rJh">
-                                <view key="view" id="Odo-16-BK2">
-                                    <rect key="frame" x="0.0" y="0.0" width="610" height="103"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <scrollView autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tZt-ZL-r0Q">
-                                            <rect key="frame" x="0.0" y="0.0" width="550" height="103"/>
-                                            <clipView key="contentView" id="1Ph-yg-2X6">
-                                                <rect key="frame" x="1" y="1" width="548" height="101"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" rowSizeStyle="automatic" viewBased="YES" id="89B-JB-qEm">
-                                                        <rect key="frame" x="0.0" y="0.0" width="548" height="101"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                        <size key="intercellSpacing" width="17" height="0.0"/>
-                                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
-                                                        <tableColumns>
-                                                            <tableColumn identifier="StackColumn" editable="NO" width="536" minWidth="40" maxWidth="1000" id="wD1-ZT-VFT">
-                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="right">
-                                                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
-                                                                </tableHeaderCell>
-                                                                <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="lSN-FH-Wsb">
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                                <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
-                                                                <prototypeCellViews>
-                                                                    <tableCellView id="mAb-I2-LmA">
-                                                                        <rect key="frame" x="8" y="0.0" width="531" height="24"/>
-                                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                                        <subviews>
-                                                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="W4r-zN-Nr4">
-                                                                                <rect key="frame" x="0.0" y="4" width="531" height="16"/>
-                                                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                                                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="ksb-jl-KCN">
-                                                                                    <font key="font" usesAppearanceFont="YES"/>
-                                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                                </textFieldCell>
-                                                                            </textField>
-                                                                        </subviews>
-                                                                        <connections>
-                                                                            <outlet property="textField" destination="W4r-zN-Nr4" id="aPn-JP-0Ai"/>
-                                                                        </connections>
-                                                                    </tableCellView>
-                                                                </prototypeCellViews>
-                                                            </tableColumn>
-                                                        </tableColumns>
-                                                        <connections>
-                                                            <outlet property="dataSource" destination="Voe-Tx-rLC" id="8E6-uQ-Y17"/>
-                                                            <outlet property="delegate" destination="Voe-Tx-rLC" id="YWX-AK-Jzb"/>
-                                                        </connections>
-                                                    </tableView>
-                                                </subviews>
-                                            </clipView>
-                                            <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="rP7-qK-HJX">
-                                                <rect key="frame" x="1" y="87" width="548" height="15"/>
-                                                <autoresizingMask key="autoresizingMask"/>
-                                            </scroller>
-                                            <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="AOV-of-irm">
-                                                <rect key="frame" x="224" y="17" width="15" height="102"/>
-                                                <autoresizingMask key="autoresizingMask"/>
-                                            </scroller>
-                                        </scrollView>
-                                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="1" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B9r-Af-ExH">
-                                            <rect key="frame" x="550" y="0.0" width="60" height="103"/>
-                                            <subviews>
-                                                <button identifier="swap" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ftI-zR-HFE" customClass="UDCalcButton">
-                                                    <rect key="frame" x="0.0" y="78" width="60" height="25"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" constant="60" id="dWV-qx-b3H"/>
-                                                        <constraint firstAttribute="height" constant="25" id="r2E-Ha-nOp"/>
-                                                    </constraints>
-                                                    <buttonCell key="cell" type="square" title="x↔y" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="dGq-rd-gTX">
-                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="A0B-iG-kL0"/>
-                                                    </connections>
-                                                </button>
-                                                <button identifier="rolldown" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="n0U-ne-Ib6" customClass="UDCalcButton">
-                                                    <rect key="frame" x="0.0" y="52" width="60" height="25"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" constant="60" id="DC9-wQ-ZM0"/>
-                                                        <constraint firstAttribute="height" constant="25" id="RMj-tD-7UY"/>
-                                                    </constraints>
-                                                    <buttonCell key="cell" type="square" title="R↓" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xjc-Jr-HqP">
-                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="bMx-TA-ScK"/>
-                                                    </connections>
-                                                </button>
-                                                <button identifier="rollup" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="d0L-hf-LsS" customClass="UDCalcButton">
-                                                    <rect key="frame" x="0.0" y="26" width="60" height="25"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="25" id="Rbh-8Y-t9t"/>
-                                                        <constraint firstAttribute="width" constant="60" id="xnX-KA-V7T"/>
-                                                    </constraints>
-                                                    <buttonCell key="cell" type="square" title="R↑" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Kkt-oe-fIg">
-                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="fnv-ir-JVD"/>
-                                                    </connections>
-                                                </button>
-                                                <button identifier="drop" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EKE-E4-i4j" customClass="UDCalcButton">
-                                                    <rect key="frame" x="0.0" y="0.0" width="60" height="25"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="25" id="Hgz-eJ-Fmd"/>
-                                                        <constraint firstAttribute="width" constant="60" id="eOp-sS-hfZ"/>
-                                                    </constraints>
-                                                    <buttonCell key="cell" type="square" title="drop" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YVd-4C-CIv">
-                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="x5j-TD-rVd"/>
-                                                    </connections>
-                                                </button>
-                                            </subviews>
-                                            <visibilityPriorities>
-                                                <integer value="1000"/>
-                                                <integer value="1000"/>
-                                                <integer value="1000"/>
-                                                <integer value="1000"/>
-                                            </visibilityPriorities>
-                                            <customSpacing>
-                                                <real value="3.4028234663852886e+38"/>
-                                                <real value="3.4028234663852886e+38"/>
-                                                <real value="3.4028234663852886e+38"/>
-                                                <real value="3.4028234663852886e+38"/>
-                                            </customSpacing>
-                                        </stackView>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstAttribute="bottom" secondItem="tZt-ZL-r0Q" secondAttribute="bottom" id="25E-yi-hdV"/>
-                                        <constraint firstAttribute="trailing" secondItem="B9r-Af-ExH" secondAttribute="trailing" id="FyG-uz-6vx"/>
-                                        <constraint firstItem="tZt-ZL-r0Q" firstAttribute="leading" secondItem="Odo-16-BK2" secondAttribute="leading" id="Sta-6Y-94Y"/>
-                                        <constraint firstItem="B9r-Af-ExH" firstAttribute="leading" secondItem="tZt-ZL-r0Q" secondAttribute="trailing" id="VMA-Yr-KwU"/>
-                                        <constraint firstAttribute="bottom" secondItem="B9r-Af-ExH" secondAttribute="bottom" id="ghD-7u-7eT"/>
-                                        <constraint firstItem="tZt-ZL-r0Q" firstAttribute="top" secondItem="Odo-16-BK2" secondAttribute="top" id="jGx-sP-Ubr"/>
-                                        <constraint firstItem="B9r-Af-ExH" firstAttribute="top" secondItem="Odo-16-BK2" secondAttribute="top" id="upX-IE-Xds"/>
-                                    </constraints>
-                                </view>
-                            </tabViewItem>
-                        </tabViewItems>
-                    </tabView>
-                    <gridView identifier="basicContainer" autoresizesSubviews="NO" horizontalHuggingPriority="600" verticalHuggingPriority="600" xPlacement="fill" yPlacement="fill" rowAlignment="none" rowSpacing="1" columnSpacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="PXV-Xm-VeB">
-                        <rect key="frame" x="368" y="1" width="243" height="254"/>
-                        <rows>
-                            <gridRow height="50" id="pFF-EX-3em"/>
-                            <gridRow height="50" id="dUM-9G-Gco"/>
-                            <gridRow height="50" id="1X3-nB-lvI"/>
-                            <gridRow height="50" id="SrI-WF-yAe"/>
-                            <gridRow height="50" id="q0p-aU-2QJ"/>
-                        </rows>
-                        <columns>
-                            <gridColumn width="60" id="gr6-6v-22e"/>
-                            <gridColumn width="60" id="HEB-Mx-J5e"/>
-                            <gridColumn width="60" id="lJk-bE-cuv"/>
-                            <gridColumn width="60" id="Q1D-Uq-DNT"/>
-                        </columns>
-                        <gridCells>
-                            <gridCell row="pFF-EX-3em" column="gr6-6v-22e" xPlacement="fill" yPlacement="fill" id="gGR-bn-3cr">
-                                <button key="contentView" identifier="clear" toolTip="Clear" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="odQ-MV-PK1" customClass="UDCalcButton">
-                                    <rect key="frame" x="0.0" y="204" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="AC" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4nE-Ch-kyn">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent" base64-UTF8="YES">
-Gw
-</string>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="ue6-jy-Fkz"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="pFF-EX-3em" column="HEB-Mx-J5e" xPlacement="fill" yPlacement="fill" id="glX-7m-R52">
-                                <button key="contentView" identifier="negate" toolTip="Negate the displayed value" translatesAutoresizingMaskIntoConstraints="NO" id="CDr-jE-QGN" customClass="UDCalcButton">
-                                    <rect key="frame" x="61" y="204" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="±" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YXX-Ip-k64">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">-</string>
-                                        <modifierMask key="keyEquivalentModifierMask" option="YES"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="Dqd-EA-ISt"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="pFF-EX-3em" column="lJk-bE-cuv" xPlacement="fill" yPlacement="fill" id="LGP-q4-afg">
-                                <button key="contentView" identifier="percent" toolTip="Per cent" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UCa-pg-gy9" customClass="UDCalcButton">
-                                    <rect key="frame" x="122" y="204" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="%" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Puw-dM-36c">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">5</string>
-                                        <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="l5Y-Yq-USU"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="pFF-EX-3em" column="Q1D-Uq-DNT" xPlacement="fill" yPlacement="fill" id="2Ha-s8-l5m">
-                                <button key="contentView" identifier="div" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vcG-2c-oiX" customClass="UDCalcButton">
-                                    <rect key="frame" x="183" y="204" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="÷" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" identifier="divide" imageScaling="proportionallyDown" inset="2" id="OZn-pD-6Oo">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">/</string>
-                                    </buttonCell>
-                                    <userDefinedRuntimeAttributes>
-                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                        </userDefinedRuntimeAttribute>
-                                    </userDefinedRuntimeAttributes>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="mhM-aT-z7y"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="dUM-9G-Gco" column="gr6-6v-22e" xPlacement="fill" id="5uk-pL-YmK">
-                                <button key="contentView" identifier="b7" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZcY-B8-Eek" customClass="UDCalcButton">
-                                    <rect key="frame" x="0.0" y="153" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="7" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="dv3-Dp-Lg4">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">7</string>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="digitPressed:" target="Voe-Tx-rLC" id="aLB-oM-DaL"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="dUM-9G-Gco" column="HEB-Mx-J5e" xPlacement="fill" id="oYM-Uc-WcS">
-                                <button key="contentView" identifier="b8" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tb2-0z-Smv" customClass="UDCalcButton">
-                                    <rect key="frame" x="61" y="153" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="8" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2Qd-Ag-ori">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">8</string>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="digitPressed:" target="Voe-Tx-rLC" id="J1e-M7-nsW"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="dUM-9G-Gco" column="lJk-bE-cuv" xPlacement="fill" yPlacement="fill" id="KRs-FK-H3V">
-                                <button key="contentView" identifier="b9" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f3j-VH-Ifs" customClass="UDCalcButton">
-                                    <rect key="frame" x="122" y="153" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="9" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="o7Z-3r-MEC">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">9</string>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="digitPressed:" target="Voe-Tx-rLC" id="ul9-hT-7Kj"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="dUM-9G-Gco" column="Q1D-Uq-DNT" xPlacement="fill" yPlacement="fill" id="oLn-fa-O9A">
-                                <button key="contentView" identifier="mul" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ErQ-Sl-KmO" customClass="UDCalcButton">
-                                    <rect key="frame" x="183" y="153" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="×" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="V3a-8E-xRB">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">8</string>
-                                        <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
-                                    </buttonCell>
-                                    <color key="bezelColor" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
-                                    <userDefinedRuntimeAttributes>
-                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                        </userDefinedRuntimeAttribute>
-                                    </userDefinedRuntimeAttributes>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="PkD-XK-8DW"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="1X3-nB-lvI" column="gr6-6v-22e" xPlacement="fill" yPlacement="fill" id="zdK-3E-zqJ">
-                                <button key="contentView" identifier="b4" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TAb-SG-s4p" customClass="UDCalcButton">
-                                    <rect key="frame" x="0.0" y="102" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="4" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YIQ-Fe-yiB">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">4</string>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="digitPressed:" target="Voe-Tx-rLC" id="xkt-na-ltF"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="1X3-nB-lvI" column="HEB-Mx-J5e" xPlacement="fill" yPlacement="fill" id="iON-Ol-hPT">
-                                <button key="contentView" identifier="b5" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GVY-LQ-kq9" customClass="UDCalcButton">
-                                    <rect key="frame" x="61" y="102" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="5" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="FDp-KW-iU7">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">5</string>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="digitPressed:" target="Voe-Tx-rLC" id="XnE-ze-1nR"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="1X3-nB-lvI" column="lJk-bE-cuv" xPlacement="fill" yPlacement="fill" id="yz2-SL-65O">
-                                <button key="contentView" identifier="b6" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VQE-RA-tSb" customClass="UDCalcButton">
-                                    <rect key="frame" x="122" y="102" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="6" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" identifier="b6" imageScaling="proportionallyDown" inset="2" id="OJC-BZ-PPK">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">6</string>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="digitPressed:" target="Voe-Tx-rLC" id="oDk-Iz-2r1"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="1X3-nB-lvI" column="Q1D-Uq-DNT" xPlacement="fill" yPlacement="fill" id="8Xb-SP-K9u">
-                                <button key="contentView" identifier="sub" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TIQ-QV-Whr" customClass="UDCalcButton">
-                                    <rect key="frame" x="183" y="102" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="−" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Lro-sh-s4Y">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">-</string>
-                                    </buttonCell>
-                                    <color key="bezelColor" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
-                                    <userDefinedRuntimeAttributes>
-                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                        </userDefinedRuntimeAttribute>
-                                    </userDefinedRuntimeAttributes>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="6dJ-XA-CEs"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="SrI-WF-yAe" column="gr6-6v-22e" xPlacement="fill" yPlacement="fill" id="aCU-wG-bia">
-                                <button key="contentView" identifier="b1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IFO-xq-Fee" customClass="UDCalcButton">
-                                    <rect key="frame" x="0.0" y="51" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="1" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="zhL-aM-VWC">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">1</string>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="digitPressed:" target="Voe-Tx-rLC" id="Hoi-Da-YbD"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="SrI-WF-yAe" column="HEB-Mx-J5e" xPlacement="fill" yPlacement="fill" id="gPX-mx-fuY">
-                                <button key="contentView" identifier="b2" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XYt-71-ZHa" customClass="UDCalcButton">
-                                    <rect key="frame" x="61" y="51" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="2" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="knO-E2-USZ">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">2</string>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="digitPressed:" target="Voe-Tx-rLC" id="L6E-Hl-St8"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="SrI-WF-yAe" column="lJk-bE-cuv" xPlacement="fill" yPlacement="fill" id="rOV-Lz-mAC">
-                                <button key="contentView" identifier="b3" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0Gs-jO-hgC" customClass="UDCalcButton">
-                                    <rect key="frame" x="122" y="51" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="3" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="g9m-nh-FcA">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">3</string>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="digitPressed:" target="Voe-Tx-rLC" id="oe6-hA-Cb7"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="SrI-WF-yAe" column="Q1D-Uq-DNT" xPlacement="fill" yPlacement="fill" id="UPj-JU-deL">
-                                <button key="contentView" identifier="add" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xIX-qw-NTE" customClass="UDCalcButton">
-                                    <rect key="frame" x="183" y="51" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="+" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iRX-DO-aDz">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">=</string>
-                                        <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
-                                    </buttonCell>
-                                    <color key="bezelColor" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
-                                    <userDefinedRuntimeAttributes>
-                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                        </userDefinedRuntimeAttribute>
-                                    </userDefinedRuntimeAttributes>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="Nzj-8F-hqo"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="q0p-aU-2QJ" column="gr6-6v-22e" headOfMergedCell="Mt5-TT-vco" xPlacement="fill" yPlacement="fill" id="Mt5-TT-vco">
-                                <button key="contentView" identifier="b0" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h9D-tb-L9O" customClass="UDCalcButton">
-                                    <rect key="frame" x="0.0" y="0.0" width="121" height="50"/>
-                                    <buttonCell key="cell" type="square" title="0" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="bd4-0s-S6Z">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">0</string>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="digitPressed:" target="Voe-Tx-rLC" id="RaC-wG-307"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="q0p-aU-2QJ" column="HEB-Mx-J5e" headOfMergedCell="Mt5-TT-vco" id="3ZZ-mB-eT4"/>
-                            <gridCell row="q0p-aU-2QJ" column="lJk-bE-cuv" xPlacement="fill" yPlacement="fill" id="shf-DC-SkR">
-                                <button key="contentView" identifier="comma" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EiN-h8-3C2" customClass="UDCalcButton">
-                                    <rect key="frame" x="122" y="0.0" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="," bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="atu-pA-8Tf">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent">.</string>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="decimalPressed:" target="Voe-Tx-rLC" id="Ke0-h0-Fkh"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                            <gridCell row="q0p-aU-2QJ" column="Q1D-Uq-DNT" xPlacement="fill" yPlacement="fill" id="Tik-2E-8CN">
-                                <button key="contentView" identifier="equals" toolTip="Equal" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aJe-pW-wvv" customClass="UDCalcButton">
-                                    <rect key="frame" x="183" y="0.0" width="60" height="50"/>
-                                    <buttonCell key="cell" type="square" title="=" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="F8F-Yt-OEN">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
-                                        <string key="keyEquivalent" base64-UTF8="YES">
-DQ
-</string>
-                                    </buttonCell>
-                                    <color key="bezelColor" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
-                                    <userDefinedRuntimeAttributes>
-                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                        </userDefinedRuntimeAttribute>
-                                    </userDefinedRuntimeAttributes>
-                                    <connections>
-                                        <action selector="operationPressed:" target="Voe-Tx-rLC" id="baM-YR-a7A"/>
-                                    </connections>
-                                </button>
-                            </gridCell>
-                        </gridCells>
-                    </gridView>
-                </subviews>
-                <constraints>
-                    <constraint firstAttribute="bottom" secondItem="kLg-Td-5Lq" secondAttribute="bottom" priority="750" constant="1" id="INe-QR-dm9"/>
-                    <constraint firstItem="PXV-Xm-VeB" firstAttribute="top" secondItem="sxD-4X-VlH" secondAttribute="bottom" constant="1" id="MNv-L8-okL"/>
-                    <constraint firstAttribute="trailing" secondItem="PXV-Xm-VeB" secondAttribute="trailing" constant="1" id="S6H-xt-OBk"/>
-                    <constraint firstAttribute="trailing" secondItem="sxD-4X-VlH" secondAttribute="trailing" constant="1" id="TLL-oF-OQV"/>
-                    <constraint firstItem="kLg-Td-5Lq" firstAttribute="top" secondItem="sxD-4X-VlH" secondAttribute="bottom" constant="1" id="W45-wA-mGo"/>
-                    <constraint firstAttribute="bottom" secondItem="PXV-Xm-VeB" secondAttribute="bottom" constant="1" id="ZHB-Ur-ArS"/>
-                    <constraint firstItem="PXV-Xm-VeB" firstAttribute="leading" secondItem="kLg-Td-5Lq" secondAttribute="trailing" priority="750" constant="1" id="aSR-rs-2mq"/>
-                    <constraint firstItem="sxD-4X-VlH" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="1" id="drr-FX-Mmp"/>
-                    <constraint firstItem="sxD-4X-VlH" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="1" id="frj-0S-K9p"/>
-                </constraints>
             </view>
             <point key="canvasLocation" x="156" y="448"/>
         </window>

@@ -433,6 +433,9 @@
         }
 
         [self buildNode:info];
+
+        [self reportCalculationResult];
+
         // Auto-evaluate for display
         [self moveStackToBuffer:YES];
         return;
@@ -457,6 +460,7 @@
     
     [self buildNode:info];
     
+    [self reportCalculationResult];
     // Auto-evaluate for display
     [self moveStackToBuffer:YES];
 }
@@ -495,6 +499,21 @@
         [self performOperationRPN:op];
     } else {
         [self performOperationShuntingYard:op];
+
+        if (op == UDOpEq) {
+            [self reportCalculationResult];
+        }
+    }
+}
+
+- (void)reportCalculationResult {
+    if ([self.delegate respondsToSelector:@selector(calculator:didCalculateResult:forTree:)]) {
+        // FIXME: incorrect in the RPN mode
+        UDASTNode *resultTree = [self.nodeStack lastObject];
+
+        double val = [self evaluateCurrentExpression];
+        
+        [self.delegate calculator:self didCalculateResult:val forTree:resultTree];
     }
 }
 

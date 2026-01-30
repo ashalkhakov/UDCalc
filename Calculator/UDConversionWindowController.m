@@ -7,6 +7,13 @@
 
 #import "UDConversionWindowController.h"
 
+NSString * const UDUnitConverterDidConvertNotification = @"org.underivable.calculator.UDUnitConverterDidConvertNotification";
+NSString * const UDUnitConverterCategoryKey = @"UDUnitConverterCategoryKey";
+NSString * const UDUnitConverterFromUnitKey = @"UDUnitConverterFromUnitKey";
+NSString * const UDUnitConverterToUnitKey = @"UDUnitConverterToUnitKey";
+NSString * const UDUnitConverterInputKey = @"UDUnitConverterInputKey";
+NSString * const UDUnitConverterResultKey = @"UDUnitConverterResultKey";
+
 @interface UDConversionWindowController ()
 
 @property (weak) IBOutlet NSComboBox *typeBox;
@@ -52,19 +59,26 @@
     NSString *cat = self.typeBox.stringValue;
     NSString *from = self.fromBox.stringValue;
     NSString *to = self.toBox.stringValue;
+    double input = self.calc.currentInputValue;
     
     // 3. Perform conversion via the Converter object
-    double result = [self.converter convertValue:self.calc.currentInputValue
+    double result = [self.converter convertValue:input
                                         category:cat
                                         fromUnit:from
                                           toUnit:to];
     
-    [self.calc inputNumber:result];
-    
-    if (self.didConvertBlock) {
-        self.didConvertBlock(cat, from, to);
-    }
-    
+    NSDictionary *userInfo = @{
+        UDUnitConverterCategoryKey: cat,
+        UDUnitConverterFromUnitKey: from,
+        UDUnitConverterToUnitKey: to,
+        UDUnitConverterInputKey: @(input),
+        UDUnitConverterResultKey: @(result)
+    };
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:UDUnitConverterDidConvertNotification
+                                                        object:self
+                                                      userInfo:userInfo];
+
     [self.window close];
 }
 

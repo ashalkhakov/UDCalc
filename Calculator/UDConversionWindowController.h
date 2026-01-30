@@ -9,14 +9,19 @@
 #import "UDCalc.h"
 #import "UDUnitConverter.h"
 
+extern NSString * const UDUnitConverterDidConvertNotification;
+// Keys for the userInfo dictionary
+extern NSString * const UDUnitConverterCategoryKey;     // NSString*
+extern NSString * const UDUnitConverterFromUnitKey;     // NSString*
+extern NSString * const UDUnitConverterToUnitKey;       // NSString*
+extern NSString * const UDUnitConverterInputKey;        // double
+extern NSString * const UDUnitConverterResultKey;       // double
+
 @interface UDConversionWindowController : NSWindowController
 
 // Reference to the main calculator engine
 @property (strong) UDCalc *calc;
 @property (strong) UDUnitConverter *converter;
-
-// Block/Callback to tell the Main App to refresh its display
-@property (copy) void (^didConvertBlock)(NSString *cat, NSString *from, NSString *to);
 
 - (void)selectCategory:(NSString *)categoryName;
 
