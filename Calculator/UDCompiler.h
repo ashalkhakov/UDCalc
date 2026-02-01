@@ -10,5 +10,5 @@
 
 @interface UDCompiler : NSObject
 // The main entry point
-+ (NSArray<UDInstruction *> *)compile:(UDASTNode *)root;
++ (NSArray<UDInstruction *> *)compile:(UDASTNode *)root withIntegerMode:(BOOL)integerMode;
 @end

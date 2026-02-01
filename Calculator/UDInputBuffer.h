@@ -6,6 +6,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "UDValue.h"
+
+// Add to your UDBase enum if not already visible here
+typedef NS_ENUM(NSInteger, UDBase) {
+    UDBaseDec = 10,
+    UDBaseHex = 16,
+    UDBaseOct = 8,
+    UDBaseBin = 2
+};
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,10 +29,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly) BOOL isExponentNegative;
 @property (nonatomic, assign, readonly) BOOL hasHitDecimal;
 
+@property (nonatomic, assign) UDBase inputBase;
+@property (nonatomic, assign) BOOL isIntegerMode; // If YES, ignores Decimal/EE logic
+
 // --- Public Methods ---
 
 // Force-loads a value (like Pi or Ans) by simulating user input
-- (void)loadConstant:(double)constant;
+- (void)loadConstant:(UDValue)constant;
 
 // Adds a digit (0-9) to the current active buffer (mantissa or exponent)
 - (void)handleDigit:(int)digit;
@@ -44,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)performClearEntry;
 
 // Converts the internal integer structures into a final double for the Node Stack
-- (double)finalizeValue;
+- (UDValue)finalizeValue;
 
 // Returns the string representation for the Calculator Display
 - (NSString *)displayString;

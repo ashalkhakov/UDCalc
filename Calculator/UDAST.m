@@ -6,6 +6,7 @@
 //
 
 #import "UDAST.h"
+#import "UDValueFormatter.h"
 
 @implementation UDASTNode
 - (UDASTPrecedence)precedence { return UDASTPrecedenceNone; }
@@ -31,7 +32,7 @@
 #pragma mark - Number Node
 // ---------------------------------------------------------
 @implementation UDNumberNode
-+ (instancetype)value:(double)v {
++ (instancetype)value:(UDValue)v {
     UDNumberNode *n = [UDNumberNode new];
     n->_value = v;
     return n;
@@ -44,18 +45,38 @@
 - (NSString *)prettyPrint {
     // Format nicely: Remove trailing zeros (e.g. 5.0 -> 5)
     // %.8g uses significant digits, usually cleanest for calcs
-    return [NSString stringWithFormat:@"%.8g", self.value];
+    return [UDValueFormatter stringForValue:self.value base:UDBaseDec];
 }
 
 - (BOOL)isEqual:(id)object {
     if (![object isKindOfClass:[UDNumberNode class]]) return NO;
     UDNumberNode *other = (UDNumberNode *)object;
-    // Use a small epsilon for double comparison to avoid floating point issues
-    return fabs(self.value - other.value) < 0.0000001;
+    if (other.value.type != self.value.type) return NO;
+    switch (self.value.type) {
+        case UDValueTypeErr:
+            return other.value.v.intValue == self.value.v.intValue;
+        case UDValueTypeDouble:
+            // Use a small epsilon for double comparison to avoid floating point issues
+            return fabs(UDValueAsDouble(self.value) - UDValueAsDouble(other.value)) < 0.0000001;
+        case UDValueTypeInteger:
+            return UDValueAsInt(self.value) == UDValueAsInt(other.value);
+        default:
+            NSLog(@"isEqual: unhandled value type %ld", self.value.type);
+            return NO;
+    }
 }
 
 - (NSUInteger)hash {
-    return [[NSNumber numberWithDouble:self.value] hash];
+    switch (self.value.type) {
+        case UDValueTypeDouble:
+            return [[NSNumber numberWithDouble:UDValueAsDouble(self.value)] hash];
+        case UDValueTypeErr:
+        case UDValueTypeInteger:
+            return [[NSNumber numberWithLongLong:UDValueAsInt(self.value)] hash];
+        default:
+            NSLog(@"hash: unhandled value type %ld", self.value.type);
+            return 0;
+    }
 }
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -69,7 +90,7 @@
 #pragma mark - Constant Node
 // ---------------------------------------------------------
 @implementation UDConstantNode
-+ (instancetype)value:(double)v symbol:(NSString *)sym {
++ (instancetype)value:(UDValue)v symbol:(NSString *)sym {
     UDConstantNode *n = [UDConstantNode new];
     n->_symbol = sym;
     n->_value = v;

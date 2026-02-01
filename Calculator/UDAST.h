@@ -6,6 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "UDValue.h"
 
 // Precedence levels for Pretty Printing
 // Higher number = Binds tighter
@@ -26,15 +27,15 @@ typedef NS_ENUM(NSInteger, UDASTPrecedence) {
 
 // --- NUMBER NODE (e.g., 5, 3.14) ---
 @interface UDNumberNode : UDASTNode
-@property (nonatomic, readonly) double value;
-+ (instancetype)value:(double)v;
+@property (nonatomic, readonly) UDValue value;
++ (instancetype)value:(UDValue)v;
 @end
 
 // --- CONSTANT NODE (e.g. pi or e) ---
 @interface UDConstantNode : UDASTNode
 @property (nonatomic, copy, readonly) NSString *symbol;
-@property (nonatomic, readonly) double value;
-+ (instancetype)value:(double)v symbol:(NSString *)sym;
+@property (nonatomic, readonly) UDValue value;
++ (instancetype)value:(UDValue)v symbol:(NSString *)sym;
 @end
 
 // --- UNARY PREFIX NODE (e.g. -5) ---

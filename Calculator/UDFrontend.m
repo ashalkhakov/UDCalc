@@ -73,7 +73,7 @@
 
     // mr (Memory Recall) -> Constant Snapshot
     self.table[@(UDOpMR)] = [UDOpInfo infoWithSymbol:@"MR" tag:UDOpMR action:^UDASTNode *(UDFrontendContext *ctx) {
-        return [UDConstantNode value:ctx.memoryValue symbol:@"MR"];
+        return [UDConstantNode value:UDValueMakeDouble(ctx.memoryValue) symbol:@"MR"];
     }];
 
     // +/- (Negate) -> Unary Op
@@ -81,7 +81,7 @@
         UDASTNode *top = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         // Optimization: If top is number, just flip sign
         if ([top isKindOfClass:[UDNumberNode class]]) {
-             return [UDNumberNode value: -1 * [(UDNumberNode*)top value]];
+             return [UDNumberNode value:UDValueMakeDouble(-1 * UDValueAsDouble([(UDNumberNode*)top value]))];
         }
         return [UDUnaryOpNode op:@"-" child:top];
     }];
@@ -97,14 +97,14 @@
             // In a pure stack, it's hidden.
             // Workaround: We define % in this context to return (Current/100) * BasePlaceholder
             // Ideally, your parser supports peeking. Assuming we construct: 50 * (10/100)
-            UDASTNode *fraction = [UDBinaryOpNode op:@"/" left:current right:[UDNumberNode value:100] precedence:5];
+            UDASTNode *fraction = [UDBinaryOpNode op:@"/" left:current right:[UDNumberNode value:UDValueMakeDouble(100)] precedence:5];
             // For the sake of this AST, we treat it as a Scalar multiplication for now to keep it simple,
             // or implement a specific UDPercentOfNode if you want perfect history.
             return [UDPostfixOpNode symbol:@"%" child:current];
         }
         
         // Standard: Current / 100
-        return [UDBinaryOpNode op:@"/" left:current right:[UDNumberNode value:100] precedence:5];
+        return [UDBinaryOpNode op:@"/" left:current right:[UDNumberNode value:UDValueMakeDouble(100)] precedence:5];
     }];
 
     // ÷ (Divide)
@@ -130,7 +130,7 @@
                                               precedence:5
                                                   action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *base = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        return [UDFunctionNode func:@"pow" args:@[base, [UDNumberNode value:2]]];
+        return [UDFunctionNode func:@"pow" args:@[base, [UDNumberNode value:UDValueMakeDouble(2)]]];
     }];
     
     // x³ -> pow(x, 3)
@@ -141,7 +141,7 @@
                                             precedence:5
                                                 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *base = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        return [UDFunctionNode func:@"pow" args:@[base, [UDNumberNode value:3]]];
+        return [UDFunctionNode func:@"pow" args:@[base, [UDNumberNode value:UDValueMakeDouble(3)]]];
     }];
         
     // x^y (Power)
@@ -175,7 +175,7 @@
                                            precedence:5
                                                action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *exp = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        return [UDFunctionNode func:@"pow" args:@[[UDConstantNode value:M_E symbol:@"e"], exp]];
+        return [UDFunctionNode func:@"pow" args:@[[UDConstantNode value:UDValueMakeDouble(M_E) symbol:@"e"], exp]];
     }];
         
     // 10^x -> pow(10, x)
@@ -186,7 +186,7 @@
                                              precedence:5
                                                  action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *exp = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        return [UDFunctionNode func:@"pow" args:@[[UDNumberNode value:10], exp]];
+        return [UDFunctionNode func:@"pow" args:@[[UDNumberNode value:UDValueMakeDouble(10)], exp]];
     }];
         
     // × (Multiply)
@@ -210,7 +210,7 @@
                                               precedence:5
                                                   action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *denom = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        return [UDBinaryOpNode op:@"/" left:[UDNumberNode value:1] right:denom precedence:5];
+        return [UDBinaryOpNode op:@"/" left:[UDNumberNode value:UDValueMakeDouble(1)] right:denom precedence:5];
     }];
         
     // ²√x (Sqrt)
@@ -233,7 +233,10 @@
                                                 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *arg = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         // Using pow(x, 1/3) is safer for the VM
-        UDASTNode *oneThird = [UDBinaryOpNode op:@"/" left:[UDNumberNode value:1] right:[UDNumberNode value:3] precedence:5];
+        UDASTNode *oneThird = [UDBinaryOpNode op:@"/"
+                                            left:[UDNumberNode value:UDValueMakeDouble(1)]
+                                           right:[UDNumberNode value:UDValueMakeDouble(3)]
+                                      precedence:5];
         return [UDFunctionNode func:@"pow" args:@[arg, oneThird]];
     }];
         
@@ -247,7 +250,7 @@
         UDASTNode *root = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject]; // y
         UDASTNode *base = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject]; // x
         
-        UDASTNode *invRoot = [UDBinaryOpNode op:@"/" left:[UDNumberNode value:1] right:root precedence:5];
+        UDASTNode *invRoot = [UDBinaryOpNode op:@"/" left:[UDNumberNode value:UDValueMakeDouble(1)] right:root precedence:5];
         return [UDFunctionNode func:@"pow" args:@[base, invRoot]];
     }];
         
@@ -417,7 +420,7 @@
     self.table[@(UDOpRand)] = [UDOpInfo infoWithSymbol:@"rand"
                                                    tag:UDOpRand
                                                 action:^UDASTNode *(UDFrontendContext *ctx) {
-        return [UDConstantNode value:((double)arc4random()/UINT32_MAX) symbol:@"rand"];
+        return [UDConstantNode value:UDValueMakeDouble(((double)arc4random()/UINT32_MAX)) symbol:@"rand"];
     }];
 
     /*

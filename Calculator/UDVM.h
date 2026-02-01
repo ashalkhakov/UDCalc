@@ -8,5 +8,5 @@
 #import "UDInstruction.h"
 
 @interface UDVM : NSObject
-+ (double)execute:(NSArray<UDInstruction *> *)program;
++ (UDValue)execute:(NSArray<UDInstruction *> *)program;
 @end

@@ -24,11 +24,11 @@
 - (void)testRPN_Drop {
     // Scenario: 5 Enter 10 Drop -> 5
     
-    [self.calculator inputNumber:5];
+    [self.calculator inputNumber:UDValueMakeDouble(5)];
     [self.calculator performOperation:UDOpEnter]; // Stack: [5]
     
     
-    [self.calculator inputNumber:10];
+    [self.calculator inputNumber:UDValueMakeDouble(10)];
     [self.calculator performOperation:UDOpEnter]; // Stack: [5, 10]
     
     // Action
@@ -36,28 +36,28 @@
     
     // Verify
     XCTAssertEqual(self.calculator.currentStackValues.count, 2);
-    XCTAssertEqualWithAccuracy([self.calculator currentInputValue], 10.0, 0.0001);
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator currentInputValue]), 10.0, 0.0001);
     XCTAssertEqual(self.calculator.nodeStack.count, 1);
-    XCTAssertEqualWithAccuracy([self.calculator evaluateNode:self.calculator.nodeStack[0]], 5.0, 0.0001);
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator evaluateNode:self.calculator.nodeStack[0]]), 5.0, 0.0001);
 }
 
 - (void)testRPN_Swap {
     // Scenario: 1 Enter 2 Swap -> X=1, Y=2
     // Stack order: [1, 2] -> Swap -> [2, 1] (Top is X)
     
-    [self.calculator inputNumber:1];
+    [self.calculator inputNumber:UDValueMakeDouble(1)];
     [self.calculator performOperation:UDOpEnter];
-    [self.calculator inputNumber:2];
+    [self.calculator inputNumber:UDValueMakeDouble(2)];
     
     // Action
     [self.calculator performOperation:UDOpSwap];  // Stack: [2, 1]
     
     // Verify Top (X Register) is 1
-    XCTAssertEqualWithAccuracy([self.calculator currentInputValue], 1.0, 0.0001);
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator currentInputValue]), 1.0, 0.0001);
     
     // Verify Depth 2 (Y Register) is 2
     XCTAssertEqual(self.calculator.nodeStack.count, 1);
-    double yVal = [[self.calculator.currentStackValues objectAtIndex:0] doubleValue]; // 0 is bottom
+    double yVal = UDValueAsDouble([[self.calculator.currentStackValues objectAtIndex:0] value]); // 0 is bottom
     XCTAssertEqualWithAccuracy(yVal, 2.0, 0.0001);
 }
 
@@ -67,22 +67,22 @@
     // Roll Down: X moves to bottom. Y becomes X.
     // Result: [3, 1, 2] (2 is now X)
     
-    [self.calculator inputNumber:1];
+    [self.calculator inputNumber:UDValueMakeDouble(1)];
     [self.calculator performOperation:UDOpEnter];
-    [self.calculator inputNumber:2];
+    [self.calculator inputNumber:UDValueMakeDouble(2)];
     [self.calculator performOperation:UDOpEnter];
-    [self.calculator inputNumber:3];
+    [self.calculator inputNumber:UDValueMakeDouble(3)];
     
     // Action
     [self.calculator performOperation:UDOpRollDown];
     
     // Verify Structure: [3, 1, 2]
-    NSArray *stack = self.calculator.currentStackValues;
+    NSArray<UDNumberNode *> *stack = self.calculator.currentStackValues;
     XCTAssertEqual(stack.count, 3);
     
-    XCTAssertEqualWithAccuracy([stack[0] doubleValue], 3.0, 0.0001); // Bottom
-    XCTAssertEqualWithAccuracy([stack[1] doubleValue], 1.0, 0.0001); // Middle
-    XCTAssertEqualWithAccuracy([stack[2] doubleValue], 2.0, 0.0001); // Top (X)
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([stack[0] value]), 3.0, 0.0001); // Bottom
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([stack[1] value]), 1.0, 0.0001); // Middle
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([stack[2] value]), 2.0, 0.0001); // Top (X)
 }
 
 - (void)testRPN_RollUp {
@@ -91,39 +91,39 @@
     // Roll Up: Bottom moves to Top.
     // Result: [2, 3, 1] (1 is now X)
     
-    [self.calculator inputNumber:1];
+    [self.calculator inputNumber:UDValueMakeDouble(1)];
     [self.calculator performOperation:UDOpEnter];
-    [self.calculator inputNumber:2];
+    [self.calculator inputNumber:UDValueMakeDouble(2)];
     [self.calculator performOperation:UDOpEnter];
-    [self.calculator inputNumber:3];
+    [self.calculator inputNumber:UDValueMakeDouble(3)];
     
     // Action
     [self.calculator performOperation:UDOpRollUp];
     
     // Verify Structure: [2, 3, 1]
-    NSArray *stack = self.calculator.currentStackValues;
+    NSArray<UDNumberNode *> *stack = self.calculator.currentStackValues;
     XCTAssertEqual(stack.count, 3);
     
-    XCTAssertEqualWithAccuracy([stack[0] doubleValue], 2.0, 0.0001); // Bottom
-    XCTAssertEqualWithAccuracy([stack[1] doubleValue], 3.0, 0.0001); // Middle
-    XCTAssertEqualWithAccuracy([stack[2] doubleValue], 1.0, 0.0001); // Top (X)
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([stack[0] value]), 2.0, 0.0001); // Bottom
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([stack[1] value]), 3.0, 0.0001); // Middle
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([stack[2] value]), 1.0, 0.0001); // Top (X)
 }
 
 - (void)testRPN_ImplicitEnter {
     // Scenario: 3 Enter 4 +
     // The "4" is in the buffer. Hitting "+" should implicitly flush 4 to stack, then add.
     
-    [self.calculator inputNumber:3];
+    [self.calculator inputNumber:UDValueMakeDouble(3)];
     [self.calculator performOperation:UDOpEnter]; // Stack: [3]
     
-    [self.calculator inputNumber:4];              // Buffer: 4, Stack: [3]
+    [self.calculator inputNumber:UDValueMakeDouble(4)];              // Buffer: 4, Stack: [3]
     
     // Action: Operator causes implicit push
     [self.calculator performOperation:UDOpAdd];
     
     // Verify Stack has 1 item: (3+4)
     XCTAssertEqual(self.calculator.currentStackValues.count, 1);
-    XCTAssertEqualWithAccuracy([self.calculator currentInputValue], 7.0, 0.0001);
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator currentInputValue]), 7.0, 0.0001);
 }
 
 - (void)testRPN_EnterDup {
@@ -132,14 +132,14 @@
     // Second Enter (while not typing) duplicates 5.
     // + adds them -> 10.
     
-    [self.calculator inputNumber:5];
+    [self.calculator inputNumber:UDValueMakeDouble(5)];
     [self.calculator performOperation:UDOpEnter]; // Stack: [5]. isTyping = NO.
     
     [self.calculator performOperation:UDOpEnter]; // Dup! Stack: [5, 5]
     
     [self.calculator performOperation:UDOpAdd];   // 5+5
     
-    XCTAssertEqualWithAccuracy([self.calculator currentInputValue], 10.0, 0.0001);
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator currentInputValue]), 10.0, 0.0001);
 }
 
 - (void)testRPN_Integration_AreaOfCircle {
@@ -156,9 +156,9 @@
     
     // Helper to get the String for the LAST row (The X Register)
     NSString* (^getXRegisterString)(void) = ^NSString*{
-        NSArray *values = [self.calculator currentStackValues];
+        NSArray<UDNumberNode *> *values = [self.calculator currentStackValues];
         
-        double val = [[values lastObject] doubleValue];
+        double val = UDValueAsDouble([[values lastObject] value]);
         return [NSString stringWithFormat:@"%.4g", val]; // Simplified formatting
     };
 
@@ -238,7 +238,7 @@
     XCTAssertEqual(self.calculator.nodeStack.count, 0);
     XCTAssertEqual(getRowCount(), 1);
     
-    double result = [[self.calculator currentStackValues][0] doubleValue];
+    double result = UDValueAsDouble([[self.calculator currentStackValues][0] value]);
     XCTAssertEqualWithAccuracy(result, 78.5, 0.1);
 }
 

@@ -14,7 +14,7 @@
 
 @protocol UDCalcDelegate <NSObject>
 @optional
-- (void)calculator:(UDCalc *)calc didCalculateResult:(double)result forTree:(UDASTNode *)tree;
+- (void)calculator:(UDCalc *)calc didCalculateResult:(UDValue)result forTree:(UDASTNode *)tree;
 @end
 
 @interface UDCalc : NSObject
@@ -35,20 +35,20 @@
 @property (strong, readonly) NSMutableArray<UDASTNode *> *nodeStack;
 
 // Core Actions
-- (void)inputDigit:(double)digit;
+- (void)inputDigit:(NSInteger)digit;
 - (void)inputDecimal;
-- (void)inputNumber:(double)number;
+- (void)inputNumber:(UDValue)number;
 - (void)performOperation:(UDOp)op;
 - (void)reset;
 
 // Returns what should currently be on screen (Buffer string OR Result string)
-- (double)currentInputValue;
+- (UDValue)currentInputValue;
 - (NSString *)currentDisplayValue;
-- (NSArray<NSNumber *> *)currentStackValues; // Returns evaluated numbers for X, Y, Z...
+- (NSArray<UDNumberNode *> *)currentStackValues; // Returns evaluated numbers for X, Y, Z...
 
 // The "Run" Button
 // Compiles the current AST and executes it on the VM.
-- (double)evaluateNode:(UDASTNode *)node;
-- (double)evaluateCurrentExpression;
+- (UDValue)evaluateNode:(UDASTNode *)node;
+- (UDValue)evaluateCurrentExpression;
 
 @end

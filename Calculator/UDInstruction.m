@@ -8,9 +8,9 @@
 #import "UDInstruction.h"
 
 @implementation UDInstruction
-+ (instancetype)push:(double)val {
++ (instancetype)push:(UDValue)val {
     UDInstruction *i = [UDInstruction new];
-    i->_opcode = UDOpcodePush; i->_doublePayload = val; return i;
+    i->_opcode = UDOpcodePush; i->_payload = val; return i;
 }
 + (instancetype)op:(UDOpcode)op {
     UDInstruction *i = [UDInstruction new];
@@ -21,8 +21,30 @@
     i->_opcode = UDOpcodeCall; i->_stringPayload = funcName; return i;
 }
 - (NSString *)debugDescription {
-    if (_opcode == UDOpcodePush) return [NSString stringWithFormat:@"PUSH %.4g", _doublePayload];
-    if (_opcode == UDOpcodeCall) return [NSString stringWithFormat:@"CALL %@", _stringPayload];
-    return @[@"PUSH", @"ADD", @"SUB", @"MUL", @"DIV", @"NEG", @"CALL"][_opcode];
+    switch (_opcode) {
+        case UDOpcodePush: return [NSString stringWithFormat:@"PUSH %.4g", UDValueAsDouble(_payload)];
+        case UDOpcodeCall:
+            return [NSString stringWithFormat:@"CALL %@", _stringPayload];
+        case UDOpcodeAdd:
+            return @"ADD";
+        case UDOpcodeSub:
+            return @"SUB";
+        case UDOpcodeMul:
+            return @"MUL";
+        case UDOpcodeDiv:
+            return @"DIV";
+        case UDOpcodeNeg:
+            return @"NEG";
+        case UDOpcodeAddI:
+            return @"ADDI";
+        case UDOpcodeSubI:
+            return @"SUBI";
+        case UDOpcodeMulI:
+            return @"MULI";
+        case UDOpcodeDivI:
+            return @"DIVI";
+        default:
+            return @"UNKNOWN";
+    }
 }
 @end

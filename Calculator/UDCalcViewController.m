@@ -9,6 +9,7 @@
 #import "UDCalcViewController.h"
 #import <QuartzCore/QuartzCore.h>
 #import "UDCalcButton.h"
+#import "UDValueFormatter.h"
 
 NSString * const UDCalcDidFinishCalculationNotification = @"org.underivable.calculator.DidFinishCalculation";
 
@@ -294,9 +295,9 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     
     // CONSTANTS: Treat them as number inputs!
     if (op == UDOpConstPi) {
-        [self.calc inputNumber:M_PI]; // You'll need to add this method
+        [self.calc inputNumber:UDValueMakeDouble(M_PI)];
     } else if (op == UDOpConstE) {
-        [self.calc inputNumber:M_E];
+        [self.calc inputNumber:UDValueMakeDouble(M_E)];
     } else {
         // Update Calculator.
         [self.calc performOperation:op];
@@ -382,10 +383,6 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
 #pragma mark - NSTableViewDataSource and NSTableViewDelegate Delegate
 
-- (NSString *)formatDouble:(double)val {
-    return [NSString stringWithFormat:@"%.10g", val];
-}
-
 // Calculate how many filler rows are needed
 - (NSInteger)calculateFillerRows:(NSTableView *)tableView forActualRows:(NSInteger)actualRows {
     CGFloat tableHeight = NSHeight(tableView.enclosingScrollView.documentVisibleRect);
@@ -405,7 +402,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 // 2. View For Row: What to display?
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
 
-    NSArray *values = [self.calc currentStackValues];
+    NSArray<UDNumberNode *> *values = [self.calc currentStackValues];
 
     NSInteger fillerRowCount = [self calculateFillerRows:tableView forActualRows:values.count];
     
@@ -446,8 +443,8 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     // So Row 0 = Deep History. Row Last = X Register.
 
     if (row < values.count) {
-        double val = [values[row] doubleValue];
-        cell.textField.stringValue = [self formatDouble:val];
+        UDValue val = values[row].value;
+        cell.textField.stringValue = [UDValueFormatter stringForValue:val base:self.calc.inputBuffer.inputBase];
         
         // Styling: The last row is always the X Register (Active) -> Bold
         // If we are typing, the Buffer (handled above) is X.
@@ -487,7 +484,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
         }
     } else {
         // %g removes trailing zeros for us
-        [self.displayField setStringValue:[self formatDouble:self.calc.currentInputValue]];
+        [self.displayField setStringValue:self.calc.currentDisplayValue];
     }
 }
 
@@ -504,7 +501,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 - (void)copy:(id)sender {
     // 1. Get the current display value
     // We format it to ensure we don't copy "5.0000" but just "5"
-    NSString *stringToCopy = [NSString stringWithFormat:@"%g", self.calc.currentInputValue];
+    NSString *stringToCopy = self.calc.currentDisplayValue;
 
     // 2. Clear and write to Pasteboard
     NSPasteboard *pb = [NSPasteboard generalPasteboard];
@@ -527,7 +524,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     // scanDouble returns YES if it found a valid double at the start
     if ([scanner scanDouble:&value] && [scanner isAtEnd]) {
         // 3. Update the Calculator
-        [self.calc inputNumber:value];
+        [self.calc inputNumber:UDValueMakeDouble(value)];
         [self updateUI];
     } else {
         NSBeep(); // Standard macOS "error" sound for invalid input
@@ -536,15 +533,15 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
 #pragma mark - UDCalcDelegate
 
-- (void)calculator:(UDCalc *)calc didCalculateResult:(double)result forTree:(UDASTNode *)tree {
+- (void)calculator:(UDCalc *)calc didCalculateResult:(UDValue)result forTree:(UDASTNode *)tree {
     
     if (!tree) {
         return;
     }
-    
+       
     NSDictionary *userInfo = @{
         UDCalcFormulaKey : tree,
-        UDCalcResultKey  : @(result)
+        UDCalcResultKey  : @(UDValueAsDouble(result))
     };
 
     [[NSNotificationCenter defaultCenter] postNotificationName:UDCalcDidFinishCalculationNotification

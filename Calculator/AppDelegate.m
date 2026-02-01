@@ -82,7 +82,7 @@
     double input = [(NSNumber *)note.userInfo[UDUnitConverterInputKey] doubleValue];
     double result = [(NSNumber *)note.userInfo[UDUnitConverterResultKey] doubleValue];
 
-    [self.calcViewController.calc inputNumber:result];
+    [self.calcViewController.calc inputNumber:UDValueMakeDouble(result)];
     [self.calcViewController updateUI];
     [self addToHistory:@{ @"cat": cat, @"from": from, @"to":to }];
 }
@@ -144,12 +144,12 @@
         NSDictionary *data = sender.representedObject;
         
         // 1. Use the UnitConverter directly
-        double result = [self.unitConverter convertValue:self.calcViewController.calc.currentInputValue
+        double result = [self.unitConverter convertValue:UDValueAsDouble(self.calcViewController.calc.currentInputValue)
                                                 category:data[@"cat"]
                                                 fromUnit:data[@"from"]
                                                   toUnit:data[@"to"]];
         
-        [self.calcViewController.calc inputNumber:result];
+        [self.calcViewController.calc inputNumber:UDValueMakeDouble(result)];
         [self.calcViewController updateUI];
         [self addToHistory:data];
         return;

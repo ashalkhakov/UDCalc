@@ -15,11 +15,6 @@
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
-// Actions (Methods linked to buttons)
-- (IBAction)changeMode:(NSMenuItem *)sender;
-- (IBAction)changeRPNMode:(NSMenuItem *)sender;
-- (IBAction)openConverter:(id)sender;
-
 @property (nonatomic, strong) UDUnitConverter *unitConverter;
 @property (nonatomic, strong) UDConversionHistoryManager *historyManager;
 @property (nonatomic, strong) UDTape *tape;
@@ -31,7 +26,6 @@
 @property (nonatomic, weak) IBOutlet NSMenu *recentMenu;
 
 - (IBAction)conversionMenuClicked:(NSMenuItem *)sender;
-- (void)setCalculatorMode:(CalculatorMode)mode animate:(BOOL)animate;
 
 @end
 

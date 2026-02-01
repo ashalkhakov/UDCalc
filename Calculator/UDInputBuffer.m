@@ -6,6 +6,7 @@
 //
 
 #import "UDInputBuffer.h"
+#import "UDValueFormatter.h"
 
 // Safety limit to prevent long long overflow (approx 17-18 digits)
 static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
@@ -26,6 +27,7 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
 - (instancetype)init {
     self = [super init];
     if (self) {
+        self.inputBase = UDBaseDec;
         [self performClearEntry];
     }
     return self;
@@ -33,9 +35,16 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
 
 #pragma mark - Input Handling
 
-- (void)loadConstant:(double)constant {
+- (void)loadConstant:(UDValue)value {
     // 1. Reset everything first
     [self performClearEntry];
+    
+    if (value.type == UDValueTypeInteger) {
+        self.mantissaBuffer = UDValueAsInt(value);
+        return;
+    }
+    
+    double constant = UDValueAsDouble(value);
 
     // 2. Handle Edge Case: Zero
     if (constant == 0) return; // Buffer is already 0 from clearEntry
@@ -79,7 +88,24 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
 }
 
 - (void)handleDigit:(int)digit {
-    if (digit < 0 || digit > 9) return;
+    if (digit < 0 || digit > _inputBase - 1) return;
+
+    if (_isIntegerMode) {
+        // --- INTEGER MODE LOGIC ---
+        // Simple accumulation: val = (val * base) + digit
+        // e.g. Typing Hex "A" (10) then "5":
+        // 1. Buffer = 10
+        // 2. Buffer = (10 * 16) + 5 = 165 (which is 0xA5)
+        
+        // Check for Overflow (Optional but recommended)
+        if (self.mantissaBuffer > (LLONG_MAX - digit) / _inputBase) {
+            return;
+        }
+
+        // Re-use mantissaBuffer to store the raw integer
+        _mantissaBuffer = (_mantissaBuffer * _inputBase) + digit;
+        return;
+    }
 
     if (self.inExponentMode) {
         // --- Exponent Mode ---
@@ -102,6 +128,8 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
 }
 
 - (void)handleDecimalPoint {
+    if (self.isIntegerMode) return;
+    
     // Cannot add decimal if already in exponent mode
     if (self.inExponentMode) return;
     
@@ -113,6 +141,8 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
 }
 
 - (void)handleEE {
+    if (self.isIntegerMode) return;
+
     // Already in EE mode? Do nothing.
     if (self.inExponentMode) return;
     
@@ -120,6 +150,8 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
 }
 
 - (void)toggleSign {
+    if (self.isIntegerMode) return;
+
     if (self.inExponentMode) {
         self.isExponentNegative = !self.isExponentNegative;
     } else {
@@ -175,7 +207,11 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
 
 #pragma mark - Output
 
-- (double)finalizeValue {
+- (UDValue)finalizeValue {
+    if (self.isIntegerMode) {
+        return UDValueMakeInt(self.mantissaBuffer);
+    }
+
     // 1. Convert Mantissa Digits
     double value = (double)self.mantissaBuffer;
     
@@ -186,7 +222,7 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
     
     // 3. Apply Decimal Shift (e.g. 123 with shift 2 -> 1.23)
     if (self.decimalShift > 0) {
-        value = value * pow(10.0, -((double)self.decimalShift));
+        value = value * pow(self.inputBase, -((double)self.decimalShift));
     }
     
     // 4. Calculate Total Exponent
@@ -197,13 +233,19 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
     
     // 5. Combine: Value * 10^Exp
     if (finalExp != 0) {
-        value = value * pow(10.0, (double)finalExp);
+        value = value * pow(self.inputBase, (double)finalExp);
     }
     
-    return value;
+    return UDValueMakeDouble(value);
 }
 
 - (NSString *)displayString {
+    if (self.isIntegerMode) {
+        long long val = self.mantissaBuffer;
+
+        return [UDValueFormatter stringForLong:val base:self.inputBase];
+    }
+
     NSMutableString *display = [NSMutableString string];
     
     // 1. Mantissa Sign

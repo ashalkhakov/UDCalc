@@ -8,6 +8,7 @@
 #import "UDCalc.h"
 #import "UDCompiler.h"
 #import "UDVM.h"
+#import "UDValueFormatter.h"
 
 @interface UDCalc ()
 @property (strong, readwrite) NSMutableArray<UDASTNode *> *nodeStack;
@@ -55,7 +56,7 @@
 
 - (void)flushBufferToStack {
     if (self.isTyping) {
-        double val = [self.inputBuffer finalizeValue];
+        UDValue val = [self.inputBuffer finalizeValue];
         [self.nodeStack addObject:[UDNumberNode value:val]];
         [self.inputBuffer performClearEntry];
         self.isTyping = NO;
@@ -64,7 +65,7 @@
 
 - (void)moveBufferToStack {
     if (self.isTyping) {
-        double val = [self.inputBuffer finalizeValue];
+        UDValue val = [self.inputBuffer finalizeValue];
         [self.nodeStack addObject:[UDNumberNode value:val]];
     }
 }
@@ -75,7 +76,7 @@
         UDASTNode *topNode = self.nodeStack.lastObject;
         [self.nodeStack removeLastObject];
 
-        double val = [self evaluateNode:topNode];
+        UDValue val = [self evaluateNode:topNode];
         [self.inputBuffer loadConstant:val];
         self.isTyping = YES;
         self.expectingOperator = YES;
@@ -88,7 +89,7 @@
     [self.inputBuffer handleEE];
 }
 
-- (void)inputDigit:(double)digit {
+- (void)inputDigit:(NSInteger)digit {
     // 1. SOFT RESET (Start new calc after =, M+, M-)
     if (self.shouldResetOnDigit) {
         [self performSoftReset];
@@ -125,7 +126,7 @@
 }
 
 // Used for Constants (π, e) and MR
-- (void)inputNumber:(double)number {
+- (void)inputNumber:(UDValue)number {
     if (self.shouldResetOnDigit) {
         [self performSoftReset];
     }
@@ -155,12 +156,13 @@
             [self reduceOp];
         }
         
-        double result = [self evaluateCurrentExpression];
+        UDValue result = [self evaluateCurrentExpression];
+        double resultDouble = UDValueAsDouble(result);
         
         if (op == UDOpMAdd) {
-            self.memoryRegister += result;
+            self.memoryRegister += resultDouble;
         } else if (op == UDOpMSub) {
-            self.memoryRegister -= result;
+            self.memoryRegister -= resultDouble;
         }
         
         // Reload result so "Ans + 2" works
@@ -227,7 +229,7 @@
         [self buildNode:info];
         
         // Auto-evaluate for display
-        double val = [self evaluateCurrentExpression];
+        UDValue val = [self evaluateCurrentExpression];
         [self.inputBuffer loadConstant:val];
         self.isTyping = NO;
         
@@ -340,7 +342,7 @@
         }
         
         // duplicate a zero
-        [self.nodeStack addObject:[UDNumberNode value:0.0]];
+        [self.nodeStack addObject:[UDNumberNode value:UDValueMakeDouble(0.0)]];
         return;
     }
 
@@ -427,7 +429,7 @@
 
         // Implicit Enter: "3 Enter 4 +" -> "+" acts as Enter for "4" first.
         if (!self.isTyping) {
-            [self.nodeStack addObject:[UDNumberNode value:0.0]];
+            [self.nodeStack addObject:[UDNumberNode value:UDValueMakeDouble(0.0)]];
         } else {
             [self flushBufferToStack];
         }
@@ -474,9 +476,9 @@
         switch (op) {
             case UDOpEE: [self inputEE]; break;
             case UDOpRad: self.isRadians = !self.isRadians; break;
-            case UDOpMC: self.memoryRegister = 0; break;
+            case UDOpMC: self.memoryRegister = 0.0; break;
             case UDOpNegate: [self.inputBuffer toggleSign]; break;
-            case UDOpMR: [self inputNumber:self.memoryRegister]; break;
+            case UDOpMR: [self inputNumber:UDValueMakeDouble(self.memoryRegister)]; break;
             default: break;
         }
         return;
@@ -508,10 +510,9 @@
 
 - (void)reportCalculationResult {
     if ([self.delegate respondsToSelector:@selector(calculator:didCalculateResult:forTree:)]) {
-        // FIXME: incorrect in the RPN mode
         UDASTNode *resultTree = [self.nodeStack lastObject];
 
-        double val = [self evaluateCurrentExpression];
+        UDValue val = [self evaluateCurrentExpression];
         
         [self.delegate calculator:self didCalculateResult:val forTree:resultTree];
     }
@@ -545,43 +546,43 @@
     if (node) [self.nodeStack addObject:node];
 }
 
-- (double)evaluateNode:(UDASTNode *)node {
-    NSArray *bytecode = [UDCompiler compile:node];
+- (UDValue)evaluateNode:(UDASTNode *)node {
+    NSArray *bytecode = [UDCompiler compile:node withIntegerMode:self.inputBuffer.isIntegerMode];
     return [UDVM execute:bytecode];
 }
 
-- (double)evaluateCurrentExpression {
-    if (self.nodeStack.count == 0) return 0.0;
+- (UDValue)evaluateCurrentExpression {
+    if (self.nodeStack.count == 0) return UDValueMakeDouble(0.0);
     UDASTNode *root = [self.nodeStack lastObject];
     return [self evaluateNode:root];
 }
 
-- (double)currentInputValue {
+- (UDValue)currentInputValue {
     if (self.isTyping) return [self.inputBuffer finalizeValue];
     if (self.nodeStack.count > 0) return [self evaluateCurrentExpression];
-    return 0;
+    return UDValueMakeDouble(0.0);
 }
 
 - (NSString *)currentDisplayValue {
-    return [NSString stringWithFormat:@"%.10g", [self currentInputValue]];
+    return [UDValueFormatter stringForValue:[self currentInputValue] base:self.inputBuffer.inputBase];
 }
 
-- (NSArray<NSNumber *> *)currentStackValues {
-    NSMutableArray<NSNumber *> *values = [NSMutableArray array];
+- (NSArray<UDNumberNode *> *)currentStackValues {
+    NSMutableArray<UDNumberNode *> *values = [NSMutableArray array];
     
     // Iterate through the entire node stack
     for (UDASTNode *node in self.nodeStack) {
         // Resolve the tree (e.g., "3 + 5") into a number (8.0)
-        double val = [self evaluateNode:node];
-        [values addObject:@(val)];
+        UDValue val = [self evaluateNode:node];
+        [values addObject:[UDNumberNode value:val]];
     }
 
     if (self.isTyping) {
-        [values addObject:@([self.inputBuffer finalizeValue])];
+        [values addObject:[UDNumberNode value:[self.inputBuffer finalizeValue]]];
     } else {
-        [values addObject:@(0.0)];
+        [values addObject:[UDNumberNode value:UDValueMakeDouble(0.0)]];
     }
-    
+
     return [values copy];
 }
 

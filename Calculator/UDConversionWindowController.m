@@ -59,7 +59,7 @@ NSString * const UDUnitConverterResultKey = @"UDUnitConverterResultKey";
     NSString *cat = self.typeBox.stringValue;
     NSString *from = self.fromBox.stringValue;
     NSString *to = self.toBox.stringValue;
-    double input = self.calc.currentInputValue;
+    double input = UDValueAsDouble(self.calc.currentInputValue);
     
     // 3. Perform conversion via the Converter object
     double result = [self.converter convertValue:input
