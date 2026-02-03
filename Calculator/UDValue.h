@@ -64,9 +64,3 @@ static inline long long UDValueAsInt(UDValue val) {
     if (val.type == UDValueTypeInteger) return val.v.intValue;
     return (long long)val.v.doubleValue; // Truncate
 }
-
-static inline BOOL UDValueIsZero(UDValue val) {
-    if (val.type == UDValueTypeDouble) return val.v.doubleValue == 0.0 ? YES : NO;
-    else if (val.type == UDValueTypeInteger) return val.v.intValue == 0 ? YES : NO;
-    return NO;
-}

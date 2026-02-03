@@ -12,6 +12,7 @@
 #import "UDConversionWindowController.h"
 #import "UDTape.h"
 #import "UDTapeWindowController.h"
+#import "UDBitDisplayView.h"
 
 typedef NS_ENUM(NSInteger, CalculatorMode) {
     CalculatorModeBasic         = 1,
@@ -37,11 +38,20 @@ extern NSString * const UDCalcResultKey;  // double
 - (IBAction)operationPressed:(NSButton *)sender;
 - (IBAction)decimalPressed:(NSButton *)sender;
 - (IBAction)secondFunctionPressed:(NSButton *)sender;
+- (IBAction)showBinaryPressed:(NSButton *)sender;
+- (IBAction)baseSelected:(NSSegmentedControl *)sender;
+- (IBAction)encodingSelected:(NSSegmentedControl *)sender;
 
 @property (nonatomic, weak) IBOutlet NSTabView *displayTabView;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *scientificWidthConstraint;
 @property (nonatomic, weak) IBOutlet NSView *scientificView;
 @property (nonatomic, assign) CGFloat standardScientificWidth; // To remember the size
+
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *programmerInputHeightConstraint;
+@property (nonatomic, assign) CGFloat standardProgrammerInputHeight; // To remember the size
+@property (nonatomic, weak) IBOutlet NSStackView *programmerInputView;
+@property (nonatomic, weak) IBOutlet NSSegmentedControl *baseSegmentedControl;
+@property (nonatomic, weak) IBOutlet UDBitDisplayView *bitDisplayView;
 
 @property (nonatomic, weak) IBOutlet NSTableView *stackTableView;
 

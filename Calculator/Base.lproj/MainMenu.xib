@@ -173,6 +173,11 @@
                                     <action selector="changeMode:" target="-1" id="kGq-ba-xyb"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Programmer Mode" tag="3" keyEquivalent="3" id="UVI-QU-gEi">
+                                <connections>
+                                    <action selector="changeMode:" target="-1" id="HgY-t8-um5"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>
                             <menuItem title="RPN Mode" tag="2" keyEquivalent="r" id="l56-dn-s0o">
                                 <connections>

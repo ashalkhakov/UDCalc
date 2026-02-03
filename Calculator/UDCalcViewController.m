@@ -27,6 +27,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
     // 1. Store the designed width of the scientific pane
     self.standardScientificWidth = self.scientificWidthConstraint.constant;
+    self.standardProgrammerInputHeight = self.programmerInputHeightConstraint.constant;
     
     // 2. Default to Basic Mode on launch (Optional)
     //[self setCalculatorMode:CalculatorModeBasic animate:NO];
@@ -38,7 +39,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 #pragma mark - Button Actions
 
 - (IBAction)changeMode:(NSMenuItem *)sender {
-    // Tag 1 = Basic, Tag 2 = Scientific
+    // Tag 1 = Basic, Tag 2 = Scientific, Tag 3 = Programmer
     [self setCalculatorMode:(CalculatorMode)sender.tag animate:YES];
 }
 
@@ -67,63 +68,77 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     [self updateUI];
 }
 
-- (void) setCalculatorMode:(CalculatorMode)mode animate:(BOOL)animate {
-    switch (mode) {
-        case CalculatorModeBasic:
-            [self setScientificModeVisible:NO animate:animate];
-            break;
-        case CalculatorModeScientific:
-            [self setScientificModeVisible:YES animate:animate];
-            break;
-        default:
-            break;
-    }
-    self.calcMode = mode;
-}
+- (void)setCalculatorMode:(CalculatorMode)mode animate:(BOOL)animate {
+    NSWindow *window = self.view.window;
+    if (!window) return; // Guard against early calls before window is attached
 
-- (void)setScientificModeVisible:(BOOL)showScientific animate:(BOOL)animate {
-    // If state isn't changing, do nothing
-    BOOL isCurrentlyVisible = !self.scientificView.hidden;
-    if (showScientific == isCurrentlyVisible) return;
-
-    NSWindow *window = self.scientificView.window;
+    // 1. Determine Target Visibility
+    BOOL showScientific = (mode == CalculatorModeScientific);
+    BOOL showProgrammer = (mode == CalculatorModeProgrammer);
+    
+    // 2. Determine Target Window Frame
+    // We start with the CURRENT frame and "undo" any current extensions to find the 'Basic' frame,
+    // then apply the "Target" extensions. This prevents accumulation errors.
+    
     NSRect currentFrame = window.frame;
-    CGFloat widthDelta = self.standardScientificWidth;
+    NSRect targetFrame = currentFrame;
     
-    // Calculate new Frame (Expand/Shrink to the LEFT)
-    NSRect newFrame = currentFrame;
-    
-    if (showScientific) {
-        // EXPAND: Width increases, Origin.x moves Left
-        newFrame.size.width += widthDelta;
-        newFrame.origin.x -= widthDelta;
-        self.scientificView.hidden = NO; // Show before animating
-    } else {
-        // SHRINK: Width decreases, Origin.x moves Right
-        newFrame.size.width -= widthDelta;
-        newFrame.origin.x += widthDelta;
+    // A. Revert width (Scientific) if currently visible
+    if (!self.scientificView.hidden) {
+        targetFrame.size.width -= self.standardScientificWidth;
+        targetFrame.origin.x += self.standardScientificWidth;
     }
     
-    // The Animation Block
+    // B. Revert height (Programmer) if currently visible
+    if (!self.programmerInputView.hidden) {
+        targetFrame.size.height -= self.standardProgrammerInputHeight;
+        targetFrame.origin.y += self.standardProgrammerInputHeight;
+    }
+    
+    // C. Apply New Width (Scientific)
+    if (showScientific) {
+        targetFrame.size.width += self.standardScientificWidth;
+        targetFrame.origin.x -= self.standardScientificWidth;
+    }
+    
+    // D. Apply New Height (Programmer)
+    if (showProgrammer) {
+        targetFrame.size.height += self.standardProgrammerInputHeight;
+        targetFrame.origin.y -= self.standardProgrammerInputHeight;
+    }
+    
+    // 3. Pre-Animation Setup
+    // If we are showing views, unhide them NOW so they can animate into place.
+    if (showScientific) self.scientificView.hidden = NO;
+    if (showProgrammer) self.programmerInputView.hidden = NO;
+    
+    // 4. Run Animation
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
         context.duration = animate ? 0.25 : 0.0;
         context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         
-        // 1. Animate the Window Frame
-        [[window animator] setFrame:newFrame display:YES];
+        // Animate Window Frame
+        [[window animator] setFrame:targetFrame display:YES];
         
-        // 2. Animate the Constraint (The Drawer Effect)
-        // If showing, restore width. If hiding, crush to 0.
+        // Animate Constraints
+        // Scientific: Horizontal Drawer
         [[self.scientificWidthConstraint animator] setConstant:(showScientific ? self.standardScientificWidth : 0)];
         
-        // 3. Force layout update within animation
-        [self.scientificView layoutSubtreeIfNeeded];
+        // Programmer: Vertical Drawer (Assuming you have a height constraint connected)
+        [[self.programmerInputHeightConstraint animator] setConstant:(showProgrammer ? self.standardProgrammerInputHeight : 0)];
+        
+        // Force Layout
+        [self.view.superview layoutSubtreeIfNeeded];
         
     } completionHandler:^{
-        if (!showScientific) {
-            self.scientificView.hidden = YES; // Hide strictly after animation
-        }
+        // 5. Post-Animation Cleanup
+        // If we hid views, set hidden=YES now to prevent them from handling clicks or drawing
+        if (!showScientific) self.scientificView.hidden = YES;
+        if (!showProgrammer) self.programmerInputView.hidden = YES;
     }];
+    
+    // 6. Update Model/State
+    self.calcMode = mode;
 }
 
 - (IBAction)digitPressed:(NSButton *)sender {
@@ -316,6 +331,36 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     [self updateScientificButtons];
 }
 
+- (IBAction)showBinaryPressed:(NSButton *)sender {
+    self.bitDisplayView.hidden = !self.bitDisplayView.hidden;
+    
+    [self updateUI];
+}
+
+- (IBAction)baseSelected:(NSSegmentedControl *)sender {
+    NSInteger selectedTag = [[sender cell] tagForSegment:[sender selectedSegment]];
+    
+    UDBase newBase = (UDBase)selectedTag;
+
+    self.calc.inputBuffer.inputBase = newBase;
+    
+    [self updateUI];
+}
+
+- (IBAction)encodingSelected:(NSSegmentedControl *)sender {
+    NSInteger index = [sender selectedSegment];
+        
+    if (index == 0) {
+        NSLog(@"Switched to ASCII Mode");
+        // self.calculator.inputBuffer.encodingMode = UDEncodingASCII;
+    } else {
+        NSLog(@"Switched to Unicode Mode");
+        // self.calculator.inputBuffer.encodingMode = UDEncodingUnicode;
+    }
+    
+    [self updateUI];
+}
+
 - (void)updateScientificButtons {
     BOOL second = self.isSecondFunctionActive;
     
@@ -485,6 +530,21 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     } else {
         // %g removes trailing zeros for us
         [self.displayField setStringValue:self.calc.currentDisplayValue];
+    }
+
+    if (self.calcMode == CalculatorModeProgrammer) {
+        UDBase currentBase = self.calc.inputBuffer.inputBase;
+        
+        // Map Model -> Segment Index
+        NSInteger segmentIndex = 1; // Default to Decimal (Middle)
+        
+        if (currentBase == UDBaseOct) segmentIndex = 0;      // "8"
+        else if (currentBase == UDBaseHex) segmentIndex = 2; // "16"
+        
+        // Only update if different to prevent UI flickering
+        if ([self.baseSegmentedControl selectedSegment] != segmentIndex) {
+            [self.baseSegmentedControl setSelectedSegment:segmentIndex];
+        }
     }
 }
 
