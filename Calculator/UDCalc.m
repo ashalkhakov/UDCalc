@@ -32,7 +32,7 @@
 - (void)reset {
     _nodeStack = [NSMutableArray array];
     _opStack = [NSMutableArray array];
-    _isRadians = NO;
+    _isRadians = YES;
     _isTyping = NO;
     _expectingOperator = NO;
     _shouldResetOnDigit = NO;
@@ -53,6 +53,14 @@
 }
 
 #pragma mark - Input
+
+- (BOOL)isIntegerMode {
+    return self.inputBuffer.isIntegerMode;
+}
+
+- (void)setIsIntegerMode:(BOOL)isIntegerMode {
+    self.inputBuffer.isIntegerMode = isIntegerMode;
+}
 
 - (void)flushBufferToStack {
     if (self.isTyping) {

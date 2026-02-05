@@ -32,19 +32,6 @@
     self.highlightColor = [NSColor colorWithCalibratedWhite:0.4 alpha:1.0];   // Lighter Grey
 }
 
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    
-    // Map the Interface Builder 'Tag' integer to our Enum
-    // This allows you to set the type directly in the IB side panel
-    self.symbolType = (CalcButtonType)self.tag;
-}
-
-- (void)setSymbolType:(CalcButtonType)newSymbolType {
-    _symbolType = newSymbolType;
-    [self setNeedsDisplay:YES];
-}
-
 #pragma mark - Main Draw Loop
 
 - (void)drawRect:(NSRect)dirtyRect {
@@ -54,7 +41,7 @@
     [[NSBezierPath bezierPathWithRoundedRect:self.bounds xRadius:0 yRadius:0] fill];
 
     // 2. Draw Symbol
-    switch (self.symbolType) {
+    switch ((CalcButtonType)self.symbolType) {
         // If Tag is 0, just draw the text from Interface Builder (e.g., "7", "AC", "+")
         case CalcButtonTypeStandard:  [self drawScaledText:self.title]; break;
             

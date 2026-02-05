@@ -25,7 +25,7 @@ extern NSString * const UDCalcDidFinishCalculationNotification;
 extern NSString * const UDCalcFormulaKey; // UDASTNode*
 extern NSString * const UDCalcResultKey;  // double
 
-@interface UDCalcViewController : NSViewController <NSTableViewDataSource, NSTableViewDelegate, UDCalcDelegate>
+@interface UDCalcViewController : NSViewController <NSTableViewDataSource, NSTableViewDelegate, UDCalcDelegate, UDBitDisplayDelegate>
 
 @property (nonatomic, weak) IBOutlet NSTextField *displayField;
 
@@ -53,6 +53,11 @@ extern NSString * const UDCalcResultKey;  // double
 @property (nonatomic, weak) IBOutlet NSSegmentedControl *baseSegmentedControl;
 @property (nonatomic, weak) IBOutlet UDBitDisplayView *bitDisplayView;
 
+@property (nonatomic, weak) IBOutlet NSTabView *basicOrProgrammerTabView;
+@property (nonatomic, weak) IBOutlet NSGridView *basicGridView;
+@property (nonatomic, weak) IBOutlet NSGridView *programmerGridView;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *keypadHeightConstraint;
+
 @property (nonatomic, weak) IBOutlet NSTableView *stackTableView;
 
 @property (nonatomic, weak) IBOutlet NSButton *parenLeftButton;
@@ -70,6 +75,16 @@ extern NSString * const UDCalcResultKey;  // double
 @property (nonatomic, weak) IBOutlet NSButton *sinhButton;
 @property (nonatomic, weak) IBOutlet NSButton *coshButton;
 @property (nonatomic, weak) IBOutlet NSButton *tanhButton;
+
+@property (nonatomic, weak) IBOutlet NSButton *p8Button;
+@property (nonatomic, weak) IBOutlet NSButton *p9Button;
+@property (nonatomic, weak) IBOutlet NSButton *pAButton;
+@property (nonatomic, weak) IBOutlet NSButton *pBButton;
+@property (nonatomic, weak) IBOutlet NSButton *pCButton;
+@property (nonatomic, weak) IBOutlet NSButton *pDButton;
+@property (nonatomic, weak) IBOutlet NSButton *pEButton;
+@property (nonatomic, weak) IBOutlet NSButton *pFButton;
+@property (nonatomic, weak) IBOutlet NSButton *pFFButton;
 
 - (void)updateUI;
 - (void)setCalculatorMode:(CalculatorMode)mode animate:(BOOL)animate;

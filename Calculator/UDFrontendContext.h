@@ -12,73 +12,102 @@
 
 // Shorter Enum names
 typedef NS_ENUM(NSInteger, UDOp) {
-    UDOpNone = 0,
-    UDOpAdd = 1,
-    UDOpSub = 2,
-    UDOpMul = 3,
-    UDOpDiv = 4,
-    UDOpEq = 5,
-    UDOpClear = 6,
-    UDOpPercent = 7,
-    UDOpNegate = 8,
+    UDOpNone        = -1,
+
+    // Digits
+    UDOpDigit0      = 0,
+    UDOpDigit9      = 9,
+    UDOpDigitA      = 10,
+    UDOpDigitF      = 15,
+    UDOpDigitFF     = 16,
+    UDOpDigit00     = 17,
+
+    // Basic Ops
+    UDOpAdd         = 21,
+    UDOpSub         = 22,
+    UDOpMul         = 23,
+    UDOpDiv         = 24,
+    UDOpEq          = 25,
+    UDOpClear       = 26,
+    UDOpPercent     = 27,
+    UDOpNegate      = 28,
+    UDOpDecimal     = 29,
 
     // --- ROW 2 (Powers) ---
-    UDOpSquare = 9,     // x^2
-    UDOpCube = 10,      // x^3
-    UDOpPow = 11,       // x^y (Binary)
-    UDOpPowRev = 12,    // y^x (Binary)
-    UDOpExp = 13,       // e^x
-    UDOpPow10 = 14,     // 10^x
-    UDOpPow2 = 15,      // 2^x
+    UDOpSquare      = 31,       // x^2
+    UDOpCube        = 32,       // x^3
+    UDOpPow         = 33,       // x^y (Binary)
+    UDOpPowRev      = 34,       // y^x (Binary)
+    UDOpExp         = 35,       // e^x
+    UDOpPow10       = 36,       // 10^x
+    UDOpPow2        = 37,       // 2^x
     
     // --- ROW 3 (Roots & Logs) ---
-    UDOpInvert = 16,   // 1/x
-    UDOpSqrt = 17,     // sqrt x
-    UDOpCbrt = 18,     // cbrt x
-    UDOpYRoot = 19,    // root(x, y) (Binary)
-    UDOpLn = 20,       // ln
-    UDOpLog10 = 21,    // log 10
-    UDOpLog2 = 22,     // log 2
-    UDOpLogY = 23,     // log y(x)
+    UDOpInvert      = 41,       // 1/x
+    UDOpSqrt        = 42,       // sqrt x
+    UDOpCbrt        = 43,       // cbrt x
+    UDOpYRoot       = 44,       // root(x, y) (Binary)
+    UDOpLn          = 45,       // ln
+    UDOpLog10       = 46,       // log 10
+    UDOpLog2        = 47,       // log 2
+    UDOpLogY        = 48,       // log y(x)
     
     // --- ROW 4 (Trig) ---
-    UDOpFactorial = 24,  // x!
-    UDOpSin = 25,
-    UDOpSinInverse = 26,
-    UDOpCos = 27,
-    UDOpCosInverse = 28,
-    UDOpTan = 29,
-    UDOpTanInverse = 30,
-    UDOpConstE = 31,     // Constant e
-    UDOpEE = 32,         // Scientific Notation (Advanced)
+    UDOpFactorial   = 51,       // x!
+    UDOpSin         = 52,
+    UDOpSinInverse  = 53,
+    UDOpCos         = 54,
+    UDOpCosInverse  = 55,
+    UDOpTan         = 56,
+    UDOpTanInverse  = 57,
+    UDOpConstE      = 58,       // Constant e
+    UDOpEE          = 59,       // Scientific Notation (Advanced)
     
     // --- ROW 5 (Hyperbolic & Misc) ---
-    UDOpSinh = 33,
-    UDOpSinhInverse = 34,
-    UDOpCosh = 35,
-    UDOpCoshInverse = 36,
-    UDOpTanh = 37,
-    UDOpTanhInverse = 38,
-    UDOpConstPi = 39,    // Constant π
-    UDOpRand = 40,       // Random Number
-    UDOpRad = 41,        // Rad/Deg Switch
+    UDOpSinh        = 61,
+    UDOpSinhInverse = 62,
+    UDOpCosh        = 63,
+    UDOpCoshInverse = 64,
+    UDOpTanh        = 65,
+    UDOpTanhInverse = 66,
+    UDOpConstPi     = 67,       // Constant π
+    UDOpRand        = 68,       // Random Number
+    UDOpRad         = 69,       // Rad/Deg Switch
     
     // Memory
-    UDOpMR = 42,
-    UDOpMC = 43,
-    UDOpMAdd = 44,
-    UDOpMSub = 45,
+    UDOpMR          = 71,
+    UDOpMC          = 72,
+    UDOpMAdd        = 73,
+    UDOpMSub        = 74,
 
     // --- SPECIAL ---
-    UDOpParenLeft = 46,  // (
-    UDOpParenRight = 47,  // )
-    
+    UDOpParenLeft   = 81,  // (
+    UDOpParenRight  = 82,  // )
+    UDOpSecondFunc  = 83,
+
     // --- RPN ---
-    UDOpEnter = 48,
-    UDOpSwap = 49,
-    UDOpDrop = 50,
-    UDOpRollDown = 51,
-    UDOpRollUp = 52
+    UDOpEnter       = 91,
+    UDOpSwap        = 92,
+    UDOpDrop        = 93,
+    UDOpRollDown    = 94,
+    UDOpRollUp      = 95,
+    
+    // --- Programmer ---
+    UDOpLogicalAnd  = 101,
+    UDOpLogicalOr   = 102,
+    UDOpLogicalNor  = 103,
+    UDOpLogicalXor  = 104,
+    UDOpShift1Left  = 105,
+    UDOpShift1Right = 106,
+    UDOpShiftLeft   = 107,
+    UDOpShiftRight  = 108,
+    
+    UDOpByteFlip    = 111,
+    UDOpWordFlip    = 112,
+    UDOpRotateLeft  = 113,
+    UDOpRotateRight = 114,
+    UDOpComp2       = 115,
+    UDOpComp1       = 116
 };
 
 @interface UDFrontendContext : NSObject

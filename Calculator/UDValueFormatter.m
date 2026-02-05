@@ -31,10 +31,10 @@
     return @"0";
 }
 
-+ (NSString *)stringForLong:(long long)val base:(UDBase)base {
++ (NSString *)stringForLong:(unsigned long long)val base:(UDBase)base {
     switch (base) {
         case UDBaseDec:
-            return [NSString stringWithFormat:@"%lld", val];
+            return [NSString stringWithFormat:@"%llu", val];
             
         case UDBaseHex:
             // %llX formats as uppercase Hex

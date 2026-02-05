@@ -25,7 +25,7 @@ typedef struct {
     UDValueType type;
     union {
         double doubleValue;
-        long long intValue; // Explicit 64-bit integer
+        unsigned long long intValue; // Explicit 64-bit integer
     } v;
 } UDValue;
 
@@ -43,7 +43,7 @@ static inline UDValue UDValueMakeDouble(double d) {
     return val;
 }
 
-static inline UDValue UDValueMakeInt(long long i) {
+static inline UDValue UDValueMakeInt(unsigned long long i) {
     UDValue val;
     val.type = UDValueTypeInteger;
     val.v.intValue = i;
@@ -60,7 +60,7 @@ static inline double UDValueAsDouble(UDValue val) {
     return (double)val.v.intValue;
 }
 
-static inline long long UDValueAsInt(UDValue val) {
+static inline unsigned long long UDValueAsInt(UDValue val) {
     if (val.type == UDValueTypeInteger) return val.v.intValue;
-    return (long long)val.v.doubleValue; // Truncate
+    return (unsigned long long)val.v.doubleValue; // Truncate
 }

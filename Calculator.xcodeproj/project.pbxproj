@@ -13,7 +13,6 @@
 		9A22A84C2F2BBCA40087F296 /* UDCalcViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A22A84A2F2BBCA40087F296 /* UDCalcViewController.m */; };
 		9A22A84E2F2BBE130087F296 /* UDCalcView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A22A84D2F2BBE130087F296 /* UDCalcView.xib */; };
 		9A22A84F2F2BBE130087F296 /* UDCalcView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A22A84D2F2BBE130087F296 /* UDCalcView.xib */; };
-		9A3238742F31181A009ECE69 /* UDCalcProgrammerInputView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A3238732F31181A009ECE69 /* UDCalcProgrammerInputView.xib */; };
 		9A4496B52F2143980024B55F /* UDCalcButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4496B42F2143980024B55F /* UDCalcButton.m */; };
 		9A5589862F1FFDA500159E7B /* UDFrontendContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5589852F1FFDA500159E7B /* UDFrontendContext.m */; };
 		9A5E28BF2F2E76F2001A7618 /* UDValueFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5E28BE2F2E76F2001A7618 /* UDValueFormatter.m */; };
@@ -73,7 +72,6 @@
 		9A22A8492F2BBC790087F296 /* UDCalcViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDCalcViewController.h; sourceTree = "<group>"; };
 		9A22A84A2F2BBCA40087F296 /* UDCalcViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCalcViewController.m; sourceTree = "<group>"; };
 		9A22A84D2F2BBE130087F296 /* UDCalcView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UDCalcView.xib; sourceTree = "<group>"; };
-		9A3238732F31181A009ECE69 /* UDCalcProgrammerInputView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UDCalcProgrammerInputView.xib; sourceTree = "<group>"; };
 		9A4496B32F2143790024B55F /* UDCalcButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDCalcButton.h; sourceTree = "<group>"; };
 		9A4496B42F2143980024B55F /* UDCalcButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCalcButton.m; sourceTree = "<group>"; };
 		9A5589842F1FFD8A00159E7B /* UDFrontendContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDFrontendContext.h; sourceTree = "<group>"; };
@@ -205,7 +203,6 @@
 				9A5E28BE2F2E76F2001A7618 /* UDValueFormatter.m */,
 				9A7D1A262F30E45C00CC974D /* UDBitDisplayView.h */,
 				9A7D1A272F30E47A00CC974D /* UDBitDisplayView.m */,
-				9A3238732F31181A009ECE69 /* UDCalcProgrammerInputView.xib */,
 			);
 			path = Calculator;
 			sourceTree = "<group>";
@@ -302,7 +299,6 @@
 				9A717CAD2F1D20C8005A27B7 /* UDTapeWindow.xib in Resources */,
 				9A22A84E2F2BBE130087F296 /* UDCalcView.xib in Resources */,
 				9A7B94F02F1BB18800ED7306 /* Assets.xcassets in Resources */,
-				9A3238742F31181A009ECE69 /* UDCalcProgrammerInputView.xib in Resources */,
 				9A7B94F32F1BB18800ED7306 /* MainMenu.xib in Resources */,
 				9A7B95032F1BF7CE00ED7306 /* ConversionWindow.xib in Resources */,
 			);

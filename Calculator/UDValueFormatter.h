@@ -15,6 +15,6 @@
 + (NSString *)stringForValue:(UDValue)value base:(UDBase)base;
 
 // Helper: Converts a raw long long (useful for the InputBuffer display)
-+ (NSString *)stringForLong:(long long)val base:(UDBase)base;
++ (NSString *)stringForLong:(unsigned long long)val base:(UDBase)base;
 
 @end

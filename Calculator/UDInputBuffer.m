@@ -13,8 +13,8 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
 
 @interface UDInputBuffer ()
 // Read-write versions of properties for internal use
-@property (nonatomic, assign) long long mantissaBuffer;
-@property (nonatomic, assign) long long exponentBuffer;
+@property (nonatomic, assign) unsigned long long mantissaBuffer;
+@property (nonatomic, assign) unsigned long long exponentBuffer;
 @property (nonatomic, assign) NSInteger decimalShift;
 @property (nonatomic, assign) BOOL inExponentMode;
 @property (nonatomic, assign) BOOL isMantissaNegative;
@@ -96,14 +96,15 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
         // e.g. Typing Hex "A" (10) then "5":
         // 1. Buffer = 10
         // 2. Buffer = (10 * 16) + 5 = 165 (which is 0xA5)
+        unsigned long long buf = self.mantissaBuffer;
         
         // Check for Overflow (Optional but recommended)
-        if (self.mantissaBuffer > (LLONG_MAX - digit) / _inputBase) {
+        if (buf > (ULLONG_MAX - digit) / _inputBase) {
             return;
         }
 
         // Re-use mantissaBuffer to store the raw integer
-        _mantissaBuffer = (_mantissaBuffer * _inputBase) + digit;
+        _mantissaBuffer = (buf * _inputBase) + digit;
         return;
     }
 

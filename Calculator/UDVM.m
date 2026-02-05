@@ -64,32 +64,32 @@
             case UDOpcodeAddI: {
                 if (sp - 2 < 0)
                     goto err;
-                long long b = UDValueAsInt(stack[--sp]);
-                long long a = UDValueAsInt(stack[--sp]);
+                unsigned long long b = UDValueAsInt(stack[--sp]);
+                unsigned long long a = UDValueAsInt(stack[--sp]);
                 stack[sp++] = UDValueMakeInt(a + b);
             } break;
                 
             case UDOpcodeMulI: {
                 if (sp - 2 < 0)
                     goto err;
-                long long b = UDValueAsInt(stack[--sp]);
-                long long a = UDValueAsInt(stack[--sp]);
+                unsigned long long b = UDValueAsInt(stack[--sp]);
+                unsigned long long a = UDValueAsInt(stack[--sp]);
                 stack[sp++] = UDValueMakeInt(a * b);
             } break;
                 
             case UDOpcodeSubI: {
                 if (sp - 2 < 0)
                     goto err;
-                long long b = UDValueAsInt(stack[--sp]);
-                long long a = UDValueAsInt(stack[--sp]);
+                unsigned long long b = UDValueAsInt(stack[--sp]);
+                unsigned long long a = UDValueAsInt(stack[--sp]);
                 stack[sp++] = UDValueMakeInt(a - b);
             } break;
                 
             case UDOpcodeDivI: {
                 if (sp - 2 < 0)
                     goto err;
-                long long b = UDValueAsInt(stack[--sp]);
-                long long a = UDValueAsInt(stack[--sp]);
+                unsigned long long b = UDValueAsInt(stack[--sp]);
+                unsigned long long a = UDValueAsInt(stack[--sp]);
 
                 if (b == 0) {
                     return UDValueMakeError(UDValueErrorTypeDivideByZero);

@@ -24,13 +24,14 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
     self.calc = [[UDCalc alloc] init];
     self.calc.delegate = self;
+    self.bitDisplayView.delegate = self;
 
     // 1. Store the designed width of the scientific pane
     self.standardScientificWidth = self.scientificWidthConstraint.constant;
     self.standardProgrammerInputHeight = self.programmerInputHeightConstraint.constant;
     
     // 2. Default to Basic Mode on launch (Optional)
-    //[self setCalculatorMode:CalculatorModeBasic animate:NO];
+    [self setCalculatorMode:CalculatorModeBasic animate:NO];
 
     [self updateScientificButtons];
     [self updateUI];
@@ -59,6 +60,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
     // 2. Toggle "Enter" vs "=" Button Title
     self.equalsButton.title = isRPNMode ? @"enter" : @"=";
+    self.equalsButton.tag = isRPNMode ? UDOpEnter : UDOpEq;
 
     // 3. Disable Parens in RPN
     self.parenLeftButton.enabled = !isRPNMode;
@@ -70,89 +72,120 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
 - (void)setCalculatorMode:(CalculatorMode)mode animate:(BOOL)animate {
     NSWindow *window = self.view.window;
-    if (!window) return; // Guard against early calls before window is attached
+    if (!window) return;
 
-    // 1. Determine Target Visibility
-    BOOL showScientific = (mode == CalculatorModeScientific);
-    BOOL showProgrammer = (mode == CalculatorModeProgrammer);
+    BOOL isProgrammer = (mode == CalculatorModeProgrammer);
+    BOOL isScientific = (mode == CalculatorModeScientific);
+
+    // --- 1. Determine Target Content & Sizes ---
+    // Instead of asking the whole window, we ask the specific Grid View
+    // "How big do you need to be to show all your rows?"
+    NSView *targetGrid = isProgrammer ? self.programmerGridView : self.basicGridView;
+    NSSize gridFitSize = [targetGrid fittingSize];
     
-    // 2. Determine Target Window Frame
-    // We start with the CURRENT frame and "undo" any current extensions to find the 'Basic' frame,
-    // then apply the "Target" extensions. This prevents accumulation errors.
+    // Add a small buffer for tab margins if necessary (usually 0-4 pts)
+    CGFloat targetKeypadHeight = gridFitSize.height;
+    CGFloat targetKeypadWidth = gridFitSize.width;
     
-    NSRect currentFrame = window.frame;
-    NSRect targetFrame = currentFrame;
+    CGFloat targetBitDisplayHeight = isProgrammer ? self.standardProgrammerInputHeight : 0.0;
+    CGFloat targetDrawerWidth = isScientific ? self.standardScientificWidth : 0.0;
+
+    // --- 2. Calculate Window Deltas ---
+    // We calculate the difference between "What we want" and "What constraints are set to NOW"
     
-    // A. Revert width (Scientific) if currently visible
-    if (!self.scientificView.hidden) {
-        targetFrame.size.width -= self.standardScientificWidth;
-        targetFrame.origin.x += self.standardScientificWidth;
+    CGFloat currentKeypadHeight = self.keypadHeightConstraint.constant;
+    CGFloat currentBitDisplayHeight = self.programmerInputHeightConstraint.constant;
+    CGFloat currentDrawerWidth = self.scientificWidthConstraint.constant;
+    
+    // Height Delta = (Keypad Change) + (BitDisplay Change)
+    CGFloat deltaH = (targetKeypadHeight - currentKeypadHeight) + (targetBitDisplayHeight - currentBitDisplayHeight);
+    
+    // Width Deltas
+    // We separate these because they affect the window Origin differently
+    // Assuming you have a keypadWidthConstraint connected. If not, use current frame width differences.
+    // If you don't have a keypadWidthConstraint, you can rely on the natural stack resizing,
+    // but calculating the delta manually is safer.
+    // For now, let's assume the window width change is driven by the Drawer mainly.
+    // If you want the keypad to widen the window to the RIGHT, we add that delta but don't move X.
+    
+    CGFloat currentWindowWidth = window.frame.size.width;
+    // Calculate expected total width = Drawer + Keypad (plus margins/borders)
+    // Note: This relies on your layout being tight.
+    // A safer way for Width is utilizing the Drawer Delta only for Origin X shift.
+    
+    CGFloat deltaW_Drawer = targetDrawerWidth - currentDrawerWidth;
+    
+    // If Keypad gets wider, we want window to grow.
+    // If we assume the current Keypad width matches the grid inside it (roughly):
+    CGFloat deltaW_Keypad = isProgrammer ? (targetKeypadWidth - self.basicGridView.fittingSize.width) : (targetKeypadWidth - self.programmerGridView.fittingSize.width);
+    
+    // Simplify: Just use the fittingSize difference for width if you don't have a width constraint
+    // But applying the Drawer Delta to Origin.x is CRITICAL.
+    
+    // --- 3. Calculate New Window Frame ---
+    NSRect newFrame = window.frame;
+    
+    // Apply Height (Grow Down)
+    newFrame.size.height += deltaH;
+    newFrame.origin.y -= deltaH;
+    
+    // Apply Width (Drawer Grows Left, Keypad Grows Right)
+    // We add the total width change...
+    // Note: To do this perfectly without a Keypad Width Constraint is tricky,
+    // so we calculate total expected width change implies:
+    CGFloat totalNewWidth = newFrame.size.width + deltaW_Drawer; // Start with drawer change
+    
+    // If we are switching Keypads, check if we need to expand for the new keypad width
+    // (This block effectively simulates a width constraint)
+    if (isProgrammer) {
+        totalNewWidth += (targetKeypadWidth - [self.basicGridView fittingSize].width);
+    } else {
+        totalNewWidth -= ([self.programmerGridView fittingSize].width - targetKeypadWidth);
     }
     
-    // B. Revert height (Programmer) if currently visible
-    if (!self.programmerInputView.hidden) {
-        targetFrame.size.height -= self.standardProgrammerInputHeight;
-        targetFrame.origin.y += self.standardProgrammerInputHeight;
-    }
+    newFrame.size.width = totalNewWidth;
+    newFrame.origin.x -= deltaW_Drawer; // Only move Left for the Drawer
     
-    // C. Apply New Width (Scientific)
-    if (showScientific) {
-        targetFrame.size.width += self.standardScientificWidth;
-        targetFrame.origin.x -= self.standardScientificWidth;
-    }
     
-    // D. Apply New Height (Programmer)
-    if (showProgrammer) {
-        targetFrame.size.height += self.standardProgrammerInputHeight;
-        targetFrame.origin.y -= self.standardProgrammerInputHeight;
-    }
-    
-    // 3. Pre-Animation Setup
-    // If we are showing views, unhide them NOW so they can animate into place.
-    if (showScientific) self.scientificView.hidden = NO;
-    if (showProgrammer) self.programmerInputView.hidden = NO;
-    
-    // 4. Run Animation
+    // --- 4. Setup State ---
+    [self.basicOrProgrammerTabView selectTabViewItemAtIndex:isProgrammer ? 1 : 0];
+    self.programmerInputView.hidden = !isProgrammer;
+    self.scientificView.hidden = !isScientific;
+
+    // --- 5. Animate ---
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
         context.duration = animate ? 0.25 : 0.0;
         context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         
-        // Animate Window Frame
-        [[window animator] setFrame:targetFrame display:YES];
+        [[window animator] setFrame:newFrame display:YES];
         
         // Animate Constraints
-        // Scientific: Horizontal Drawer
-        [[self.scientificWidthConstraint animator] setConstant:(showScientific ? self.standardScientificWidth : 0)];
+        [[self.scientificWidthConstraint animator] setConstant:targetDrawerWidth];
+        [[self.programmerInputHeightConstraint animator] setConstant:targetBitDisplayHeight];
+        [[self.keypadHeightConstraint animator] setConstant:targetKeypadHeight]; // Fixes the missing row!
         
-        // Programmer: Vertical Drawer (Assuming you have a height constraint connected)
-        [[self.programmerInputHeightConstraint animator] setConstant:(showProgrammer ? self.standardProgrammerInputHeight : 0)];
-        
-        // Force Layout
         [self.view.superview layoutSubtreeIfNeeded];
-        
-    } completionHandler:^{
-        // 5. Post-Animation Cleanup
-        // If we hid views, set hidden=YES now to prevent them from handling clicks or drawing
-        if (!showScientific) self.scientificView.hidden = YES;
-        if (!showProgrammer) self.programmerInputView.hidden = YES;
-    }];
-    
-    // 6. Update Model/State
+    } completionHandler:nil];
+
+    self.calc.isIntegerMode = isProgrammer;
     self.calcMode = mode;
 }
 
 - (IBAction)digitPressed:(NSButton *)sender {
-    NSString *buttonName = sender.identifier;
-    NSInteger digit = 0;
+    UDOp op = sender.tag;
     
-    if ([buttonName length] == 2 && [buttonName characterAtIndex:0] == 'b' && isdigit([buttonName characterAtIndex:1])) {
-        digit = [buttonName characterAtIndex:1] - '0';
-    } else {
-        NSLog(@"Unsupported button name %@", buttonName);
-        return;
+    if ((op >= UDOpDigit0 && op <= UDOpDigit9) || (op >= UDOpDigitA && op <= UDOpDigitF)) {
+        
+        NSInteger digit = op;
+        
+        [self.calc inputDigit:digit];
+    } else if (op == UDOpDigit00) {
+        [self.calc inputDigit:0];
+        [self.calc inputDigit:0];
+    } else if (op == UDOpDigitFF) {
+        [self.calc inputDigit:UDOpDigitF];
+        [self.calc inputDigit:UDOpDigitF];
     }
-    
-    [self.calc inputDigit:digit];
 
     [self updateUI];
 }
@@ -167,157 +200,38 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 }
 
 - (IBAction)operationPressed:(NSButton *)sender {
-    NSString *opTitle = sender.identifier;
-    NSInteger tag = sender.tag;
-    UDOp op = UDOpNone;
     
-    switch (tag) {
-        case CalcButtonTypeStandard:
-            // Map button titles to Enum
-            if ([opTitle isEqualToString:@"add"]) op = UDOpAdd;
-            else if ([opTitle isEqualToString:@"sub"]) op = UDOpSub;
-            else if ([opTitle isEqualToString:@"mul"]) op = UDOpMul; // or "x" or "X"
-            else if ([opTitle isEqualToString:@"div"]) op = UDOpDiv; // or "÷"
-            else if ([opTitle isEqualToString:@"equals"]) op = self.calc.isRPNMode ? UDOpEnter : UDOpEq;
-            else if ([opTitle isEqualToString:@"clear"]) op = UDOpClear;
-            else if ([opTitle isEqualToString:@"negate"]) op = UDOpNegate;
-            else if ([opTitle isEqualToString:@"percent"]) op = UDOpPercent;
-            else if ([opTitle isEqualToString:@"lparen"]) op = UDOpParenLeft;
-            else if ([opTitle isEqualToString:@"rparen"]) op = UDOpParenRight;
-            else if ([opTitle isEqualToString:@"pi"]) op = UDOpConstPi;
-            else if ([opTitle isEqualToString:@"e"]) op = UDOpConstE;
-            else if ([opTitle isEqualToString:@"rand"]) op = UDOpRand;
-            // row:
-            else if ([opTitle isEqualToString:@"sqr"]) op = UDOpSquare;
-            else if ([opTitle isEqualToString:@"pow"]) op = UDOpPow;
-            else if ([opTitle isEqualToString:@"e_pow_x"]) op = UDOpExp;
-            else if ([opTitle isEqualToString:@"_10_pow_x"]) op = UDOpPow10;
-            else if ([opTitle isEqualToString:@"_2_pow_x"]) op = UDOpPow2;
-            else if ([opTitle isEqualToString:@"rad"]) op = UDOpRad;
-            else if ([opTitle isEqualToString:@"fact"]) op = UDOpFactorial;
-            else if ([opTitle isEqualToString:@"ln"]) op = UDOpLn;
-            else if ([opTitle isEqualToString:@"mc"]) op = UDOpMC;
-            else if ([opTitle isEqualToString:@"mplus"]) op = UDOpMAdd;
-            else if ([opTitle isEqualToString:@"mminus"]) op = UDOpMSub;
-            else if ([opTitle isEqualToString:@"mr"]) op = UDOpMR;
-            // stack ops
-            else if ([opTitle isEqualToString:@"swap"]) op = UDOpSwap;
-            else if ([opTitle isEqualToString:@"rolldown"]) op = UDOpRollDown;
-            else if ([opTitle isEqualToString:@"rollup"]) op = UDOpRollUp;
-            else if ([opTitle isEqualToString:@"drop"]) op = UDOpDrop;
-            break;
-            
-        case CalcButtonTypePi:           // Pi symbol
-            op = UDOpConstPi;
-            break;
-        case CalcButtonTypeInverse:      // 1/x
-            op = UDOpInvert;
-            break;
-
-        // --- Standard Trig ---
-        case CalcButtonTypeSin:          // sin
-            op = UDOpSin;
-            break;
-        case CalcButtonTypeCos:          // cos
-            op = UDOpCos;
-            break;
-        case CalcButtonTypeTan:          // tan
-            op = UDOpTan;
-            break;
-        case CalcButtonTypeSinh:         // sinh
-            op = UDOpSinh;
-            break;
-        case CalcButtonTypeCosh:         // cosh
-            op = UDOpCosh;
-            break;
-        case CalcButtonTypeTanh:         // tanh
-            op = UDOpTanh;
-            break;
-            
-        // Inverse Trig
-        case CalcButtonTypeSinInverse:   // sin^-1
-            op = UDOpSinInverse;
-            break;
-        case CalcButtonTypeCosInverse:   // cos^-1
-            op = UDOpCosInverse;
-            break;
-        case CalcButtonTypeTanInverse:   // tan^-1
-            op = UDOpTanInverse;
-            break;
-        case CalcButtonTypeSinhInverse:  // sinh^-1
-            op = UDOpSinhInverse;
-            break;
-        case CalcButtonTypeCoshInverse:  // cosh^-1
-            op = UDOpCoshInverse;
-            break;
-        case CalcButtonTypeTanhInverse:  // tanh^-1
-            op = UDOpTanhInverse;
-            break;
-
-        // Standard Exponents
-        case CalcButtonTypeSquare:      // x^2
-            op = UDOpSquare;
-            break;
-        case CalcButtonTypeCube:        // x^3
-            op = UDOpCube;
-            break;
-        case CalcButtonTypePower:       // x^y
-            op = UDOpPow;
-            break;
-        case CalcButtonTypePowerYtoX:   // y^x
-            op = UDOpPowRev;
-            break;
-        case CalcButtonTypePower2toX:   // 2^x
-            op = UDOpPow2;
-            break;
-        case CalcButtonTypeExp:         // e^x
-            op = UDOpExp;
-            break;
-        case CalcButtonTypeTenPower:    // 10^x
-            op = UDOpPow10;
-            break;
-        case CalcButtonType2nd:         // 2nd
-            self.isSecondFunctionActive = !self.isSecondFunctionActive;
-
-            // Visual Feedback: Make the "2nd" button look pressed/highlighted
-            sender.state = self.isSecondFunctionActive ? NSControlStateValueOn : NSControlStateValueOff;
-            
-            [self updateScientificButtons];
-            return;
-
-        // Logarithms
-        case CalcButtonTypeLog10:        // log10
-            op = UDOpLog10;
-            break;
-        case CalcButtonTypeLog2:         // log2 <-- NEW
-            op = UDOpLog2;
-            break;
-        case CalcButtonTypeLogY:         // logy <-- NEW
-            op = UDOpLogY;
-            break;
-
-        // Roots & Others
-        case CalcButtonTypeSqrt:         // sqrt(x)
-            op = UDOpSqrt;
-            break;
-        case CalcButtonTypeCubeRoot:     // 3rd root
-            op = UDOpCbrt;
-            break;
-        case CalcButtonTypeYRoot:       // y-th root
-            op = UDOpYRoot;
-            break;
+    if (![sender isKindOfClass:[UDCalcButton class]]) {
+        NSLog(@"Incorrect button class");
+        return;
     }
     
-    // CONSTANTS: Treat them as number inputs!
-    if (op == UDOpConstPi) {
+    UDOp op = sender.tag;
+
+    if (op == UDOpSecondFunc) {
+        self.isSecondFunctionActive = !self.isSecondFunctionActive;
+        
+        // Visual Feedback: Make the "2nd" button look pressed/highlighted
+        sender.state = self.isSecondFunctionActive ? NSControlStateValueOn : NSControlStateValueOff;
+        [sender setNeedsDisplay:YES];
+
+        [self updateScientificButtons];
+        return;
+    } else if (op == UDOpConstPi) {
         [self.calc inputNumber:UDValueMakeDouble(M_PI)];
     } else if (op == UDOpConstE) {
         [self.calc inputNumber:UDValueMakeDouble(M_E)];
+    } else if (op == UDOpRad) {
+        [self.calc performOperation:op];
+        
+        // visual feedback
+        sender.title = self.calc.isRadians ? @"Rad" : @"Deg";
+        [sender setNeedsDisplay:YES];
     } else {
         // Update Calculator.
         [self.calc performOperation:op];
     }
-    
+
     // 3. Update Display
     [self updateUI];
 }
@@ -344,6 +258,19 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
     self.calc.inputBuffer.inputBase = newBase;
     
+    BOOL hexInputEnabled = newBase == UDBaseHex;
+    BOOL decOrHexInputEnabled = newBase == UDBaseHex || newBase == UDBaseDec;
+
+    self.p8Button.enabled = decOrHexInputEnabled;
+    self.p9Button.enabled = decOrHexInputEnabled;
+    self.pAButton.enabled = hexInputEnabled;
+    self.pBButton.enabled = hexInputEnabled;
+    self.pCButton.enabled = hexInputEnabled;
+    self.pDButton.enabled = hexInputEnabled;
+    self.pEButton.enabled = hexInputEnabled;
+    self.pFButton.enabled = hexInputEnabled;
+    self.pFFButton.enabled = hexInputEnabled;
+
     [self updateUI];
 }
 
@@ -363,35 +290,10 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
 - (void)updateScientificButtons {
     BOOL second = self.isSecondFunctionActive;
-    
-    /*
-     // TODO:
-     // Example in ViewDidLoad
-     self.squareRootBtn.symbolType = MathButtonTypeSqrt;
-     self.cubeRootBtn.symbolType = MathButtonTypeCubeRoot;
-     self.piBtn.symbolType = MathButtonTypePi;
-     // Force redraw
-     [self.squareRootBtn setNeedsDisplay:YES];
-     
-     // Example: Configuring the "Square Root" button
-     MathButton *sqrtBtn = [[MathButton alloc] initWithFrame:NSMakeRect(0, 0, 60, 50)];
-     sqrtBtn.symbolType = MathButtonTypeSqrt;
-
-     // Set it to "Function" style (Dark Grey)
-     sqrtBtn.buttonColor = [NSColor colorWithCalibratedWhite:0.2 alpha:1.0];
-     sqrtBtn.highlightColor = [NSColor colorWithCalibratedWhite:0.5 alpha:1.0]; // Flash lighter
-
-     // Example: Configuring the "2nd" button (often lighter grey)
-     MathButton *secondBtn = [[MathButton alloc] initWithFrame:NSMakeRect(60, 0, 60, 50)];
-     secondBtn.symbolType = MathButtonType2nd;
-     secondBtn.buttonColor = [NSColor colorWithCalibratedWhite:0.35 alpha:1.0]; // Light Grey
-     secondBtn.highlightColor = [NSColor colorWithCalibratedWhite:0.6 alpha:1.0];
-     secondBtn.textColor = [NSColor blackColor]; // Text might need to be black on light buttons
-     */
 
     // Helper block to swap button state
-    void (^setBtn)(NSButton*, CalcButtonType, CalcButtonType) =
-    ^(NSButton *b, CalcButtonType norm, CalcButtonType sec) {
+    void (^setBtn)(NSButton*, CalcButtonType, UDOp, CalcButtonType, UDOp) =
+    ^(NSButton *b, CalcButtonType norm, UDOp normOp, CalcButtonType sec, UDOp secOp) {
         if (![b isKindOfClass:[UDCalcButton class]]) {
             NSLog(@"wrong kind of button");
             return;
@@ -401,29 +303,34 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
         
         if (second) {
             calcButton.symbolType = sec;
+            calcButton.tag = secOp;
         } else {
             calcButton.symbolType = norm;
+            calcButton.tag = normOp;
         }
+        [calcButton setNeedsDisplay:YES];
     };
     
-    setBtn(self.expButton, CalcButtonTypeExp, CalcButtonTypePowerYtoX);
-    setBtn(self.xthPowerOf10Button, CalcButtonTypeTenPower, CalcButtonTypePower2toX);
+    setBtn(self.expButton, CalcButtonTypeExp, UDOpExp, CalcButtonTypePowerYtoX, UDOpPowRev);
+    setBtn(self.xthPowerOf10Button, CalcButtonTypeTenPower, UDOpPow10, CalcButtonTypePower2toX, UDOpPow2);
     if ([self.lnButton isKindOfClass:[UDCalcButton class]]) {
         if (second) {
             self.lnButton.title = @"";
             ((UDCalcButton *)self.lnButton).symbolType = CalcButtonTypeLogY;
+            self.lnButton.tag = UDOpLogY;
         } else {
             self.lnButton.title = @"ln";
             ((UDCalcButton *)self.lnButton).symbolType = CalcButtonTypeStandard;
+            self.lnButton.tag = UDOpLn;
         }
     }
-    setBtn(self.log10Button, CalcButtonTypeLog10, CalcButtonTypeLog2);
-    setBtn(self.sinButton, CalcButtonTypeSin, CalcButtonTypeSinInverse);
-    setBtn(self.cosButton, CalcButtonTypeCos, CalcButtonTypeCosInverse);
-    setBtn(self.tanButton, CalcButtonTypeTan, CalcButtonTypeTanInverse);
-    setBtn(self.sinhButton, CalcButtonTypeSinh, CalcButtonTypeSinhInverse);
-    setBtn(self.coshButton, CalcButtonTypeCosh, CalcButtonTypeCoshInverse);
-    setBtn(self.tanhButton, CalcButtonTypeTanh, CalcButtonTypeTanhInverse);
+    setBtn(self.log10Button, CalcButtonTypeLog10, UDOpLog10, CalcButtonTypeLog2, UDOpLog2);
+    setBtn(self.sinButton, CalcButtonTypeSin, UDOpSin, CalcButtonTypeSinInverse, UDOpSinInverse);
+    setBtn(self.cosButton, CalcButtonTypeCos, UDOpCos, CalcButtonTypeCosInverse, UDOpCosInverse);
+    setBtn(self.tanButton, CalcButtonTypeTan, UDOpTan, CalcButtonTypeTanInverse, UDOpTanInverse);
+    setBtn(self.sinhButton, CalcButtonTypeSinh, UDOpSinh, CalcButtonTypeSinhInverse, UDOpSinhInverse);
+    setBtn(self.coshButton, CalcButtonTypeCosh, UDOpCosh, CalcButtonTypeCoshInverse, UDOpCoshInverse);
+    setBtn(self.tanhButton, CalcButtonTypeTanh, UDOpTanh, CalcButtonTypeTanhInverse, UDOpTanhInverse);
 }
 
 #pragma mark - NSTableViewDataSource and NSTableViewDelegate Delegate
@@ -533,18 +440,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     }
 
     if (self.calcMode == CalculatorModeProgrammer) {
-        UDBase currentBase = self.calc.inputBuffer.inputBase;
-        
-        // Map Model -> Segment Index
-        NSInteger segmentIndex = 1; // Default to Decimal (Middle)
-        
-        if (currentBase == UDBaseOct) segmentIndex = 0;      // "8"
-        else if (currentBase == UDBaseHex) segmentIndex = 2; // "16"
-        
-        // Only update if different to prevent UI flickering
-        if ([self.baseSegmentedControl selectedSegment] != segmentIndex) {
-            [self.baseSegmentedControl setSelectedSegment:segmentIndex];
-        }
+        self.bitDisplayView.value = UDValueAsInt(self.calc.currentInputValue);
     }
 }
 
@@ -607,6 +503,26 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     [[NSNotificationCenter defaultCenter] postNotificationName:UDCalcDidFinishCalculationNotification
                                                         object:self
                                                       userInfo:userInfo];
+}
+
+#pragma mark - UDBitDisplayDelegate
+
+- (void)bitDisplayDidToggleBit:(NSInteger)bitIndex toValue:(BOOL)newValue {
+    if (bitIndex < 0 || bitIndex > 63)
+    {
+        return;
+    }
+
+    UDValue currentValue = self.calc.currentInputValue;
+    unsigned long long bits = UDValueAsInt(currentValue);
+
+    if (newValue)
+        bits |= (1ULL << bitIndex);
+    else
+        bits &= ~(1ULL << bitIndex);
+
+    [self.calc inputNumber:UDValueMakeInt(bits)];
+    [self updateUI];
 }
 
 @end

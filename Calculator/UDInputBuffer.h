@@ -21,8 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface UDInputBuffer : NSObject
 
 // --- Properties (Exposed for debugging/UI if needed) ---
-@property (nonatomic, assign, readonly) long long mantissaBuffer;
-@property (nonatomic, assign, readonly) long long exponentBuffer;
+@property (nonatomic, assign, readonly) unsigned long long mantissaBuffer;
+@property (nonatomic, assign, readonly) unsigned long long exponentBuffer;
 @property (nonatomic, assign, readonly) NSInteger decimalShift;
 @property (nonatomic, assign, readonly) BOOL inExponentMode;
 @property (nonatomic, assign, readonly) BOOL isMantissaNegative;
