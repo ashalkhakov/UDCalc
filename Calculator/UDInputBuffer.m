@@ -88,14 +88,14 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
 }
 
 - (void)handleDigit:(int)digit {
-    if (digit < 0 || digit > _inputBase - 1) return;
-
     if (_isIntegerMode) {
         // --- INTEGER MODE LOGIC ---
         // Simple accumulation: val = (val * base) + digit
         // e.g. Typing Hex "A" (10) then "5":
         // 1. Buffer = 10
         // 2. Buffer = (10 * 16) + 5 = 165 (which is 0xA5)
+        if (digit < 0 || digit > _inputBase - 1) return;
+
         unsigned long long buf = self.mantissaBuffer;
         
         // Check for Overflow (Optional but recommended)
@@ -107,6 +107,8 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
         _mantissaBuffer = (buf * _inputBase) + digit;
         return;
     }
+
+    if (digit < 0 || digit > 9) return;
 
     if (self.inExponentMode) {
         // --- Exponent Mode ---
@@ -223,7 +225,7 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
     
     // 3. Apply Decimal Shift (e.g. 123 with shift 2 -> 1.23)
     if (self.decimalShift > 0) {
-        value = value * pow(self.inputBase, -((double)self.decimalShift));
+        value = value * pow(10, -((double)self.decimalShift));
     }
     
     // 4. Calculate Total Exponent
@@ -234,7 +236,7 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
     
     // 5. Combine: Value * 10^Exp
     if (finalExp != 0) {
-        value = value * pow(self.inputBase, (double)finalExp);
+        value = value * pow(10, (double)finalExp);
     }
     
     return UDValueMakeDouble(value);
@@ -296,6 +298,10 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
     }
     
     return display;
+}
+
+- (NSString *)stringForValue:(UDValue)value {
+    return _isIntegerMode ? [UDValueFormatter stringForValue:value base:self.inputBase] : [UDValueFormatter stringForValue:value base:UDBaseDec];
 }
 
 @end

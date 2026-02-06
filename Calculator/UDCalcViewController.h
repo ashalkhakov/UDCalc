@@ -14,12 +14,6 @@
 #import "UDTapeWindowController.h"
 #import "UDBitDisplayView.h"
 
-typedef NS_ENUM(NSInteger, CalculatorMode) {
-    CalculatorModeBasic         = 1,
-    CalculatorModeScientific    = 2,
-    CalculatorModeProgrammer    = 3
-};
-
 extern NSString * const UDCalcDidFinishCalculationNotification;
 // Keys for the userInfo dictionary
 extern NSString * const UDCalcFormulaKey; // UDASTNode*
@@ -30,7 +24,6 @@ extern NSString * const UDCalcResultKey;  // double
 @property (nonatomic, weak) IBOutlet NSTextField *displayField;
 
 @property (nonatomic, strong) UDCalc *calc;
-@property (nonatomic, assign) CalculatorMode calcMode;
 @property (nonatomic, assign) BOOL isSecondFunctionActive;
 
 // Actions (Methods linked to buttons)
@@ -87,6 +80,6 @@ extern NSString * const UDCalcResultKey;  // double
 @property (nonatomic, weak) IBOutlet NSButton *pFFButton;
 
 - (void)updateUI;
-- (void)setCalculatorMode:(CalculatorMode)mode animate:(BOOL)animate;
+- (void)setCalculatorMode:(UDCalcMode)mode animate:(BOOL)animate;
 
 @end

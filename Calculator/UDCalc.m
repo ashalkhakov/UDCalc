@@ -54,12 +54,21 @@
 
 #pragma mark - Input
 
-- (BOOL)isIntegerMode {
-    return self.inputBuffer.isIntegerMode;
+- (void)setMode:(UDCalcMode)newMode {
+    _mode = newMode;
+    if (_mode == UDCalcModeProgrammer) {
+        self.inputBuffer.isIntegerMode = YES;
+    } else {
+        self.inputBuffer.isIntegerMode = NO;
+    }
 }
 
-- (void)setIsIntegerMode:(BOOL)isIntegerMode {
-    self.inputBuffer.isIntegerMode = isIntegerMode;
+- (UDBase)inputBase {
+    return self.inputBuffer.inputBase;
+}
+
+- (void)setInputBase:(UDBase)newBase {
+    self.inputBuffer.inputBase = newBase;
 }
 
 - (void)flushBufferToStack {
@@ -572,7 +581,7 @@
 }
 
 - (NSString *)currentDisplayValue {
-    return [UDValueFormatter stringForValue:[self currentInputValue] base:self.inputBuffer.inputBase];
+    return [self stringForValue:[self currentInputValue]];
 }
 
 - (NSArray<UDNumberNode *> *)currentStackValues {
@@ -592,6 +601,10 @@
     }
 
     return [values copy];
+}
+
+- (NSString *)stringForValue:(UDValue)value {
+    return [self.inputBuffer stringForValue:value];
 }
 
 @end

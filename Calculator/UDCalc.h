@@ -12,6 +12,12 @@
 
 @class UDCalc;
 
+typedef NS_ENUM(NSInteger, UDCalcMode) {
+    UDCalcModeBasic         = 1,
+    UDCalcModeScientific    = 2,
+    UDCalcModeProgrammer    = 3
+};
+
 @protocol UDCalcDelegate <NSObject>
 @optional
 - (void)calculator:(UDCalc *)calc didCalculateResult:(UDValue)result forTree:(UDASTNode *)tree;
@@ -20,11 +26,12 @@
 @interface UDCalc : NSObject
 
 // State
+@property (nonatomic, assign) UDCalcMode mode;
+@property (nonatomic, assign) UDBase inputBase;
 @property (nonatomic, weak) id<UDCalcDelegate> delegate;
 @property (nonatomic, strong) UDInputBuffer *inputBuffer;
 @property (nonatomic, assign) BOOL isRadians;
 @property (nonatomic, assign) BOOL isRPNMode;
-@property (nonatomic, assign) BOOL isIntegerMode;
 @property (nonatomic, assign) double memoryRegister; // The 'M' value
 // YES = User is editing the buffer.
 // NO = User just hit an Op/Equals, buffer is "fresh".
@@ -51,5 +58,7 @@
 // Compiles the current AST and executes it on the VM.
 - (UDValue)evaluateNode:(UDASTNode *)node;
 - (UDValue)evaluateCurrentExpression;
+
+- (NSString *)stringForValue:(UDValue)value;
 
 @end

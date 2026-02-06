@@ -35,14 +35,28 @@
 #pragma mark - Main Draw Loop
 
 - (void)drawRect:(NSRect)dirtyRect {
-    // 1. Draw Background (Highlight logic)
-    NSColor *bg = [self.cell isHighlighted] ? self.highlightColor : self.buttonColor;
+    // 1. Determine Background Color based on State
+    NSColor *bg;
+    
+    if (!self.isEnabled) {
+        // DISABLED: Use a flat, dark gray to indicate inactivity
+        bg = [NSColor colorWithCalibratedWhite:0.15 alpha:1.0];
+    }
+    else if ([self.cell isHighlighted]) {
+        // HIGHLIGHTED: Use the specified highlight color
+        bg = self.highlightColor;
+    }
+    else {
+        // NORMAL: Use the custom background (Yellow, Dark Gray, etc.)
+        bg = self.buttonColor ? self.buttonColor : [NSColor controlColor];
+    }
+    
     [bg setFill];
     [[NSBezierPath bezierPathWithRoundedRect:self.bounds xRadius:0 yRadius:0] fill];
 
     // 2. Draw Symbol
+    // Note: The drawing helpers below now check [self isEnabled] to dim the text automatically.
     switch ((CalcButtonType)self.symbolType) {
-        // If Tag is 0, just draw the text from Interface Builder (e.g., "7", "AC", "+")
         case CalcButtonTypeStandard:  [self drawScaledText:self.title]; break;
             
         // --- Standard Trig ---
@@ -90,9 +104,13 @@
 #pragma mark - Drawing Helpers
 
 - (NSDictionary *)attributesWithSize:(CGFloat)size {
+    // 1. Calculate effective text color
+    // If disabled, use the text color with 40% opacity (dimmed)
+    NSColor *effectiveColor = self.isEnabled ? self.textColor : [self.textColor colorWithAlphaComponent:0.4];
+    
     return @{
         NSFontAttributeName: [NSFont systemFontOfSize:size weight:NSFontWeightRegular],
-        NSForegroundColorAttributeName: self.textColor
+        NSForegroundColorAttributeName: effectiveColor
     };
 }
 
@@ -197,19 +215,22 @@
     // 1. Detect Coordinate System Direction
     CGFloat dir = [self isFlipped] ? -1.0 : 1.0;
     
-    // 2. Setup Fonts
+    // 2. Setup Fonts & Colors
+    // Calculate effective color for both text and stroke
+    NSColor *effectiveColor = self.isEnabled ? self.textColor : [self.textColor colorWithAlphaComponent:0.4];
+    
     NSFont *baseFont = [NSFont systemFontOfSize:24.0 weight:NSFontWeightBold];
     NSFont *indexFont = [NSFont systemFontOfSize:13.0 weight:NSFontWeightBold];
     
-    NSDictionary *baseAttrs = @{NSFontAttributeName: baseFont, NSForegroundColorAttributeName: self.textColor};
-    NSDictionary *indexAttrs = @{NSFontAttributeName: indexFont, NSForegroundColorAttributeName: self.textColor};
+    NSDictionary *baseAttrs = @{NSFontAttributeName: baseFont, NSForegroundColorAttributeName: effectiveColor};
+    NSDictionary *indexAttrs = @{NSFontAttributeName: indexFont, NSForegroundColorAttributeName: effectiveColor};
     
     NSString *baseText = @"x";
     NSSize baseSize = [baseText sizeWithAttributes:baseAttrs];
     NSSize indexSize = indexText ? [indexText sizeWithAttributes:indexAttrs] : NSZeroSize;
     
     // 3. Layout Geometry
-    CGFloat radicalLeftPadding = 5.0; // Reduced padding slightly
+    CGFloat radicalLeftPadding = 5.0;
     CGFloat strokeWidth = 2.5;
     
     CGFloat totalWidth = baseSize.width + radicalLeftPadding + 6.0;
@@ -219,11 +240,9 @@
     CGFloat centerY = (self.bounds.size.height - baseSize.height) / 2.0;
     
     // 4. Draw Text
-    // Base 'x'
     CGFloat xTextX = startX + totalWidth - baseSize.width;
     [baseText drawAtPoint:NSMakePoint(xTextX, centerY) withAttributes:baseAttrs];
     
-    // Index '3' or 'y' (Superscripted)
     if (indexText) {
         CGFloat indexX = xTextX - radicalLeftPadding - indexSize.width + 3.0;
         CGFloat indexY = centerY + (4.0 * dir);
@@ -231,42 +250,28 @@
     }
     
     // 5. Draw Radical Geometry (The Checkmark)
-    [self.textColor setStroke];
+    [effectiveColor setStroke]; // <--- Use the dimmed color here
     NSBezierPath *path = [NSBezierPath bezierPath];
     [path setLineWidth:strokeWidth];
     [path setLineCapStyle:NSLineCapStyleRound];
     [path setLineJoinStyle:NSLineJoinStyleRound];
     
-    // Vertical Offsets (Relative to Center)
+    // Vertical Offsets
     CGFloat baseY = centerY + (baseSize.height / 2.0);
-
-    // TWEAKED: Lowered tick start slightly to make the angle look more 45-ish
-    CGFloat tickYOffset   = 0.0;     // Was 3.0
-    CGFloat bottomYOffset = -6.0;   // Deep valley
-    CGFloat topYOffset    = 9.0;    // High bar
+    CGFloat tickYOffset   = 0.0;
+    CGFloat bottomYOffset = -6.0;
+    CGFloat topYOffset    = 9.0;
     
     CGFloat tickY   = baseY + (tickYOffset * dir);
     CGFloat bottomY = baseY + (bottomYOffset * dir);
     CGFloat topY    = baseY + (topYOffset * dir);
     
-    // Horizontal Coordinates (The "Tightness")
-    // TWEAKED: Adjusted these to steepen the rise and shorten the tick
-    
-    // 1. The Bar starts very close to the X
+    // Horizontal Coordinates
     CGFloat barStartX = xTextX - 0.5;
     CGFloat barEndX   = xTextX + baseSize.width;
-
-    // 2. The Valley (Bottom of V)
-    // Closer to barStartX = Steeper Rise.
-    // Gap is now 3.5px (was 4.0px) for a 21px rise -> Very steep.
     CGFloat bottomPointX = xTextX - 5.0;
-    
-    // 3. The Tick Start
-    // Closer to bottomPointX = Shorter Tick.
-    // Gap is now 3.0px (was 4.0px).
     CGFloat tickStartX = xTextX - 8.0;
 
-    // Handle index overlap
     if (indexText) tickStartX -= 2.0;
 
     // Draw Path

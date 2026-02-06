@@ -31,9 +31,8 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     self.standardProgrammerInputHeight = self.programmerInputHeightConstraint.constant;
     
     // 2. Default to Basic Mode on launch (Optional)
-    [self setCalculatorMode:CalculatorModeBasic animate:NO];
+    [self setCalculatorMode:UDCalcModeBasic animate:NO];
 
-    [self updateScientificButtons];
     [self updateUI];
 }
 
@@ -41,7 +40,8 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
 - (IBAction)changeMode:(NSMenuItem *)sender {
     // Tag 1 = Basic, Tag 2 = Scientific, Tag 3 = Programmer
-    [self setCalculatorMode:(CalculatorMode)sender.tag animate:YES];
+    [self setCalculatorMode:(UDCalcMode)sender.tag animate:YES];
+    [self updateUI];
 }
 
 - (IBAction)changeRPNMode:(NSMenuItem *)sender {
@@ -70,12 +70,12 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     [self updateUI];
 }
 
-- (void)setCalculatorMode:(CalculatorMode)mode animate:(BOOL)animate {
+- (void)setCalculatorMode:(UDCalcMode)mode animate:(BOOL)animate {
     NSWindow *window = self.view.window;
     if (!window) return;
 
-    BOOL isProgrammer = (mode == CalculatorModeProgrammer);
-    BOOL isScientific = (mode == CalculatorModeScientific);
+    BOOL isProgrammer = (mode == UDCalcModeProgrammer);
+    BOOL isScientific = (mode == UDCalcModeScientific);
 
     // --- 1. Determine Target Content & Sizes ---
     // Instead of asking the whole window, we ask the specific Grid View
@@ -167,8 +167,8 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
         [self.view.superview layoutSubtreeIfNeeded];
     } completionHandler:nil];
 
-    self.calc.isIntegerMode = isProgrammer;
-    self.calcMode = mode;
+    self.calc.mode = mode;
+    [self updateScientificButtons];
 }
 
 - (IBAction)digitPressed:(NSButton *)sender {
@@ -256,20 +256,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     
     UDBase newBase = (UDBase)selectedTag;
 
-    self.calc.inputBuffer.inputBase = newBase;
-    
-    BOOL hexInputEnabled = newBase == UDBaseHex;
-    BOOL decOrHexInputEnabled = newBase == UDBaseHex || newBase == UDBaseDec;
-
-    self.p8Button.enabled = decOrHexInputEnabled;
-    self.p9Button.enabled = decOrHexInputEnabled;
-    self.pAButton.enabled = hexInputEnabled;
-    self.pBButton.enabled = hexInputEnabled;
-    self.pCButton.enabled = hexInputEnabled;
-    self.pDButton.enabled = hexInputEnabled;
-    self.pEButton.enabled = hexInputEnabled;
-    self.pFButton.enabled = hexInputEnabled;
-    self.pFFButton.enabled = hexInputEnabled;
+    self.calc.inputBase = newBase;
 
     [self updateUI];
 }
@@ -289,6 +276,9 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 }
 
 - (void)updateScientificButtons {
+    if (self.calc.mode != UDCalcModeScientific) {
+        return;
+    }
     BOOL second = self.isSecondFunctionActive;
 
     // Helper block to swap button state
@@ -396,7 +386,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
     if (row < values.count) {
         UDValue val = values[row].value;
-        cell.textField.stringValue = [UDValueFormatter stringForValue:val base:self.calc.inputBuffer.inputBase];
+        cell.textField.stringValue = [self.calc stringForValue:val];
         
         // Styling: The last row is always the X Register (Active) -> Bold
         // If we are typing, the Buffer (handled above) is X.
@@ -439,8 +429,23 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
         [self.displayField setStringValue:self.calc.currentDisplayValue];
     }
 
-    if (self.calcMode == CalculatorModeProgrammer) {
+    if (self.calc.mode == UDCalcModeProgrammer) {
         self.bitDisplayView.value = UDValueAsInt(self.calc.currentInputValue);
+        
+        UDBase base = self.calc.inputBase;
+
+        BOOL hexInputEnabled = base == UDBaseHex;
+        BOOL decOrHexInputEnabled = base == UDBaseHex || base == UDBaseDec;
+
+        self.p8Button.enabled = decOrHexInputEnabled;
+        self.p9Button.enabled = decOrHexInputEnabled;
+        self.pAButton.enabled = hexInputEnabled;
+        self.pBButton.enabled = hexInputEnabled;
+        self.pCButton.enabled = hexInputEnabled;
+        self.pDButton.enabled = hexInputEnabled;
+        self.pEButton.enabled = hexInputEnabled;
+        self.pFButton.enabled = hexInputEnabled;
+        self.pFFButton.enabled = hexInputEnabled;
     }
 }
 

@@ -53,7 +53,7 @@
     [self.window setContentSize:calcView.frame.size];
     [self.window setContentView:calcView];
 
-    [self.calcViewController setCalculatorMode:CalculatorModeBasic animate:NO];
+    [self.calcViewController setCalculatorMode:UDCalcModeBasic animate:NO];
 
     // 3. Make the Next Responder chain work (Keyboard shortcuts)
     [self.window makeFirstResponder:self.calcViewController];

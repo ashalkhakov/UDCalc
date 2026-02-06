@@ -55,8 +55,8 @@ typedef NS_ENUM(NSInteger, CalcButtonType) {
 @interface UDCalcButton : NSButton
 
 @property (nonatomic, assign) IBInspectable NSInteger symbolType;
-@property (nonatomic, strong) NSColor *textColor;
-@property (nonatomic, strong) NSColor *buttonColor;      // Normal background
-@property (nonatomic, strong) NSColor *highlightColor;   // Color when pressed
+@property (nonatomic, strong) IBInspectable NSColor *textColor;
+@property (nonatomic, strong) IBInspectable NSColor *buttonColor;      // Normal background
+@property (nonatomic, strong) IBInspectable NSColor *highlightColor;   // Color when pressed
 
 @end
