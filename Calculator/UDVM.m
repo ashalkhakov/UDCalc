@@ -10,6 +10,21 @@
 
 #define MAX_STACK_DEPTH 1024
 
+static inline double Pow(double base, double power) {
+    // Check for Odd Root of Negative Number
+    // If Base is Negative AND Exponent is a generic "Odd Root" (like 0.33333 or 0.2)
+    // A simplistic check is seeing if 1/exp is an odd integer.
+    if (base < 0 && fabs(power) < 1.0) {
+        long long inverse = (long long)round(1.0 / power);
+        if (inverse % 2 != 0) {
+            // Calculate using absolute value, then restore sign
+            return -pow(fabs(base), power);
+        }
+    }
+
+    return pow(base, power);
+}
+
 static inline uint64_t RotL64(uint64_t value, int shift) {
     // FIXME: incorrect
     if ((shift &= 63) == 0) return value;
@@ -189,17 +204,19 @@ static inline uint64_t FlipWords64(uint64_t v) {
             case UDOpcodeRotateLeft: {
                 if (sp - 1 < 0)
                     goto err;
+                unsigned long long b = UDValueAsInt(stack[--sp]);
                 unsigned long long a = UDValueAsInt(stack[--sp]);
 
-                stack[sp++] = UDValueMakeInt(RotL64(a, 1));
+                stack[sp++] = UDValueMakeInt(RotL64(a, (int)b));
             } break;
 
             case UDOpcodeRotateRight: {
                 if (sp - 1 < 0)
                     goto err;
+                unsigned long long b = UDValueAsInt(stack[--sp]);
                 unsigned long long a = UDValueAsInt(stack[--sp]);
 
-                stack[sp++] = UDValueMakeInt(RotR64(a, 1));
+                stack[sp++] = UDValueMakeInt(RotR64(a, (int)b));
             } break;
 
             case UDOpcodePow: {
@@ -209,7 +226,7 @@ static inline uint64_t FlipWords64(uint64_t v) {
                 double power = UDValueAsDouble(stack[--sp]);
                 double base  = UDValueAsDouble(stack[--sp]);
 
-                stack[sp++] = UDValueMakeDouble(pow(base, power));
+                stack[sp++] = UDValueMakeDouble(Pow(base, power));
             } break;
 
             case UDOpcodeSqrt: {

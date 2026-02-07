@@ -307,6 +307,32 @@
         return [UDFunctionNode func:UDConstPow args:@[arg, oneThird]];
     }];
 
+    // n√x (N-th Root)
+    // Input Sequence: Base [Op] Root
+    // AST Transformation: pow(Base, 1/Root)
+    self.table[@(UDOpYRoot)] = [UDOpInfo infoWithSymbol:@"ⁿ√x"
+                                                      tag:UDOpYRoot
+                                                placement:UDOpPlacementInfix
+                                                    assoc:UDOpAssocRight
+                                               precedence:60 // Same as Power (^)
+                                                   action:^UDASTNode *(UDFrontendContext *ctx) {
+        // 1. Pop n (Root) - Top of stack
+        UDASTNode *n = [ctx.nodeStack lastObject];
+        [ctx.nodeStack removeLastObject];
+
+        // 2. Pop x (Base) - Below n
+        UDASTNode *x = [ctx.nodeStack lastObject];
+        [ctx.nodeStack removeLastObject];
+        
+        // 3. Create (1 / n)
+        // We hardcode precedence 60 here to ensure tight binding in the AST
+        UDASTNode *one = [UDNumberNode value:UDValueMakeDouble(1)];
+        UDASTNode *exponent = [UDBinaryOpNode op:UDConstDiv left:one right:n precedence:60];
+        
+        // 4. Return pow(x, 1/n)
+        return [UDFunctionNode func:UDConstPow args:@[x, exponent]];
+    }];
+
     self.table[@(UDOpInvert)] = [UDOpInfo infoWithSymbol:@"1/x" tag:UDOpCbrt placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *arg = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         UDASTNode *oneX = [UDBinaryOpNode op:UDConstDiv left:[UDNumberNode value:UDValueMakeDouble(1)] right:arg precedence:60];
@@ -323,9 +349,60 @@
     self.table[@(UDOpSin)] = [UDOpInfo infoWithSymbol:@"sin" tag:UDOpSin placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstSin]];
     self.table[@(UDOpCos)] = [UDOpInfo infoWithSymbol:@"cos" tag:UDOpCos placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstCos]];
     self.table[@(UDOpTan)] = [UDOpInfo infoWithSymbol:@"tan" tag:UDOpTan placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstTan]];
+    self.table[@(UDOpSinInverse)] = [UDOpInfo infoWithSymbol:@"sin⁻¹"
+                                                         tag:UDOpSinInverse
+                                                   placement:UDOpPlacementPostfix
+                                                       assoc:UDOpAssocNone
+                                                  precedence:60 // Highest
+                                                      action:[self trigOp:UDConstASin]];
+    self.table[@(UDOpCosInverse)] = [UDOpInfo infoWithSymbol:@"cos⁻¹"
+                                                         tag:UDOpCosInverse
+                                                   placement:UDOpPlacementPostfix
+                                                       assoc:UDOpAssocNone
+                                                  precedence:60 // Highest
+                                                      action:[self trigOp:UDConstACos]];
+    self.table[@(UDOpTanInverse)] = [UDOpInfo infoWithSymbol:@"tan⁻¹"
+                                                         tag:UDOpTanInverse
+                                                   placement:UDOpPlacementPostfix
+                                                       assoc:UDOpAssocNone
+                                                  precedence:60 // Highest
+                                                      action:[self trigOp:UDConstATan]];
+    self.table[@(UDOpSinh)] = [UDOpInfo infoWithSymbol:@"sinh" tag:UDOpSinh placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstSinH]];
+    self.table[@(UDOpCosh)] = [UDOpInfo infoWithSymbol:@"cosh" tag:UDOpCosh placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstCos]];
+    self.table[@(UDOpTanh)] = [UDOpInfo infoWithSymbol:@"tanh" tag:UDOpTanh placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstTanH]];
+    self.table[@(UDOpSinhInverse)] = [UDOpInfo infoWithSymbol:@"sinh⁻¹" tag:UDOpSinhInverse placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstASinH]];
+    self.table[@(UDOpCoshInverse)] = [UDOpInfo infoWithSymbol:@"cosh⁻¹" tag:UDOpCoshInverse placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstACosH]];
+    self.table[@(UDOpTanhInverse)] = [UDOpInfo infoWithSymbol:@"tanh⁻¹" tag:UDOpTanhInverse placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstATanH]];
+
     self.table[@(UDOpLn)]  = [UDOpInfo infoWithSymbol:@"ln" tag:UDOpLn placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self funcOp:UDConstLn]];
     self.table[@(UDOpLog10)] = [UDOpInfo infoWithSymbol:@"log_10" tag:UDOpLog10 placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self funcOp:UDConstLog10]];
     self.table[@(UDOpLog2)] = [UDOpInfo infoWithSymbol:@"log_2" tag:UDOpLog10 placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self funcOp:UDConstLog2]];
+
+    // log_y(x) (Log Base Y)
+    // Input Sequence: Value [Op] Base
+    // AST Transformation: ln(Value) / ln(Base)
+    self.table[@(UDOpLogY)] = [UDOpInfo infoWithSymbol:@"log_y"
+                                                       tag:UDOpLogY
+                                                 placement:UDOpPlacementInfix
+                                                     assoc:UDOpAssocRight
+                                                precedence:60 // Same as Power (^)
+                                                    action:^UDASTNode *(UDFrontendContext *ctx) {
+        // 1. Pop y (Base) - Top of stack
+        UDASTNode *y = [ctx.nodeStack lastObject];
+        [ctx.nodeStack removeLastObject];
+
+        // 2. Pop x (Value) - Below y
+        UDASTNode *x = [ctx.nodeStack lastObject];
+        [ctx.nodeStack removeLastObject];
+        
+        // 3. Construct Change of Base Formula: ln(x) / ln(y)
+        UDASTNode *lnX = [UDFunctionNode func:UDConstLn args:@[x]];
+        UDASTNode *lnY = [UDFunctionNode func:UDConstLn args:@[y]];
+        
+        // 4. Return Division Node
+        // Use Precedence 60 to ensure this entire block is treated as a single unit
+        return [UDBinaryOpNode op:UDConstDiv left:lnX right:lnY precedence:60];
+    }];
 
     // Rand
     self.table[@(UDOpRand)] = [UDOpInfo infoWithSymbol:@"rand" tag:UDOpRand action:^UDASTNode *(UDFrontendContext *ctx) {

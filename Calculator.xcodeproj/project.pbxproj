@@ -34,6 +34,8 @@
 		9A7D1A282F30E47A00CC974D /* UDBitDisplayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7D1A272F30E47A00CC974D /* UDBitDisplayView.m */; };
 		9AA27CF32F3760A600C55FAE /* UDConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA27CF22F3760A600C55FAE /* UDConstants.m */; };
 		9AA27CF42F3760A600C55FAE /* UDConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA27CF22F3760A600C55FAE /* UDConstants.m */; };
+		9AA27CF72F3779C200C55FAE /* UDCompilerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA27CF52F3779C200C55FAE /* UDCompilerTests.m */; };
+		9AA27CF92F377AA100C55FAE /* UDVMTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA27CF82F377AA100C55FAE /* UDVMTests.m */; };
 		9AC4C6052F27CA3000CD3AD4 /* UDCalcTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC4C6042F27CA3000CD3AD4 /* UDCalcTests.m */; };
 		9AC4C60B2F27CA7C00CD3AD4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B94ED2F1BB18600ED7306 /* AppDelegate.m */; };
 		9AC4C60C2F27CA8300CD3AD4 /* UDCalc.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B94FC2F1BE4FF00ED7306 /* UDCalc.m */; };
@@ -110,6 +112,8 @@
 		9A7D1A272F30E47A00CC974D /* UDBitDisplayView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDBitDisplayView.m; sourceTree = "<group>"; };
 		9AA27CF12F37606700C55FAE /* UDConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDConstants.h; sourceTree = "<group>"; };
 		9AA27CF22F3760A600C55FAE /* UDConstants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDConstants.m; sourceTree = "<group>"; };
+		9AA27CF52F3779C200C55FAE /* UDCompilerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCompilerTests.m; sourceTree = "<group>"; };
+		9AA27CF82F377AA100C55FAE /* UDVMTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDVMTests.m; sourceTree = "<group>"; };
 		9AC4C6022F27CA3000CD3AD4 /* CalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9AC4C6042F27CA3000CD3AD4 /* UDCalcTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCalcTests.m; sourceTree = "<group>"; };
 		9AE3F67B2F1EA12D00E1CFCF /* UDAST.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDAST.h; sourceTree = "<group>"; };
@@ -218,6 +222,8 @@
 			children = (
 				9AC4C6042F27CA3000CD3AD4 /* UDCalcTests.m */,
 				9A20771C2F291BFE00A28E88 /* UDCalcRPNTests.m */,
+				9AA27CF52F3779C200C55FAE /* UDCompilerTests.m */,
+				9AA27CF82F377AA100C55FAE /* UDVMTests.m */,
 			);
 			path = CalculatorTests;
 			sourceTree = "<group>";
@@ -360,6 +366,7 @@
 				9AC4C60B2F27CA7C00CD3AD4 /* AppDelegate.m in Sources */,
 				9AC4C6122F27CA9500CD3AD4 /* UDTapeWindowController.m in Sources */,
 				9AC4C6052F27CA3000CD3AD4 /* UDCalcTests.m in Sources */,
+				9AA27CF72F3779C200C55FAE /* UDCompilerTests.m in Sources */,
 				9AC4C60E2F27CA8900CD3AD4 /* UDUnitConverter.m in Sources */,
 				9A5E28C02F2E76FB001A7618 /* UDValueFormatter.m in Sources */,
 				9AC4C6152F27CA9D00CD3AD4 /* UDInstruction.m in Sources */,
@@ -367,6 +374,7 @@
 				9AC4C6182F27CAA600CD3AD4 /* UDFrontendContext.m in Sources */,
 				9AC4C61A2F27CAAB00CD3AD4 /* UDInputBuffer.m in Sources */,
 				9A20771D2F291BFE00A28E88 /* UDCalcRPNTests.m in Sources */,
+				9AA27CF92F377AA100C55FAE /* UDVMTests.m in Sources */,
 				9AC4C6142F27CA9B00CD3AD4 /* UDAST.m in Sources */,
 				9AC4C6132F27CA9800CD3AD4 /* UDFrontend.m in Sources */,
 				9AC4C6172F27CAA300CD3AD4 /* UDVM.m in Sources */,

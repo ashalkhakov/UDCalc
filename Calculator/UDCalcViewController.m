@@ -30,6 +30,8 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     self.standardScientificWidth = self.scientificWidthConstraint.constant;
     self.standardProgrammerInputHeight = self.programmerInputHeightConstraint.constant;
     
+    self.calc.isRadians = NO;
+    
     // 2. Default to Basic Mode on launch (Optional)
     [self setCalculatorMode:UDCalcModeBasic animate:NO];
 
@@ -221,12 +223,6 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
         [self.calc inputNumber:UDValueMakeDouble(M_PI)];
     } else if (op == UDOpConstE) {
         [self.calc inputNumber:UDValueMakeDouble(M_E)];
-    } else if (op == UDOpRad) {
-        [self.calc performOperation:op];
-        
-        // visual feedback
-        sender.title = self.calc.isRadians ? @"Rad" : @"Deg";
-        [sender setNeedsDisplay:YES];
     } else {
         // Update Calculator.
         [self.calc performOperation:op];
@@ -321,6 +317,9 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     setBtn(self.sinhButton, CalcButtonTypeSinh, UDOpSinh, CalcButtonTypeSinhInverse, UDOpSinhInverse);
     setBtn(self.coshButton, CalcButtonTypeCosh, UDOpCosh, CalcButtonTypeCoshInverse, UDOpCoshInverse);
     setBtn(self.tanhButton, CalcButtonTypeTanh, UDOpTanh, CalcButtonTypeTanhInverse, UDOpTanhInverse);
+    
+    self.radDegButton.title = self.calc.isRadians ? @"Deg" : @"Rad";
+    [self.radDegButton setNeedsDisplay:YES];
 }
 
 #pragma mark - NSTableViewDataSource and NSTableViewDelegate Delegate
@@ -446,6 +445,8 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
         self.pEButton.enabled = hexInputEnabled;
         self.pFButton.enabled = hexInputEnabled;
         self.pFFButton.enabled = hexInputEnabled;
+    } else if (self.calc.mode == UDCalcModeScientific) {
+        [self updateScientificButtons];
     }
 }
 

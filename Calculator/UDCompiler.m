@@ -22,7 +22,10 @@
         UDNumberNode *n = (UDNumberNode *)node;
         [prog addObject:[UDInstruction push:n.value]]; // Access property directly
     }
-    
+    else if ([node isKindOfClass:[UDConstantNode class]]) {
+        UDConstantNode *n = (UDConstantNode *)node;
+        [prog addObject:[UDInstruction push:n.value]];
+    }
     else if ([node isKindOfClass:[UDUnaryOpNode class]]) {
         UDUnaryOpNode *un = (UDUnaryOpNode *)node;
         [self visitNode:un.child into:prog withIntegerMode:integerMode];

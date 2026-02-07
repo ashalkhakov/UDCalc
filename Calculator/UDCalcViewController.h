@@ -55,6 +55,7 @@ extern NSString * const UDCalcResultKey;  // double
 
 @property (nonatomic, weak) IBOutlet NSButton *parenLeftButton;
 @property (nonatomic, weak) IBOutlet NSButton *parenRightButton;
+@property (nonatomic, weak) IBOutlet NSButton *radDegButton;
 @property (nonatomic, weak) IBOutlet NSButton *acButton;
 @property (nonatomic, weak) IBOutlet NSButton *expButton;
 @property (nonatomic, weak) IBOutlet NSButton *xthPowerOf10Button;
