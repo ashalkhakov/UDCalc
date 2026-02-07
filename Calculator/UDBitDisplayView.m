@@ -8,12 +8,12 @@
 #import "UDBitDisplayView.h"
 
 @implementation UDBitDisplayView {
-    NSMutableArray<NSValue *> *_bitRects; // Stores hit-test rects for clicks
+    NSMutableArray<NSValue *> *_bitRects;
 }
 
 - (void)setValue:(uint64_t)value {
     _value = value;
-    [self setNeedsDisplay:YES]; // Redraw whenever value changes
+    [self setNeedsDisplay:YES];
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
@@ -24,14 +24,23 @@
 
     // CONFIGURATION
     CGFloat rowHeight = self.bounds.size.height / 2.0;
-    CGFloat bitWidth = self.bounds.size.width / 32.0; // 32 bits per row
-    NSDictionary *attrs = @{
-        NSFontAttributeName: [NSFont monospacedSystemFontOfSize:12 weight:NSFontWeightRegular],
-        NSForegroundColorAttributeName: [NSColor secondaryLabelColor]
+    CGFloat nibbleGap = 8.0;
+    // 7 gaps in a row of 8 nibbles (32 bits)
+    CGFloat totalGapSpace = 7.0 * nibbleGap;
+    CGFloat availableWidth = self.bounds.size.width - totalGapSpace;
+    CGFloat bitWidth = availableWidth / 32.0;
+    
+    // --- STYLING UPDATES ---
+    // Bits: Smaller font, Gray color
+    NSDictionary *bitAttrs = @{
+        NSFontAttributeName: [NSFont monospacedSystemFontOfSize:10 weight:NSFontWeightRegular],
+        NSForegroundColorAttributeName: [NSColor grayColor]
     };
-    NSDictionary *labelAttrs = @{
-        NSFontAttributeName: [NSFont systemFontOfSize:9],
-        NSForegroundColorAttributeName: [NSColor labelColor]
+    
+    // Markers (63, 47, etc): Larger font, White color
+    NSDictionary *markerAttrs = @{
+        NSFontAttributeName: [NSFont systemFontOfSize:11 weight:NSFontWeightBold],
+        NSForegroundColorAttributeName: [NSColor whiteColor]
     };
 
     // DRAWING LOOP (63 down to 0)
@@ -39,47 +48,51 @@
         BOOL isTopRow = (i >= 32);
         int colIndex = isTopRow ? (63 - i) : (31 - i); // 0 is Left-most column
         
+        // Calculate Gaps
+        int gapCount = colIndex / 4;
+        
         // Calculate Position
-        CGFloat x = colIndex * bitWidth;
-        CGFloat y = isTopRow ? rowHeight : 0; // Top row draws in upper half
+        CGFloat x = (colIndex * bitWidth) + (gapCount * nibbleGap);
+        CGFloat y = isTopRow ? rowHeight : 0;
         
         // 1. Draw the Bit (0 or 1)
         BOOL isSet = (_value >> i) & 1;
         NSString *bitStr = isSet ? @"1" : @"0";
-        NSRect bitRect = NSMakeRect(x, y + 15, bitWidth, rowHeight - 15); // Shift up for labels
         
-        // Center text in rect
-        CGSize textSize = [bitStr sizeWithAttributes:attrs];
+        // Calculate text size for centering
+        CGSize bitSize = [bitStr sizeWithAttributes:bitAttrs];
+        
+        // Center vertically in the top portion of the row (leaving space for marker below)
+        CGFloat bitY = y + 12 + (rowHeight - 12 - bitSize.height) / 2;
+        
         NSRect textRect = NSMakeRect(
-            x + (bitWidth - textSize.width)/2,
-            y + 15 + (bitRect.size.height - textSize.height)/2,
-            textSize.width,
-            textSize.height
+            x + (bitWidth - bitSize.width)/2,
+            bitY,
+            bitSize.width,
+            bitSize.height
         );
-        [bitStr drawInRect:textRect withAttributes:attrs];
+        [bitStr drawInRect:textRect withAttributes:bitAttrs];
         
-        // Store Hit-Test Rect (Full cell)
+        // Store Hit-Test Rect
         NSRect touchRect = NSMakeRect(x, y, bitWidth, rowHeight);
-        [_bitRects addObject:[NSValue valueWithRect:touchRect]]; // Index matches loop order? No.
-        // We need to map Rect -> Bit Index later.
+        [_bitRects addObject:[NSValue valueWithRect:touchRect]];
         
-        // 2. Draw Labels (63, 47, 32...) underneath specific bits
-        // Logic: Apple usually labels the MSB of groups (or every 16th/8th)
-        // Your request: 63, 47, 32 on Top | 31, 15, 0 on Bottom
+        // 2. Draw Markers (63, 47, 32...)
         BOOL shouldLabel = (i == 63 || i == 47 || i == 32 ||
                             i == 31 || i == 15 || i == 0);
         
         if (shouldLabel) {
             NSString *label = [NSString stringWithFormat:@"%d", i];
-            CGSize labelSize = [label sizeWithAttributes:labelAttrs];
-            // Draw slightly below the bit
+            CGSize labelSize = [label sizeWithAttributes:markerAttrs];
+            
+            // Draw below the bit, closer to the bottom edge
             NSRect labelRect = NSMakeRect(
                 x + (bitWidth - labelSize.width)/2,
-                y + 2, // Close to bottom of row
+                y + 2,
                 labelSize.width,
                 labelSize.height
             );
-            [label drawInRect:labelRect withAttributes:labelAttrs];
+            [label drawInRect:labelRect withAttributes:markerAttrs];
         }
     }
 }
@@ -87,26 +100,22 @@
 // HANDLE CLICKS
 - (void)mouseDown:(NSEvent *)event {
     NSPoint point = [self convertPoint:event.locationInWindow fromView:nil];
-    CGFloat rowHeight = self.bounds.size.height / 2.0;
-    CGFloat bitWidth = self.bounds.size.width / 32.0;
     
-    // Determine Row
-    BOOL isTopRow = (point.y >= rowHeight);
+    // Since we introduced gaps, simple division (x / width) no longer works reliably.
+    // Instead, we check the cached rects we generated during drawing.
+    // The _bitRects array is filled in loop order: Index 0 = Bit 63, Index 63 = Bit 0.
     
-    // Determine Column (0..31)
-    int col = (int)(point.x / bitWidth);
-    if (col < 0 || col > 31) return;
-    
-    // Map back to Bit Index (0..63)
-    // Top Row: Col 0 -> Bit 63
-    // Bottom Row: Col 0 -> Bit 31
-    int bitIndex = isTopRow ? (63 - col) : (31 - col);
-    
-    // Inform Delegate
-    if (bitIndex >= 0 && bitIndex <= 63) {
-        // Calculate new state locally for snappy feel, or let delegate handle it
-        BOOL currentBit = (_value >> bitIndex) & 1;
-        [self.delegate bitDisplayDidToggleBit:bitIndex toValue:!currentBit];
+    for (int i = 0; i < _bitRects.count; i++) {
+        NSRect r = [_bitRects[i] rectValue];
+        
+        // Check if the click is inside this specific bit's box
+        if (NSPointInRect(point, r)) {
+            int bitIndex = 63 - i; // Map array index back to bit index
+            
+            BOOL currentBit = (_value >> bitIndex) & 1;
+            [self.delegate bitDisplayDidToggleBit:bitIndex toValue:!currentBit];
+            return; // Stop looking once found
+        }
     }
 }
 
