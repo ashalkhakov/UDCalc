@@ -130,13 +130,13 @@
     // ============================================================
 
     // Byte Flip - Unary Prefix (Right-to-Left)
-    self.table[@(UDOpByteFlip)] = [UDOpInfo infoWithSymbol:@"ByteFlip" tag:UDOpByteFlip placement:UDOpPlacementPrefix assoc:UDOpAssocRight precedence:50 action:^UDASTNode *(UDFrontendContext *ctx) {
+    self.table[@(UDOpByteFlip)] = [UDOpInfo infoWithSymbol:@"ByteFlip" tag:UDOpByteFlip placement:UDOpPlacementPostfix assoc:UDOpAssocRight precedence:50 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *top = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         return [UDFunctionNode func:UDConstFlipB args:@[top]]; // "flip_b" handled in backend
     }];
 
     // Word Flip - Unary Prefix (Right-to-Left)
-    self.table[@(UDOpWordFlip)] = [UDOpInfo infoWithSymbol:@"WordFlip" tag:UDOpWordFlip placement:UDOpPlacementPrefix assoc:UDOpAssocRight precedence:50 action:^UDASTNode *(UDFrontendContext *ctx) {
+    self.table[@(UDOpWordFlip)] = [UDOpInfo infoWithSymbol:@"WordFlip" tag:UDOpWordFlip placement:UDOpPlacementPostfix assoc:UDOpAssocRight precedence:50 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *top = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         return [UDFunctionNode func:UDConstFlipW args:@[top]]; // "flip_w" handled in backend
     }];

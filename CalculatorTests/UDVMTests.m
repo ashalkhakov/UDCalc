@@ -199,34 +199,74 @@
 
 // --- PROGRAMMER MODE SPECIFICS ---
 
-- (void)testFlipBytes {
-    // 0x1122334455667788 -> 0x8877665544332211
-    unsigned long long input = 0x1122334455667788ULL;
-    NSArray *prog = @[ [self pushInt:input], [self op:UDOpcodeFlipB] ];
+// --- FLIP OPERATIONS (Programmer Mode) ---
+
+- (void)testByteFlip_16Bit {
+    // Heuristic: Small number (<= 0xFFFF) treated as 16-bit
+    // 0x1122 -> 0x2211
+    NSArray *prog = @[ [self pushInt:0x1122], [self op:UDOpcodeFlipB] ];
     UDValue res = [self run:prog];
-    XCTAssertEqual(UDValueAsInt(res), 0x8877665544332211ULL);
+    XCTAssertEqual(UDValueAsInt(res), 0x2211, @"Should swap bytes in 16-bit mode");
 }
 
-- (void)testFlipWords {
-    // Your implementation performs bswap64 followed by masking/shifting.
-    // Let's verify what it actually produces.
-    // 0x11223344... -> bswap -> 0x...44332211
-    // Then it seems to act like a 16-bit word swap.
-    
-    // Input: 0xAABBCCDD (padded 0s)
-    // Expected: 0xBBAADDCC ?? Or just byte reversal within words?
-    
-    // Testing specific behavior from your code:
-    // Input:  0x00000000 00001234
-    // BSwap:  0x34120000 00000000
-    // Result: 0x12340000 ... (It's complex to visualize mentally, let's trust the test ensures deterministic output)
-    
-    // Let's test checking if FlipWords(FlipWords(x)) == x (Identity check)
-    unsigned long long input = 0x123456789ABCDEF0ULL;
-    NSArray *prog = @[ [self pushInt:input], [self op:UDOpcodeFlipW], [self op:UDOpcodeFlipW] ];
+- (void)testByteFlip_32Bit_AppleCase {
+    // Heuristic: Value > 0xFFFF but <= 0xFFFFFFFF treated as 32-bit
+    // 0x80000000 (2,147,483,648) -> Reverses to 0x00000080 (128)
+    // This confirms full endian swap, not just neighbor swap.
+    unsigned long long val = 0x80000000ULL;
+    NSArray *prog = @[ [self pushInt:val], [self op:UDOpcodeFlipB] ];
     UDValue res = [self run:prog];
     
-    XCTAssertEqual(UDValueAsInt(res), input, @"Double word flip should return original value");
+    // 80 00 00 00 -> 00 00 00 80
+    XCTAssertEqual(UDValueAsInt(res), 0x80, @"Should reverse 4 bytes for 32-bit value");
+}
+
+- (void)testByteFlip_64Bit {
+    // Heuristic: Value > 32-bit treated as 64-bit
+    // 0x1122334455667788 -> 0x8877665544332211
+    unsigned long long val = 0x1122334455667788ULL;
+    NSArray *prog = @[ [self pushInt:val], [self op:UDOpcodeFlipB] ];
+    UDValue res = [self run:prog];
+    
+    XCTAssertEqual(UDValueAsInt(res), 0x8877665544332211ULL, @"Should reverse 8 bytes for 64-bit value");
+}
+
+- (void)testWordFlip_16Bit_Identity {
+    // Heuristic: 16-bit value only has 1 word.
+    // 0xABCD -> 0xABCD (Nothing to swap with)
+    NSArray *prog = @[ [self pushInt:0xABCD], [self op:UDOpcodeFlipW] ];
+    UDValue res = [self run:prog];
+    
+    XCTAssertEqual(UDValueAsInt(res), 0xABCD, @"Word flip on 16-bit value should be identity");
+}
+
+- (void)testWordFlip_32Bit {
+    // Heuristic: 32-bit value has 2 words.
+    // 0x1234 5678 -> 0x5678 1234
+    // [High 16] [Low 16] -> [Low 16] [High 16]
+    NSArray *prog = @[ [self pushInt:0x12345678], [self op:UDOpcodeFlipW] ];
+    UDValue res = [self run:prog];
+    
+    XCTAssertEqual(UDValueAsInt(res), 0x56781234, @"Should swap high/low 16-bit words");
+}
+
+- (void)testWordFlip_32Bit_AppleCase {
+    // 65536 (0x0001 0000) -> 1 (0x0000 0001)
+    // This confirms we are swapping words, not bytes.
+    NSArray *prog = @[ [self pushInt:65536], [self op:UDOpcodeFlipW] ];
+    UDValue res = [self run:prog];
+    
+    XCTAssertEqual(UDValueAsInt(res), 1, @"Should swap 0x0001 and 0x0000 to get 0x0001");
+}
+
+- (void)testWordFlip_64Bit {
+    // 0x11112222 33334444 -> 0x33334444 11112222
+    // Swaps the High 32 and Low 32
+    unsigned long long val = 0x1111222233334444ULL;
+    NSArray *prog = @[ [self pushInt:val], [self op:UDOpcodeFlipW] ];
+    UDValue res = [self run:prog];
+    
+    XCTAssertEqual(UDValueAsInt(res), 0x3333444411112222ULL, @"Should swap high/low 32-bit halves");
 }
 
 @end

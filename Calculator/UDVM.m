@@ -37,19 +37,30 @@ static inline uint64_t RotR64(uint64_t value, int shift) {
     return (value >> shift) | (value << (64 - shift));
 }
 
-static inline uint64_t FlipBytes64(uint64_t v) { return __builtin_bswap64(v); }
-static inline uint64_t FlipWords64(uint64_t v) {
-    // Swap the two 32-bit halves, then swap the 16-bit halves inside those
-    // Implementation: Rotate Left by 32, then Rotate Left each half by 16?
-    // Easier: (v >> 16) | (v << 16) works perfectly for 32-bit.
-    // For 64-bit: We want 0x1111222233334444 -> 0x2222111144443333 ?
-    // OR do we want to reverse the order of 16-bit words: 0x4444333322221111 ?
-    // Standard "Word Flip" usually means Reversing the 16-bit chunks.
-    // We can use bswap64 then bswap16 each chunk to restore byte order.
+// --- BYTE FLIP ---
+// Reverses the entire byte sequence.
+// 0x12345678 -> 0x78563412
+static inline uint64_t ByteFlip(uint64_t v, int bitWidth) {
+    if (bitWidth == 8)  return v; // 1 byte: nothing to flip
+    if (bitWidth == 16) return __builtin_bswap16((uint16_t)v);
+    if (bitWidth == 32) return __builtin_bswap32((uint32_t)v);
+    return __builtin_bswap64(v);
+}
+
+// --- WORD FLIP ---
+// Swaps the upper and lower halves of the current word size.
+// 32-bit: [High 16] [Low 16] -> [Low 16] [High 16]
+static inline uint64_t WordFlip(uint64_t v, int bitWidth) {
+    if (bitWidth <= 16) return v; // 16-bit or less: can't swap words
     
-    uint64_t swappedBytes = __builtin_bswap64(v);
-    return ((swappedBytes & 0xFF00FF00FF00FF00ULL) >> 8) |
-           ((swappedBytes & 0x00FF00FF00FF00FFULL) << 8);
+    if (bitWidth == 32) {
+        // Swap High 16 and Low 16
+        uint32_t v32 = (uint32_t)v;
+        return (v32 >> 16) | (v32 << 16);
+    }
+    
+    // 64-bit: Swap High 32 and Low 32
+    return (v >> 32) | (v << 32);
 }
 
 @implementation UDVM
@@ -437,21 +448,29 @@ static inline uint64_t FlipWords64(uint64_t v) {
             } break;
 
             case UDOpcodeFlipB: {
-                if (sp - 1 < 0)
-                    goto err;
-
+                if (sp - 1 < 0) goto err;
+                                
                 unsigned long long val = UDValueAsInt(stack[--sp]);
+
+                // Heuristic: Guess size based on magnitude
+                int width = 64;
+                if (val <= 0xFF) width = 8;
+                else if (val <= 0xFFFF) width = 16;
+                else if (val <= 0xFFFFFFFF) width = 32;
                 
-                stack[sp++] = UDValueMakeInt(FlipBytes64(val));
+                stack[sp++] = UDValueMakeInt(ByteFlip(val, width));
+
             } break;
 
             case UDOpcodeFlipW: {
-                if (sp - 1 < 0)
-                    goto err;
+                if (sp - 1 < 0) goto err;
 
                 unsigned long long val = UDValueAsInt(stack[--sp]);
+                int width = 64;
+                if (val <= 0xFFFF) width = 16;
+                else if (val <= 0xFFFFFFFF) width = 32;
                 
-                stack[sp++] = UDValueMakeInt(FlipWords64(val));
+                stack[sp++] = UDValueMakeInt(WordFlip(val, width));
             } break;
 
             default: break;
