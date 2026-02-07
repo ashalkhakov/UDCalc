@@ -72,12 +72,14 @@
 }
 
 - (void)flushBufferToStack {
-    if (self.isTyping) {
-        UDValue val = [self.inputBuffer finalizeValue];
-        [self.nodeStack addObject:[UDNumberNode value:val]];
-        [self.inputBuffer performClearEntry];
-        self.isTyping = NO;
+    if (!self.isTyping) {
+        return;
     }
+
+    UDValue val = [self.inputBuffer finalizeValue];
+    [self.nodeStack addObject:[UDNumberNode value:val]];
+    [self.inputBuffer performClearEntry];
+    self.isTyping = NO;
 }
 
 - (void)moveBufferToStack {
@@ -167,7 +169,7 @@
     // CATEGORY 3: TERMINATORS (=, M+, M-)
     // -------------------------------------------------------------------------
     if (op == UDOpEq || op == UDOpMAdd || op == UDOpMSub) {
-        if (self.isTyping) [self flushBufferToStack];
+        [self flushBufferToStack];
         
         while (self.opStack.count > 0) {
             [self reduceOp];
@@ -199,7 +201,7 @@
 
     // --- LEFT PARENTHESIS ---
     if (op == UDOpParenLeft) {
-        if (self.isTyping) [self flushBufferToStack];
+        [self flushBufferToStack];
         
         // Implicit Multiply: "2 (" -> "2 * ("
         if (self.expectingOperator) {
@@ -239,10 +241,13 @@
 
     // Capture typing state BEFORE flushing
     BOOL wasTyping = self.isTyping;
-    [self flushBufferToStack];
+    [self moveBufferToStack];
 
     // Sub-Category: Postfix (Factorial, Square, Percent)
     if (info.placement == UDOpPlacementPostfix) {
+        if (self.nodeStack.count == 0) {
+            [self.nodeStack addObject:[UDNumberNode value:UDValueMakeDouble(0.0)]];
+        }
         [self buildNode:info];
         
         // Auto-evaluate for display
@@ -467,9 +472,10 @@
 
         
     // 1. Implicit Enter
-    if (self.isTyping) {
+    if (!self.isTyping) {
+        [self.nodeStack addObject:[UDNumberNode value:UDValueMakeDouble(0.0)]];
+    } else {
         [self flushBufferToStack];
-        self.isTyping = NO;
     }
         
     // 2. Safety Check

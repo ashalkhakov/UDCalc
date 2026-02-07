@@ -126,6 +126,16 @@
     XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator currentInputValue]), 7.0, 0.0001);
 }
 
+- (void)testRPN_ImplicitEnterFactorialOf0 {
+    // 0! = 1
+    [self.calculator performOperation:UDOpFactorial];
+    
+    // Verify Stack has 1 item: 1
+    XCTAssertEqual(self.calculator.currentStackValues.count, 1);
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator currentInputValue]), 1.0, 0.0001);
+}
+
+
 - (void)testRPN_EnterDup {
     // Scenario: 5 Enter Enter +
     // First Enter pushes 5.

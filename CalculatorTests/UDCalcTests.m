@@ -610,6 +610,29 @@
 
 #pragma mark - Postfix ops
 
+- (void)testFactorialOf0 {
+    // 0! = 1
+    [self.calculator performOperation:UDOpFactorial];
+
+    [self.calculator performOperation:UDOpEq];
+    
+    // --- Structural Verification ---
+    // Expected Tree: (1!)
+
+    // 1. Postfix Node: 1!
+    UDASTNode *expectedTree = [UDPostfixOpNode symbol:@"!"
+                                                child:[UDNumberNode value:UDValueMakeDouble(0.0)]];
+    
+    // Note: Even though the calculator "auto-calculates" postfix operators for the display,
+    // the underlying AST node should remain on the stack until cleared.
+    XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
+    XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. Factorial node failed.");
+
+    // --- Value Verification ---
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator evaluateCurrentExpression]), 1.0, 0.0001);
+
+}
+
 - (void)testFactorial {
     // 3! = 6
     [self.calculator inputNumber:UDValueMakeDouble(3)];
