@@ -93,10 +93,10 @@ typedef NS_ENUM(NSInteger, UDOp) {
     UDOpRollUp      = 95,
     
     // --- Programmer ---
-    UDOpLogicalAnd  = 101,
-    UDOpLogicalOr   = 102,
-    UDOpLogicalNor  = 103,
-    UDOpLogicalXor  = 104,
+    UDOpBitwiseAnd  = 101,
+    UDOpBitwiseOr   = 102,
+    UDOpBitwiseNor  = 103,
+    UDOpBitwiseXor  = 104,
     UDOpShift1Left  = 105,
     UDOpShift1Right = 106,
     UDOpShiftLeft   = 107,

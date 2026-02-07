@@ -16,15 +16,8 @@
     UDInstruction *i = [UDInstruction new];
     i->_opcode = op; return i;
 }
-+ (instancetype)call:(NSString *)funcName {
-    UDInstruction *i = [UDInstruction new];
-    i->_opcode = UDOpcodeCall; i->_stringPayload = funcName; return i;
-}
 - (NSString *)debugDescription {
     switch (_opcode) {
-        case UDOpcodePush: return [NSString stringWithFormat:@"PUSH %.4g", UDValueAsDouble(_payload)];
-        case UDOpcodeCall:
-            return [NSString stringWithFormat:@"CALL %@", _stringPayload];
         case UDOpcodeAdd:
             return @"ADD";
         case UDOpcodeSub:

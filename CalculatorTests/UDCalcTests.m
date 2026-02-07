@@ -7,6 +7,7 @@
 
 #import <XCTest/XCTest.h>
 #import "UDCalc.h"
+#import "UDConstants.h"
 
 @interface UDCalcTests : XCTestCase
 @property (nonatomic, strong) UDCalc *calculator;
@@ -744,7 +745,7 @@
     UDASTNode *constNode = [UDNumberNode value:UDValueMakeDouble(2.0)];
     
     // 3. Postfix Square: (...)²
-    UDASTNode *expectedTree = [UDFunctionNode func:@"pow"
+    UDASTNode *expectedTree = [UDFunctionNode func:UDConstPow
                                               args:@[parenNode, constNode]];
 
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");

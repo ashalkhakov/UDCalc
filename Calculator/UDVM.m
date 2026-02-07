@@ -10,6 +10,33 @@
 
 #define MAX_STACK_DEPTH 1024
 
+static inline uint64_t RotL64(uint64_t value, int shift) {
+    // FIXME: incorrect
+    if ((shift &= 63) == 0) return value;
+    return (value << shift) | (value >> (64 - shift));
+}
+
+static inline uint64_t RotR64(uint64_t value, int shift) {
+    // FIXME: incorrect
+    if ((shift &= 63) == 0) return value;
+    return (value >> shift) | (value << (64 - shift));
+}
+
+static inline uint64_t FlipBytes64(uint64_t v) { return __builtin_bswap64(v); }
+static inline uint64_t FlipWords64(uint64_t v) {
+    // Swap the two 32-bit halves, then swap the 16-bit halves inside those
+    // Implementation: Rotate Left by 32, then Rotate Left each half by 16?
+    // Easier: (v >> 16) | (v << 16) works perfectly for 32-bit.
+    // For 64-bit: We want 0x1111222233334444 -> 0x2222111144443333 ?
+    // OR do we want to reverse the order of 16-bit words: 0x4444333322221111 ?
+    // Standard "Word Flip" usually means Reversing the 16-bit chunks.
+    // We can use bswap64 then bswap16 each chunk to restore byte order.
+    
+    uint64_t swappedBytes = __builtin_bswap64(v);
+    return ((swappedBytes & 0xFF00FF00FF00FF00ULL) >> 8) |
+           ((swappedBytes & 0x00FF00FF00FF00FFULL) << 8);
+}
+
 @implementation UDVM
 
 + (UDValue)execute:(NSArray<UDInstruction *> *)program {
@@ -97,59 +124,317 @@
 
                 stack[sp++] = UDValueMakeInt(a / b);
             } break;
+                
+            case UDOpcodeNegI: {
+                if (sp - 1 < 0)
+                    goto err;
+                unsigned long long a = UDValueAsInt(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeInt(-a);
+            } break;
+                
+            case UDOpcodeBitAnd: {
+                if (sp - 2 < 0)
+                    goto err;
+                unsigned long long b = UDValueAsInt(stack[--sp]);
+                unsigned long long a = UDValueAsInt(stack[--sp]);
 
-            case UDOpcodeCall: {
-                NSString *name = inst.stringPayload;
+                stack[sp++] = UDValueMakeInt(a & b);
+            } break;
+                
+            case UDOpcodeBitOr: {
+                if (sp - 2 < 0)
+                    goto err;
+                unsigned long long b = UDValueAsInt(stack[--sp]);
+                unsigned long long a = UDValueAsInt(stack[--sp]);
 
-                // 2-Argument Functions
-                if ([name isEqualToString:@"pow"]) {
-                    if (sp - 2 < 0)
-                        goto err;
-                    
-                    double power = UDValueAsDouble(stack[--sp]);
-                    double base  = UDValueAsDouble(stack[--sp]);
+                stack[sp++] = UDValueMakeInt(a | b);
+            } break;
 
-                    stack[sp++] = UDValueMakeDouble(pow(base, power));
-                }
-                else
-                // 1-Argument Functions
-                {
-                    if (sp - 1 < 0)
-                        goto err;
+            case UDOpcodeBitXor: {
+                if (sp - 2 < 0)
+                    goto err;
+                unsigned long long b = UDValueAsInt(stack[--sp]);
+                unsigned long long a = UDValueAsInt(stack[--sp]);
 
-                    double val = UDValueAsDouble(stack[--sp]);
-                    double res = 0;
-                    
-                    if ([name isEqualToString:@"sqrt"]) res = sqrt(val);
-                    else if ([name isEqualToString:@"ln"]) res = log(val);
+                stack[sp++] = UDValueMakeInt(a ^ b);
+            } break;
 
-                    else if ([name isEqualToString:@"sin"]) res = sin(val);
-                    else if ([name isEqualToString:@"sinD"]) res = sin(val * M_PI / 180.0);
-                    else if ([name isEqualToString:@"asin"]) res = asin(val);
-                    else if ([name isEqualToString:@"asinD"]) res = sin(val * M_PI / 180.0);
-                    else if ([name isEqualToString:@"cos"]) res = cos(val);
-                    else if ([name isEqualToString:@"cosD"]) res = cos(val * M_PI / 180.0);
-                    else if ([name isEqualToString:@"acos"]) res = acos(val);
-                    else if ([name isEqualToString:@"acosD"]) res = acos(val * M_PI / 180.0);
-                    else if ([name isEqualToString:@"tan"]) res = tan(val);
-                    else if ([name isEqualToString:@"tanD"]) res = tan(val * M_PI / 180.0);
-                    else if ([name isEqualToString:@"atan"]) res = atan(val);
-                    else if ([name isEqualToString:@"atanD"]) res = atan(val * M_PI / 180.0);
+            case UDOpcodeBitNot: {
+                if (sp - 1 < 0)
+                    goto err;
+                unsigned long long a = UDValueAsInt(stack[--sp]);
 
-                    else if ([name isEqualToString:@"sinh"]) res = sinh(val);
-                    else if ([name isEqualToString:@"asinh"]) res = asinh(val);
-                    else if ([name isEqualToString:@"cosh"]) res = cosh(val);
-                    else if ([name isEqualToString:@"acosh"]) res = acosh(val);
-                    else if ([name isEqualToString:@"tanh"]) res = tanh(val);
-                    else if ([name isEqualToString:@"atanh"]) res = atanh(val);
+                stack[sp++] = UDValueMakeInt(~a);
+            } break;
 
-                    else if ([name isEqualToString:@"log10"]) res = log10(val);
+            case UDOpcodeShiftLeft: {
+                if (sp - 2 < 0)
+                    goto err;
+                unsigned long long b = UDValueAsInt(stack[--sp]);
+                unsigned long long a = UDValueAsInt(stack[--sp]);
 
-                    else if ([name isEqualToString:@"fact"])  res = tgamma(val + 1); // Gamma function for factorial
-                    else NSLog(@"Unhandled function call %@", name);
+                stack[sp++] = UDValueMakeInt(a << b);
+            } break;
+            
+            case UDOpcodeShiftRight: {
+                if (sp - 2 < 0)
+                    goto err;
+                unsigned long long b = UDValueAsInt(stack[--sp]);
+                unsigned long long a = UDValueAsInt(stack[--sp]);
 
-                    stack[sp++] = UDValueMakeDouble(res);
-                }
+                stack[sp++] = UDValueMakeInt(a >> b);
+            } break;
+            
+            case UDOpcodeRotateLeft: {
+                if (sp - 1 < 0)
+                    goto err;
+                unsigned long long a = UDValueAsInt(stack[--sp]);
+
+                stack[sp++] = UDValueMakeInt(RotL64(a, 1));
+            } break;
+
+            case UDOpcodeRotateRight: {
+                if (sp - 1 < 0)
+                    goto err;
+                unsigned long long a = UDValueAsInt(stack[--sp]);
+
+                stack[sp++] = UDValueMakeInt(RotR64(a, 1));
+            } break;
+
+            case UDOpcodePow: {
+                if (sp - 2 < 0)
+                    goto err;
+                
+                double power = UDValueAsDouble(stack[--sp]);
+                double base  = UDValueAsDouble(stack[--sp]);
+
+                stack[sp++] = UDValueMakeDouble(pow(base, power));
+            } break;
+
+            case UDOpcodeSqrt: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(sqrt(val));
+            } break;
+
+            case UDOpcodeLn: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(log(val));
+            } break;
+
+            case UDOpcodeSin: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(sin(val));
+            } break;
+
+            case UDOpcodeSinD: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(sin(val * M_PI / 180.0));
+            } break;
+
+            case UDOpcodeASin: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(asin(val));
+            } break;
+
+            case UDOpcodeASinD: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(asin(val * M_PI / 180.0));
+            } break;
+
+            case UDOpcodeCos: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(cos(val));
+            } break;
+
+            case UDOpcodeCosD: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(cos(val * M_PI / 180.0));
+            } break;
+
+            case UDOpcodeACos: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(acos(val));
+            } break;
+
+            case UDOpcodeACosD: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(acos(val * M_PI / 180.0));
+            } break;
+
+            case UDOpcodeTan: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(tan(val));
+            } break;
+
+            case UDOpcodeTanD: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(tan(val * M_PI / 180.0));
+            } break;
+
+            case UDOpcodeATan: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(atan(val));
+            } break;
+
+            case UDOpcodeATanD: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(atan(val * M_PI / 180.0));
+            } break;
+
+            case UDOpcodeSinH: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(sinh(val));
+            } break;
+
+            case UDOpcodeASinH: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(asinh(val));
+            } break;
+
+            case UDOpcodeCosH: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(cosh(val));
+            } break;
+
+            case UDOpcodeACosH: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(acosh(val));
+            } break;
+
+            case UDOpcodeTanH: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(tanh(val));
+            } break;
+
+            case UDOpcodeATanH: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(atanh(val));
+            } break;
+
+            case UDOpcodeLog10: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(log10(val));
+            } break;
+
+            case UDOpcodeLog2: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(log2(val));
+            } break;
+
+            case UDOpcodeFact: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                double val = UDValueAsDouble(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeDouble(tgamma(val + 1));
+            } break;
+
+            case UDOpcodeFlipB: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                unsigned long long val = UDValueAsInt(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeInt(FlipBytes64(val));
+            } break;
+
+            case UDOpcodeFlipW: {
+                if (sp - 1 < 0)
+                    goto err;
+
+                unsigned long long val = UDValueAsInt(stack[--sp]);
+                
+                stack[sp++] = UDValueMakeInt(FlipWords64(val));
             } break;
 
             default: break;

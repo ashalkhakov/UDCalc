@@ -22,17 +22,52 @@ typedef NS_ENUM(NSInteger, UDOpcode) {
     UDOpcodeAddI,
     UDOpcodeSubI,
     UDOpcodeMulI,
-    UDOpcodeDivI
+    UDOpcodeDivI,
+    UDOpcodeNegI,  // unary -
+    UDOpcodeBitAnd,
+    UDOpcodeBitOr,
+    UDOpcodeBitXor,
+    UDOpcodeBitNot,
+    UDOpcodeShiftLeft,
+    UDOpcodeShiftRight,
+    UDOpcodeRotateLeft,
+    UDOpcodeRotateRight,
+    
+    // functions
+    UDOpcodePow,
+    UDOpcodeSqrt,
+    UDOpcodeLn,
+    UDOpcodeSin,
+    UDOpcodeSinD,
+    UDOpcodeASin,
+    UDOpcodeASinD,
+    UDOpcodeCos,
+    UDOpcodeCosD,
+    UDOpcodeACos,
+    UDOpcodeACosD,
+    UDOpcodeTan,
+    UDOpcodeTanD,
+    UDOpcodeATan,
+    UDOpcodeATanD,
+    UDOpcodeSinH,
+    UDOpcodeASinH,
+    UDOpcodeCosH,
+    UDOpcodeACosH,
+    UDOpcodeTanH,
+    UDOpcodeATanH,
+    UDOpcodeLog10,
+    UDOpcodeLog2,
+    UDOpcodeFact,
+    UDOpcodeFlipB,
+    UDOpcodeFlipW
 };
 
 @interface UDInstruction : NSObject
 @property (nonatomic, readonly) UDOpcode opcode;
 @property (nonatomic, readonly) UDValue payload;         // For PUSH
-@property (nonatomic, readonly) NSString *stringPayload; // For CALL
 
 + (instancetype)push:(UDValue)val;
 + (instancetype)op:(UDOpcode)op;
-+ (instancetype)call:(NSString *)funcName;
 
 - (NSString *)debugDescription;
 @end
