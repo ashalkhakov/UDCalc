@@ -29,6 +29,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     // 1. Store the designed width of the scientific pane
     self.standardScientificWidth = self.scientificWidthConstraint.constant;
     self.standardProgrammerInputHeight = self.programmerInputHeightConstraint.constant;
+    self.standardBitWrapperHeight = self.bitWrapperHeightConstraint.constant;
     
     self.calc.isRadians = NO;
     
@@ -79,95 +80,115 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     BOOL isProgrammer = (mode == UDCalcModeProgrammer);
     BOOL isScientific = (mode == UDCalcModeScientific);
 
-    // --- 1. Determine Target Content & Sizes ---
-    // Instead of asking the whole window, we ask the specific Grid View
-    // "How big do you need to be to show all your rows?"
+    // ============================================================
+    // 1. DETERMINE TARGET SIZES
+    // ============================================================
+    
+    // A. Keypad (Grid) Size
     NSView *targetGrid = isProgrammer ? self.programmerGridView : self.basicGridView;
-    NSSize gridFitSize = [targetGrid fittingSize];
-    
-    // Add a small buffer for tab margins if necessary (usually 0-4 pts)
-    CGFloat targetKeypadHeight = gridFitSize.height;
-    CGFloat targetKeypadWidth = gridFitSize.width;
-    
-    CGFloat targetBitDisplayHeight = isProgrammer ? self.standardProgrammerInputHeight : 0.0;
-    CGFloat targetDrawerWidth = isScientific ? self.standardScientificWidth : 0.0;
+    NSSize targetGridFit = [targetGrid fittingSize];
+    CGFloat targetKeypadH = targetGridFit.height;
+    CGFloat targetKeypadW = targetGridFit.width;
 
-    // --- 2. Calculate Window Deltas ---
-    // We calculate the difference between "What we want" and "What constraints are set to NOW"
+    // B. Scientific Drawer Width
+    CGFloat targetDrawerW = isScientific ? self.standardScientificWidth : 0.0;
+
+    // C. Programmer Container & Wrapper Heights
+    //    We need two targets now:
+    //    1. The Wrapper (Inner): Force it to 60.0 (Visible) if Programmer, else 0.
+    //    2. The Container (Outer): The total standard height (Buttons + Wrapper + Spacing).
     
-    CGFloat currentKeypadHeight = self.keypadHeightConstraint.constant;
-    CGFloat currentBitDisplayHeight = self.programmerInputHeightConstraint.constant;
-    CGFloat currentDrawerWidth = self.scientificWidthConstraint.constant;
-    
-    // Height Delta = (Keypad Change) + (BitDisplay Change)
-    CGFloat deltaH = (targetKeypadHeight - currentKeypadHeight) + (targetBitDisplayHeight - currentBitDisplayHeight);
-    
-    // Width Deltas
-    // We separate these because they affect the window Origin differently
-    // Assuming you have a keypadWidthConstraint connected. If not, use current frame width differences.
-    // If you don't have a keypadWidthConstraint, you can rely on the natural stack resizing,
-    // but calculating the delta manually is safer.
-    // For now, let's assume the window width change is driven by the Drawer mainly.
-    // If you want the keypad to widen the window to the RIGHT, we add that delta but don't move X.
-    
-    CGFloat currentWindowWidth = window.frame.size.width;
-    // Calculate expected total width = Drawer + Keypad (plus margins/borders)
-    // Note: This relies on your layout being tight.
-    // A safer way for Width is utilizing the Drawer Delta only for Origin X shift.
-    
-    CGFloat deltaW_Drawer = targetDrawerWidth - currentDrawerWidth;
-    
-    // If Keypad gets wider, we want window to grow.
-    // If we assume the current Keypad width matches the grid inside it (roughly):
-    CGFloat deltaW_Keypad = isProgrammer ? (targetKeypadWidth - self.basicGridView.fittingSize.width) : (targetKeypadWidth - self.programmerGridView.fittingSize.width);
-    
-    // Simplify: Just use the fittingSize difference for width if you don't have a width constraint
-    // But applying the Drawer Delta to Origin.x is CRITICAL.
-    
-    // --- 3. Calculate New Window Frame ---
-    NSRect newFrame = window.frame;
-    
-    // Apply Height (Grow Down)
-    newFrame.size.height += deltaH;
-    newFrame.origin.y -= deltaH;
-    
-    // Apply Width (Drawer Grows Left, Keypad Grows Right)
-    // We add the total width change...
-    // Note: To do this perfectly without a Keypad Width Constraint is tricky,
-    // so we calculate total expected width change implies:
-    CGFloat totalNewWidth = newFrame.size.width + deltaW_Drawer; // Start with drawer change
-    
-    // If we are switching Keypads, check if we need to expand for the new keypad width
-    // (This block effectively simulates a width constraint)
+    CGFloat targetWrapperH = 0.0;
+    CGFloat targetContainerH = 0.0;
+
     if (isProgrammer) {
-        totalNewWidth += (targetKeypadWidth - [self.basicGridView fittingSize].width);
+        // RESET to Full Open when entering Programmer Mode
+        targetWrapperH = self.standardBitWrapperHeight;
+        targetContainerH = self.standardProgrammerInputHeight;
     } else {
-        totalNewWidth -= ([self.programmerGridView fittingSize].width - targetKeypadWidth);
+        // Collapse completely (Buttons + Bits) for Sci/Basic Mode
+        targetWrapperH = 0.0;
+        targetContainerH = 0.0;
+    }
+
+    // ============================================================
+    // 2. DETERMINE CURRENT STATE
+    // ============================================================
+
+    CGFloat currentKeypadH = self.keypadHeightConstraint.constant;
+    CGFloat currentDrawerW = self.scientificWidthConstraint.constant;
+    CGFloat currentContainerH = self.programmerInputHeightConstraint.constant;
+    
+    // For width delta, use current grid fitting size
+    NSView *currentGrid = (self.calc.mode == UDCalcModeProgrammer) ? self.programmerGridView : self.basicGridView;
+    CGFloat currentKeypadW = [currentGrid fittingSize].width;
+
+    // ============================================================
+    // 3. CALCULATE DELTAS
+    // ============================================================
+
+    // Height Delta: Difference in Keypad + Difference in Container
+    CGFloat deltaH = (targetKeypadH - currentKeypadH) + (targetContainerH - currentContainerH);
+
+    // Width Deltas
+    CGFloat deltaW_Drawer = targetDrawerW - currentDrawerW;
+    CGFloat deltaW_Keypad = targetKeypadW - currentKeypadW;
+
+    // ============================================================
+    // 4. APPLY TO WINDOW FRAME
+    // ============================================================
+    
+    NSRect newFrame = window.frame;
+
+    // Height: Grow Down (Lower Y)
+    newFrame.size.height += deltaH;
+    newFrame.origin.y    -= deltaH;
+
+    // Width: Apply both
+    newFrame.size.width += (deltaW_Drawer + deltaW_Keypad);
+    newFrame.origin.x   -= deltaW_Drawer; // Shift Left for Drawer
+
+    // ============================================================
+    // 5. ANIMATION & STATE UPDATES
+    // ============================================================
+
+    // Visibility Pre-set
+    if (isProgrammer) {
+        self.programmerInputView.hidden = NO;
+        self.bitDisplayWrapperView.hidden = NO; // Ensure wrapper is visible
+        self.bitDisplayView.hidden = NO;    // Ensure inner view is visible
+    }
+    if (isScientific) {
+        self.scientificView.hidden = NO;
     }
     
-    newFrame.size.width = totalNewWidth;
-    newFrame.origin.x -= deltaW_Drawer; // Only move Left for the Drawer
-    
-    
-    // --- 4. Setup State ---
     [self.basicOrProgrammerTabView selectTabViewItemAtIndex:isProgrammer ? 1 : 0];
-    self.programmerInputView.hidden = !isProgrammer;
-    self.scientificView.hidden = !isScientific;
 
-    // --- 5. Animate ---
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
         context.duration = animate ? 0.25 : 0.0;
         context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         
+        // 1. Animate Window
         [[window animator] setFrame:newFrame display:YES];
         
-        // Animate Constraints
-        [[self.scientificWidthConstraint animator] setConstant:targetDrawerWidth];
-        [[self.programmerInputHeightConstraint animator] setConstant:targetBitDisplayHeight];
-        [[self.keypadHeightConstraint animator] setConstant:targetKeypadHeight]; // Fixes the missing row!
+        // 2. Animate Constraints
+        [[self.keypadHeightConstraint animator] setConstant:targetKeypadH];
+        [[self.scientificWidthConstraint animator] setConstant:targetDrawerW];
+        
+        // 3. Animate Programmer Constraints (Both Inner and Outer)
+        [[self.programmerInputHeightConstraint animator] setConstant:targetContainerH];
+        [[self.bitWrapperHeightConstraint animator] setConstant:targetWrapperH];
         
         [self.view.superview layoutSubtreeIfNeeded];
-    } completionHandler:nil];
+        
+    } completionHandler:^{
+        if (!isProgrammer) {
+            self.programmerInputView.hidden = YES;
+        }
+        if (!isScientific) {
+            self.scientificView.hidden = YES;
+        }
+    }];
 
     self.calc.mode = mode;
     [self updateScientificButtons];
@@ -242,9 +263,59 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 }
 
 - (IBAction)showBinaryPressed:(NSButton *)sender {
-    self.bitDisplayView.hidden = !self.bitDisplayView.hidden;
+    // 1. Determine State
+    // We check the wrapper's constraint (0 = hidden, >0 = visible)
+    BOOL isBitsVisible = (self.bitWrapperHeightConstraint.constant > 0);
     
-    [self updateUI];
+    // 2. Define Dimensions
+    CGFloat bitViewHeight = self.standardBitWrapperHeight; // Your fixed wrapper height
+    CGFloat spacing = self.programmerInputView.spacing; // Spacing between Buttons and Bits
+    CGFloat fullHeight = self.standardProgrammerInputHeight; // The Total Height (Buttons + Spacing + Bits)
+    
+    // Calculate the height of JUST the buttons
+    // Logic: Full Stack - (BitView + Spacing) = Buttons Only
+    CGFloat buttonsOnlyHeight = fullHeight - (bitViewHeight + spacing);
+    
+    // 3. Determine Targets
+    // If visible -> Go to Buttons Only.
+    // If hidden -> Go to Full Height.
+    CGFloat targetStackHeight = isBitsVisible ? buttonsOnlyHeight : fullHeight;
+    CGFloat targetWrapperHeight = isBitsVisible ? 0.0 : bitViewHeight;
+    
+    // 4. Calculate Window Delta (Target - Current)
+    CGFloat currentStackHeight = self.programmerInputHeightConstraint.constant;
+    CGFloat deltaH = targetStackHeight - currentStackHeight;
+
+    // 5. Animate
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
+        context.duration = 0.25;
+        context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        
+        // A. Resize Window
+        NSRect winFrame = self.view.window.frame;
+        winFrame.size.height += deltaH;
+        winFrame.origin.y -= deltaH;
+        [[self.view.window animator] setFrame:winFrame display:YES];
+        
+        // B. Resize Wrapper (Inner Constraint)
+        [[self.bitWrapperHeightConstraint animator] setConstant:targetWrapperHeight];
+        
+        // C. Resize Main Container (Outer Constraint)
+        // This stops exactly at 'buttonsOnlyHeight', keeping buttons visible.
+        [[self.programmerInputHeightConstraint animator] setConstant:targetStackHeight];
+        
+        // D. Toggle Visibility (Pre-animation show)
+        if (!isBitsVisible) {
+            self.bitDisplayWrapperView.hidden = NO;
+        }
+        
+    } completionHandler:^{
+        // E. Cleanup (Post-animation hide)
+        if (isBitsVisible) {
+            self.bitDisplayWrapperView.hidden = YES;
+        }
+        [self updateUI];
+    }];
 }
 
 - (IBAction)baseSelected:(NSSegmentedControl *)sender {

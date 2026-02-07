@@ -38,7 +38,7 @@
             
         case UDBaseHex:
             // %llX formats as uppercase Hex
-            return [[NSString stringWithFormat:@"%llX", val] uppercaseString];
+            return [NSString stringWithFormat:@"0x%llX", val];
             
         case UDBaseOct:
             // %llo formats as Octal

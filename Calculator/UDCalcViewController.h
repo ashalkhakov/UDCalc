@@ -42,9 +42,12 @@ extern NSString * const UDCalcResultKey;  // double
 
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *programmerInputHeightConstraint;
 @property (nonatomic, assign) CGFloat standardProgrammerInputHeight; // To remember the size
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *bitWrapperHeightConstraint; // The wrapper's height
+@property (nonatomic, assign) CGFloat standardBitWrapperHeight;
 @property (nonatomic, weak) IBOutlet NSStackView *programmerInputView;
 @property (nonatomic, weak) IBOutlet NSSegmentedControl *baseSegmentedControl;
 @property (nonatomic, weak) IBOutlet UDBitDisplayView *bitDisplayView;
+@property (nonatomic, weak) IBOutlet NSView *bitDisplayWrapperView;
 
 @property (nonatomic, weak) IBOutlet NSTabView *basicOrProgrammerTabView;
 @property (nonatomic, weak) IBOutlet NSGridView *basicGridView;
