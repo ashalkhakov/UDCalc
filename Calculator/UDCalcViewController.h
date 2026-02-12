@@ -36,6 +36,8 @@ extern NSString * const UDCalcResultKey;  // double
 - (IBAction)encodingSelected:(NSSegmentedControl *)sender;
 
 @property (nonatomic, weak) IBOutlet NSTabView *displayTabView;
+@property (weak) IBOutlet NSTextField *radLabel;
+@property (weak) IBOutlet NSTextField *charLabel;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *scientificWidthConstraint;
 @property (nonatomic, weak) IBOutlet NSView *scientificView;
 @property (nonatomic, assign) CGFloat standardScientificWidth; // To remember the size
@@ -54,6 +56,8 @@ extern NSString * const UDCalcResultKey;  // double
 @property (nonatomic, weak) IBOutlet NSGridView *programmerGridView;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *keypadHeightConstraint;
 
+@property (weak) IBOutlet NSTextField *radLabelRPN;
+@property (weak) IBOutlet NSTextField *charLabelRPN;
 @property (nonatomic, weak) IBOutlet NSTableView *stackTableView;
 
 @property (nonatomic, weak) IBOutlet NSButton *parenLeftButton;

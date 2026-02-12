@@ -37,6 +37,7 @@
     _expectingOperator = NO;
     _shouldResetOnDigit = NO;
     _shouldPushOnDigit = NO;
+    _encodingMode = UDCalcEncodingModeNone;
     [self.inputBuffer performClearEntry];
 }
 
@@ -611,6 +612,41 @@
 
 - (NSString *)stringForValue:(UDValue)value {
     return [self.inputBuffer stringForValue:value];
+}
+
+- (NSString *)currentValueEncoded {
+    switch (_encodingMode) {
+        case UDCalcEncodingModeNone:
+            return @"";
+        case UDCalcEncodingModeASCII: {
+            unsigned long long val = UDValueAsInt([self currentInputValue]);
+
+            // ASCII is valid from 32 (Space) to 126 (~).
+            // We can optionally show extended ASCII (128-255) if desired.
+            if (val >= 32 && val <= 126) {
+                return [NSString stringWithFormat:@"%c", (char)val];
+            } else if (val < 32) {
+                return @"·"; // Control char placeholder
+            } else {
+                return @""; // Out of bounds
+            }
+        }
+        case UDCalcEncodingModeUnicode: {
+            unsigned long long val = UDValueAsInt([self currentInputValue]);
+
+            // Check for valid Unicode range (ignoring surrogates for simplicity)
+            if (val <= 0x10FFFF) {
+                // Convert uint32 to NSString
+                uint32_t c = (uint32_t)val;
+                return [[NSString alloc] initWithBytes:&c length:4 encoding:NSUTF32LittleEndianStringEncoding];
+            } else {
+                return @"";
+            }
+        }
+        default:
+            NSLog(@"Unknown encoding value %@", @(_encodingMode));
+            return @"";
+    }
 }
 
 @end

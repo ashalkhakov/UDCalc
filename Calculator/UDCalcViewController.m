@@ -330,16 +330,38 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
 - (IBAction)encodingSelected:(NSSegmentedControl *)sender {
     NSInteger index = [sender selectedSegment];
-        
-    if (index == 0) {
-        NSLog(@"Switched to ASCII Mode");
-        // self.calculator.inputBuffer.encodingMode = UDEncodingASCII;
-    } else {
-        NSLog(@"Switched to Unicode Mode");
-        // self.calculator.inputBuffer.encodingMode = UDEncodingUnicode;
+
+    // Check visual state
+    BOOL isAsciiOn = [sender isSelectedForSegment:0];
+    BOOL isUnicodeOn = [sender isSelectedForSegment:1];
+    
+    // LOGIC: Enforce Mutually Exclusive "Select Zero or One"
+    if (isAsciiOn && isUnicodeOn) {
+        // User tried to select the second one while first was on.
+        // We must turn off the OLD one.
+        if (self.calc.encodingMode == UDCalcEncodingModeASCII) {
+            // Was ASCII, user clicked Unicode -> Turn off ASCII
+            [sender setSelected:NO forSegment:0];
+            self.calc.encodingMode = UDCalcEncodingModeUnicode;
+        } else {
+            // Was Unicode, user clicked ASCII -> Turn off Unicode
+            [sender setSelected:NO forSegment:1];
+            self.calc.encodingMode = UDCalcEncodingModeASCII;
+        }
+    }
+    else if (isAsciiOn) {
+        self.calc.encodingMode = UDCalcEncodingModeASCII;
+    }
+    else if (isUnicodeOn) {
+        self.calc.encodingMode = UDCalcEncodingModeUnicode;
+    }
+    else {
+        // Both are off (User clicked the active one to deselect it)
+        self.calc.encodingMode = UDCalcEncodingModeNone;
     }
     
-    [self updateUI];
+    // Now update the UI (show/hide the char label)
+    [self updateDisplayIndicators];
 }
 
 - (void)updateScientificButtons {
@@ -477,6 +499,41 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
 #pragma mark - Helper
 
+- (void)updateDisplayIndicators {
+    UDCalcMode mode = self.calc.mode;
+    NSTextField *radLabel = self.calc.isRPNMode ? self.radLabelRPN : self.radLabel;
+    NSTextField *charLabel = self.calc.isRPNMode ? self.charLabelRPN : self.charLabel;
+    
+    
+    // ============================================================
+    // 1. RADIAN INDICATOR (Scientific Mode)
+    // ============================================================
+    // Only show if we are in Scientific Mode AND Radians are active.
+    if (mode == UDCalcModeScientific && self.calc.isRadians) {
+        radLabel.hidden = NO;
+        radLabel.stringValue = @"Rad";
+    } else {
+        radLabel.hidden = YES;
+    }
+    
+    // ============================================================
+    // 2. CHARACTER INDICATOR (Programmer Mode)
+    // ============================================================
+    
+    if (mode == UDCalcModeProgrammer) {
+        NSString *glyph = [self.calc currentValueEncoded];
+
+        if (glyph.length > 0) {
+            charLabel.hidden = NO;
+            charLabel.stringValue = glyph;
+        } else {
+            charLabel.hidden = YES;
+        }
+    } else {
+        charLabel.hidden = YES;
+    }
+}
+
 - (void)updateUI {
        
     if (self.calc.isTyping) {
@@ -519,6 +576,8 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     } else if (self.calc.mode == UDCalcModeScientific) {
         [self updateScientificButtons];
     }
+    
+    [self updateDisplayIndicators];
 }
 
 #pragma mark - Copy & Paste

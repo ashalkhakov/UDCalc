@@ -18,6 +18,12 @@ typedef NS_ENUM(NSInteger, UDCalcMode) {
     UDCalcModeProgrammer    = 3
 };
 
+typedef NS_ENUM(NSInteger, UDCalcEncodingMode) {
+    UDCalcEncodingModeNone      = 0,
+    UDCalcEncodingModeASCII     = 1,
+    UDCalcEncodingModeUnicode   = 2
+};
+
 @protocol UDCalcDelegate <NSObject>
 @optional
 - (void)calculator:(UDCalc *)calc didCalculateResult:(UDValue)result forTree:(UDASTNode *)tree;
@@ -28,6 +34,7 @@ typedef NS_ENUM(NSInteger, UDCalcMode) {
 // State
 @property (nonatomic, assign) UDCalcMode mode;
 @property (nonatomic, assign) UDBase inputBase;
+@property (nonatomic, assign) UDCalcEncodingMode encodingMode;
 @property (nonatomic, weak) id<UDCalcDelegate> delegate;
 @property (nonatomic, strong) UDInputBuffer *inputBuffer;
 @property (nonatomic, assign) BOOL isRadians;
@@ -60,5 +67,7 @@ typedef NS_ENUM(NSInteger, UDCalcMode) {
 - (UDValue)evaluateCurrentExpression;
 
 - (NSString *)stringForValue:(UDValue)value;
+
+- (NSString *)currentValueEncoded;
 
 @end
