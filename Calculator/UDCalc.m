@@ -537,7 +537,7 @@
 }
 
 - (void)reportCalculationResult {
-    if ([self.delegate respondsToSelector:@selector(calculator:didCalculateResult:forTree:)]) {
+    if (self.mode != UDCalcModeProgrammer && [self.delegate respondsToSelector:@selector(calculator:didCalculateResult:forTree:)]) {
         UDASTNode *resultTree = [self.nodeStack lastObject];
 
         UDValue val = [self evaluateCurrentExpression];

@@ -307,7 +307,7 @@
                                 </segmentedControl>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jHm-XK-1ab">
                                     <rect key="frame" x="427" y="0.0" width="94" height="27"/>
-                                    <buttonCell key="cell" type="push" title="Hide Binary" alternateTitle="Show Binary" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="P6g-ZH-BGV">
+                                    <buttonCell key="cell" type="push" title="Hide Binary" alternateTitle="Show Binary" bezelStyle="rounded" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="P6g-ZH-BGV">
                                         <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="smallSystem"/>
                                     </buttonCell>
