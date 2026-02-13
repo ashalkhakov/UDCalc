@@ -10,12 +10,12 @@
 #import <QuartzCore/QuartzCore.h>
 #import "UDCalcButton.h"
 #import "UDValueFormatter.h"
+#import "UDSettingsManager.h"
 
 NSString * const UDCalcDidFinishCalculationNotification = @"org.underivable.calculator.DidFinishCalculation";
 
 NSString * const UDCalcFormulaKey = @"UDCalcFormulaKey";
 NSString * const UDCalcResultKey = @"UDCalcResultKey";
-
 
 @implementation UDCalcViewController
 
@@ -26,17 +26,66 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     self.calc.delegate = self;
     self.bitDisplayView.delegate = self;
 
-    // 1. Store the designed width of the scientific pane
+    // Store the designed width of the scientific pane
     self.standardScientificWidth = self.scientificWidthConstraint.constant;
     self.standardProgrammerInputHeight = self.programmerInputHeightConstraint.constant;
     self.standardBitWrapperHeight = self.bitWrapperHeightConstraint.constant;
     
-    self.calc.isRadians = NO;
-    
-    // 2. Default to Basic Mode on launch (Optional)
-    [self setCalculatorMode:UDCalcModeBasic animate:NO];
+    // Listen for the app closing
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(saveApplicationState)
+                                                 name:NSApplicationWillTerminateNotification
+                                               object:nil];
+}
 
-    [self updateUI];
+- (void)restoreApplicationState {
+    UDSettingsManager *settings = [UDSettingsManager sharedManager];
+    
+    self.calc.isRadians = settings.isRadians;
+    self.calc.encodingMode = settings.encodingMode;
+    self.calc.isRPNMode = settings.isRPN;
+    self.calc.inputBase = settings.inputBase;
+    self.calc.isBinaryViewShown = settings.showBinaryView;
+
+    // Update Segment Control UI to match loaded state
+    if (settings.encodingMode == UDCalcEncodingModeNone) {
+        self.encodingSegmentedControl.selectedSegment = -1;
+    } else {
+        self.encodingSegmentedControl.selectedSegment = settings.encodingMode == UDCalcEncodingModeASCII ? 0 : 1;
+    }
+
+    // Update Input Base Control UI to match loaded state
+    self.baseSegmentedControl.selectedSegment = settings.inputBase == UDBaseOct ? 0 : settings.inputBase == UDBaseDec ? 1 : 2;
+    
+    // Update Show Binary Button
+    self.showBinaryViewButton.state = settings.showBinaryView ? NSControlStateValueOn : NSControlStateValueOff;
+    self.bitWrapperHeightConstraint.constant = settings.showBinaryView ? self.standardBitWrapperHeight : 0;
+
+    [self setCalculatorMode:settings.calcMode animate:NO];
+    [self setIsBinaryViewShown:settings.showBinaryView];
+
+    [self updateUIForRPNMode:self.calc.isRPNMode];
+}
+
+- (void)saveApplicationState {
+    NSLog(@"App is terminating. Saving state...");
+    
+    // Save Calculator State (e.g., the number on screen)
+    UDSettingsManager *settings = [UDSettingsManager sharedManager];
+    
+    settings.isRadians = self.calc.isRadians;
+    settings.calcMode = self.calc.mode;
+    settings.encodingMode = self.calc.encodingMode;
+    settings.isRPN = self.calc.isRPNMode;
+    settings.inputBase = self.calc.inputBase;
+    settings.showBinaryView = self.calc.isBinaryViewShown;
+
+    // Force Sync (Optional, modern macOS does this automatically, but safe to add)
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - Button Actions
@@ -103,7 +152,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
     if (isProgrammer) {
         // RESET to Full Open when entering Programmer Mode
-        targetWrapperH = self.standardBitWrapperHeight;
+        targetWrapperH = self.calc.isBinaryViewShown ? self.standardBitWrapperHeight : 0.0;
         targetContainerH = self.standardProgrammerInputHeight;
     } else {
         // Collapse completely (Buttons + Bits) for Sci/Basic Mode
@@ -153,42 +202,32 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     // ============================================================
 
     // Visibility Pre-set
+    
     if (isProgrammer) {
         self.programmerInputView.hidden = NO;
-        self.bitDisplayWrapperView.hidden = NO; // Ensure wrapper is visible
-        self.bitDisplayView.hidden = NO;    // Ensure inner view is visible
+        //self.bitDisplayWrapperView.hidden = !self.calc.isBinaryViewShown; // Ensure wrapper is visible
+        //self.bitDisplayView.hidden = NO;    // Ensure inner view is visible
+    } else {
+        self.programmerInputView.hidden = YES;
     }
     if (isScientific) {
         self.scientificView.hidden = NO;
+    } else {
+        self.scientificView.hidden = YES;
     }
-    
+
     [self.basicOrProgrammerTabView selectTabViewItemAtIndex:isProgrammer ? 1 : 0];
 
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
-        context.duration = animate ? 0.25 : 0.0;
-        context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-        
-        // 1. Animate Window
-        [[window animator] setFrame:newFrame display:YES];
-        
-        // 2. Animate Constraints
-        [[self.keypadHeightConstraint animator] setConstant:targetKeypadH];
-        [[self.scientificWidthConstraint animator] setConstant:targetDrawerW];
-        
-        // 3. Animate Programmer Constraints (Both Inner and Outer)
-        [[self.programmerInputHeightConstraint animator] setConstant:targetContainerH];
-        [[self.bitWrapperHeightConstraint animator] setConstant:targetWrapperH];
-        
-        [self.view.superview layoutSubtreeIfNeeded];
-        
-    } completionHandler:^{
-        if (!isProgrammer) {
-            self.programmerInputView.hidden = YES;
-        }
-        if (!isScientific) {
-            self.scientificView.hidden = YES;
-        }
-    }];
+    [window setFrame:newFrame display:YES];
+
+    self.keypadHeightConstraint.constant = targetKeypadH;
+    self.scientificWidthConstraint.constant = targetDrawerW;
+
+    // 3. Animate Programmer Constraints (Both Inner and Outer)
+    self.programmerInputHeightConstraint.constant = targetContainerH;
+    self.bitWrapperHeightConstraint.constant = targetWrapperH;
+
+    [self.view.superview layoutSubtreeIfNeeded];
 
     self.calc.mode = mode;
     [self updateScientificButtons];
@@ -263,10 +302,20 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 }
 
 - (IBAction)showBinaryPressed:(NSButton *)sender {
+    self.calc.isBinaryViewShown = !self.calc.isBinaryViewShown;
+
     // 1. Determine State
     // We check the wrapper's constraint (0 = hidden, >0 = visible)
-    BOOL isBitsVisible = (self.bitWrapperHeightConstraint.constant > 0);
-    
+    BOOL isBitsVisible = self.calc.isBinaryViewShown;
+
+    sender.state = isBitsVisible ? NSControlStateValueOn : NSControlStateValueOff;
+
+    [self setIsBinaryViewShown:isBitsVisible];
+
+    [self updateUI];
+}
+
+- (void)setIsBinaryViewShown:(BOOL)isBitsVisible {
     // 2. Define Dimensions
     CGFloat bitViewHeight = self.standardBitWrapperHeight; // Your fixed wrapper height
     CGFloat spacing = self.programmerInputView.spacing; // Spacing between Buttons and Bits
@@ -287,35 +336,19 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     CGFloat deltaH = targetStackHeight - currentStackHeight;
 
     // 5. Animate
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
-        context.duration = 0.25;
-        context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-        
-        // A. Resize Window
-        NSRect winFrame = self.view.window.frame;
-        winFrame.size.height += deltaH;
-        winFrame.origin.y -= deltaH;
-        [[self.view.window animator] setFrame:winFrame display:YES];
-        
-        // B. Resize Wrapper (Inner Constraint)
-        [[self.bitWrapperHeightConstraint animator] setConstant:targetWrapperHeight];
-        
-        // C. Resize Main Container (Outer Constraint)
-        // This stops exactly at 'buttonsOnlyHeight', keeping buttons visible.
-        [[self.programmerInputHeightConstraint animator] setConstant:targetStackHeight];
-        
-        // D. Toggle Visibility (Pre-animation show)
-        if (!isBitsVisible) {
-            self.bitDisplayWrapperView.hidden = NO;
-        }
-        
-    } completionHandler:^{
-        // E. Cleanup (Post-animation hide)
-        if (isBitsVisible) {
-            self.bitDisplayWrapperView.hidden = YES;
-        }
-        [self updateUI];
-    }];
+
+    // A. Resize Window
+    NSRect winFrame = self.view.window.frame;
+    winFrame.size.height += deltaH;
+    winFrame.origin.y -= deltaH;
+    [self.view.window setFrame:winFrame display:YES];
+    
+    // B. Resize Wrapper (Inner Constraint)
+    self.bitWrapperHeightConstraint.constant = targetWrapperHeight;
+    
+    // C. Resize Main Container (Outer Constraint)
+    // This stops exactly at 'buttonsOnlyHeight', keeping buttons visible.
+    self.programmerInputHeightConstraint.constant = targetStackHeight;
 }
 
 - (IBAction)baseSelected:(NSSegmentedControl *)sender {

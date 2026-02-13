@@ -39,6 +39,7 @@ typedef NS_ENUM(NSInteger, UDCalcEncodingMode) {
 @property (nonatomic, strong) UDInputBuffer *inputBuffer;
 @property (nonatomic, assign) BOOL isRadians;
 @property (nonatomic, assign) BOOL isRPNMode;
+@property (nonatomic, assign) BOOL isBinaryViewShown;
 @property (nonatomic, assign) double memoryRegister; // The 'M' value
 // YES = User is editing the buffer.
 // NO = User just hit an Op/Equals, buffer is "fresh".

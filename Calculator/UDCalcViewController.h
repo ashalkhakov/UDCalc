@@ -50,6 +50,8 @@ extern NSString * const UDCalcResultKey;  // double
 @property (nonatomic, weak) IBOutlet NSSegmentedControl *baseSegmentedControl;
 @property (nonatomic, weak) IBOutlet UDBitDisplayView *bitDisplayView;
 @property (nonatomic, weak) IBOutlet NSView *bitDisplayWrapperView;
+@property (nonatomic, weak) IBOutlet NSSegmentedControl *encodingSegmentedControl;
+@property (nonatomic, weak) IBOutlet NSButton *showBinaryViewButton;
 
 @property (nonatomic, weak) IBOutlet NSTabView *basicOrProgrammerTabView;
 @property (nonatomic, weak) IBOutlet NSGridView *basicGridView;
@@ -87,6 +89,7 @@ extern NSString * const UDCalcResultKey;  // double
 @property (nonatomic, weak) IBOutlet NSButton *pFButton;
 @property (nonatomic, weak) IBOutlet NSButton *pFFButton;
 
+- (void)restoreApplicationState;
 - (void)updateUI;
 - (void)setCalculatorMode:(UDCalcMode)mode animate:(BOOL)animate;
 

@@ -8,6 +8,7 @@
 #import "AppDelegate.h"
 #import <QuartzCore/QuartzCore.h>
 #import "UDCalcButton.h"
+#import "UDSettingsManager.h"
 
 @interface AppDelegate ()
 
@@ -18,6 +19,8 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
+    
+    [[UDSettingsManager sharedManager] registerDefaults];
 
     self.unitConverter = [[UDUnitConverter alloc] init];
     self.historyManager = [[UDConversionHistoryManager alloc] init];
@@ -53,7 +56,7 @@
     [self.window setContentSize:calcView.frame.size];
     [self.window setContentView:calcView];
 
-    [self.calcViewController setCalculatorMode:UDCalcModeBasic animate:NO];
+    [self.calcViewController restoreApplicationState];
 
     // 3. Make the Next Responder chain work (Keyboard shortcuts)
     [self.window makeFirstResponder:self.calcViewController];
