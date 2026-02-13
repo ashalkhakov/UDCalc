@@ -30,6 +30,28 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     self.standardScientificWidth = self.scientificWidthConstraint.constant;
     self.standardProgrammerInputHeight = self.programmerInputHeightConstraint.constant;
     self.standardBitWrapperHeight = self.bitWrapperHeightConstraint.constant;
+
+    // fix up button layout
+
+    // button "0" (basic/scientific mode)
+    // merge row 5 (index 4), columns 1-2 (start 0, len 2)
+    [self.basicGridView mergeCellsInHorizontalRange:NSMakeRange(0, 2)
+                                      verticalRange:NSMakeRange(4, 1)];
+
+    // button "byte flip" (programmer mode)
+    // merge row 5 (index 4), columns 1-2 (start 0, len 2)
+    [self.programmerGridView mergeCellsInHorizontalRange:NSMakeRange(0, 2)
+                                           verticalRange:NSMakeRange(4, 1)];
+
+    // button "word flip" (programmer mode)
+    // merge row 6 (index 5), columns 1-2 (start 0, len 2)
+    [self.programmerGridView mergeCellsInHorizontalRange:NSMakeRange(0, 2)
+                                           verticalRange:NSMakeRange(5, 1)];
+
+    // button "enter" (programmer mode)
+    // merge row 6 (index 5), columns 6-7 (start 5, len 2)
+    [self.programmerGridView mergeCellsInHorizontalRange:NSMakeRange(5, 2)
+                                           verticalRange:NSMakeRange(5, 1)];
     
     // Listen for the app closing
     [[NSNotificationCenter defaultCenter] addObserver:self
