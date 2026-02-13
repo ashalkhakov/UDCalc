@@ -155,7 +155,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
     if (isProgrammer) {
         // RESET to Full Open when entering Programmer Mode
-        targetWrapperH = self.calc.isBinaryViewShown ? self.standardBitWrapperHeight : 0.0;
+        targetWrapperH = self.standardBitWrapperHeight;
         targetContainerH = self.standardProgrammerInputHeight;
     } else {
         // Collapse completely (Buttons + Bits) for Sci/Basic Mode
@@ -208,8 +208,8 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     
     if (isProgrammer) {
         self.programmerInputView.hidden = NO;
-        //self.bitDisplayWrapperView.hidden = !self.calc.isBinaryViewShown; // Ensure wrapper is visible
-        //self.bitDisplayView.hidden = NO;    // Ensure inner view is visible
+        self.bitDisplayWrapperView.hidden = NO; // Ensure wrapper is visible
+        self.bitDisplayView.hidden = NO;    // Ensure inner view is visible
     } else {
         self.programmerInputView.hidden = YES;
     }
