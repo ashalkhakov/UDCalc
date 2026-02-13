@@ -59,20 +59,20 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <view autoresizesSubviews="NO" id="cNn-5o-2k8">
-            <rect key="frame" x="0.0" y="0.0" width="609" height="416"/>
+            <rect key="frame" x="0.0" y="0.0" width="792" height="416"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <tabView type="noTabsNoBorder" translatesAutoresizingMaskIntoConstraints="NO" id="uKU-TP-rML">
-                    <rect key="frame" x="1" y="354" width="607" height="61"/>
+                    <rect key="frame" x="1" y="354" width="790" height="61"/>
                     <font key="font" metaFont="system"/>
                     <tabViewItems>
                         <tabViewItem label="Standard" identifier="" id="a84-Rr-Hz9">
                             <view key="view" id="FPS-Kl-RQk">
-                                <rect key="frame" x="0.0" y="0.0" width="607" height="61"/>
+                                <rect key="frame" x="0.0" y="0.0" width="790" height="61"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <textField identifier="display" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dJx-PN-gbn">
-                                        <rect key="frame" x="0.0" y="0.0" width="607" height="61"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="790" height="61"/>
                                         <textFieldCell key="cell" controlSize="large" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" drawsBackground="YES" usesSingleLineMode="YES" id="DIk-ym-U6A">
                                             <font key="font" metaFont="systemLight" size="52"/>
                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -287,13 +287,13 @@
                     </tabViewItems>
                 </tabView>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="750" horizontalClippingResistancePriority="250" verticalClippingResistancePriority="100" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="100" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Edd-dC-mYj">
-                    <rect key="frame" x="0.0" y="255" width="609" height="98"/>
+                    <rect key="frame" x="0.0" y="255" width="792" height="98"/>
                     <subviews>
                         <stackView distribution="equalCentering" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalClippingResistancePriority="250" verticalClippingResistancePriority="250" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XdZ-aa-uKh">
-                            <rect key="frame" x="0.0" y="68" width="609" height="30"/>
+                            <rect key="frame" x="0.0" y="68" width="792" height="30"/>
                             <subviews>
                                 <segmentedControl identifier="encoding" horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="g9X-GB-cFN">
-                                    <rect key="frame" x="5" y="4" width="301" height="21"/>
+                                    <rect key="frame" x="5" y="4" width="423" height="21"/>
                                     <segmentedCell key="cell" controlSize="small" borderStyle="border" alignment="left" style="rounded" trackingMode="selectAny" id="kAk-AN-FFS">
                                         <font key="font" metaFont="smallSystem"/>
                                         <segments>
@@ -306,7 +306,7 @@
                                     </connections>
                                 </segmentedControl>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jHm-XK-1ab">
-                                    <rect key="frame" x="305" y="0.0" width="94" height="27"/>
+                                    <rect key="frame" x="427" y="0.0" width="94" height="27"/>
                                     <buttonCell key="cell" type="push" title="Hide Binary" alternateTitle="Show Binary" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="P6g-ZH-BGV">
                                         <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="smallSystem"/>
@@ -316,7 +316,7 @@
                                     </connections>
                                 </button>
                                 <segmentedControl identifier="inputBase" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sme-38-1cA">
-                                    <rect key="frame" x="495" y="4" width="108" height="21"/>
+                                    <rect key="frame" x="678" y="4" width="108" height="21"/>
                                     <segmentedCell key="cell" controlSize="small" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="xsr-7T-aU7">
                                         <font key="font" metaFont="smallSystem"/>
                                         <segments>
@@ -343,10 +343,10 @@
                             </customSpacing>
                         </stackView>
                         <customView translatesAutoresizingMaskIntoConstraints="NO" id="XCR-QC-knV">
-                            <rect key="frame" x="0.0" y="0.0" width="612" height="60"/>
+                            <rect key="frame" x="0.0" y="0.0" width="792" height="60"/>
                             <subviews>
                                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="ocr-3f-wD7" customClass="UDBitDisplayView">
-                                    <rect key="frame" x="0.0" y="0.0" width="612" height="60"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="792" height="60"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="60" id="DWU-Os-cjQ"/>
                                     </constraints>
@@ -838,7 +838,7 @@
                     </constraints>
                 </customView>
                 <tabView horizontalHuggingPriority="750" verticalHuggingPriority="750" type="noTabsNoBorder" translatesAutoresizingMaskIntoConstraints="NO" id="RaS-hH-kkg">
-                    <rect key="frame" x="365" y="0.0" width="243" height="255"/>
+                    <rect key="frame" x="365" y="0.0" width="426" height="255"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="255" id="rAx-3U-k0u"/>
                     </constraints>
@@ -1376,7 +1376,7 @@ DQ
                                                 </button>
                                             </gridCell>
                                             <gridCell row="bU9-aq-ZUy" column="KWY-PH-vEE" id="A9y-P2-JKv">
-                                                <button key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="d24-EV-L64" customClass="UDCalcButton">
+                                                <button key="contentView" verticalHuggingPriority="750" tag="109" translatesAutoresizingMaskIntoConstraints="NO" id="d24-EV-L64" customClass="UDCalcButton">
                                                     <rect key="frame" x="305" y="255" width="60" height="50"/>
                                                     <buttonCell key="cell" type="square" title="AC" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="adg-CT-FGR">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1393,7 +1393,7 @@ DQ
                                                 </button>
                                             </gridCell>
                                             <gridCell row="bU9-aq-ZUy" column="Yf9-MS-OQQ" id="18V-F3-AqJ">
-                                                <button key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7tr-Td-ceF" customClass="UDCalcButton">
+                                                <button key="contentView" verticalHuggingPriority="750" tag="26" translatesAutoresizingMaskIntoConstraints="NO" id="7tr-Td-ceF" customClass="UDCalcButton">
                                                     <rect key="frame" x="366" y="255" width="60" height="50"/>
                                                     <buttonCell key="cell" type="square" title="C" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="VOY-d5-AWU">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

@@ -13,6 +13,7 @@
 + (instancetype)sharedManager;
 
 - (void)registerDefaults;
+- (void)forceSync;
 
 // Properties that automatically sync to NSUserDefaults
 @property (nonatomic, assign) UDCalcMode calcMode;

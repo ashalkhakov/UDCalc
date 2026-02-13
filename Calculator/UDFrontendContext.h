@@ -101,7 +101,8 @@ typedef NS_ENUM(NSInteger, UDOp) {
     UDOpShift1Right = 106,
     UDOpShiftLeft   = 107,
     UDOpShiftRight  = 108,
-    
+    UDOpClearAll    = 109,
+
     UDOpByteFlip    = 111,
     UDOpWordFlip    = 112,
     UDOpRotateLeft  = 113,

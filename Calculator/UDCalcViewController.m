@@ -79,9 +79,8 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     settings.isRPN = self.calc.isRPNMode;
     settings.inputBase = self.calc.inputBase;
     settings.showBinaryView = self.calc.isBinaryViewShown;
-
-    // Force Sync (Optional, modern macOS does this automatically, but safe to add)
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    [settings forceSync];
 }
 
 - (void)dealloc {
@@ -568,11 +567,15 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 }
 
 - (void)updateUI {
-       
-    if (self.calc.isTyping) {
-        [self.acButton setTitle:@"C"];
-    } else {
-        [self.acButton setTitle:@"AC"];
+
+    if (self.calc.mode != UDCalcModeProgrammer) {
+        if (self.calc.isTyping) {
+            [self.acButton setTitle:@"C"];
+            [self.acButton setTag:UDOpClear];
+        } else {
+            [self.acButton setTitle:@"AC"];
+            [self.acButton setTag:UDOpClearAll];
+        }
     }
     
     if (self.calc.isRPNMode) {

@@ -876,4 +876,32 @@
     XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator evaluateCurrentExpression]), 11.0, 0.0001);
 }
 
+- (void)testClear {
+    [self.calculator inputDigit:4];
+    [self.calculator inputDigit:5];
+    [self.calculator performOperation:UDOpAdd];
+    
+    [self.calculator inputDigit:3];
+    [self.calculator inputDigit:4];
+    [self.calculator performOperation:UDOpClear];
+    
+    [self.calculator inputDigit:1];
+    [self.calculator performOperation:UDOpEq];
+    
+    // Construct Expected Tree Manually
+    UDASTNode *expected = [UDBinaryOpNode op:@"+"
+                                        left:[UDNumberNode value:UDValueMakeDouble(45)]
+                                       right:[UDNumberNode value:UDValueMakeDouble(1)]
+                                  precedence:UDASTPrecedenceAdd];
+
+    // Check Structure
+    // Note: The calculator holds an array of nodes (the stack).
+    // After Eq, the stack should contain exactly one root node.
+    XCTAssertEqual(self.calculator.nodeStack.count, 1);
+    XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expected);
+    
+    // Check Value
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator evaluateCurrentExpression]), 46.0, 0.0001);
+}
+
 @end

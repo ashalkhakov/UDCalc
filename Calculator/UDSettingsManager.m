@@ -41,6 +41,11 @@ static NSString * const kUDKeyShowBinaryView    = @"UDShowBinaryView";
     }];
 }
 
+- (void)forceSync {
+    // Force Sync (Optional, modern macOS does this automatically, but safe to add)
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 #pragma mark - Properties
 // We implement custom Getters and Setters to talk directly to NSUserDefaults.
 

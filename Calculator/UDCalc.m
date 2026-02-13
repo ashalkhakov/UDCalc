@@ -24,6 +24,8 @@
     self = [super init];
     if (self) {
         self.inputBuffer = [[UDInputBuffer alloc] init];
+        _isRadians = YES;
+        _encodingMode = UDCalcEncodingModeNone;
         [self reset];
     }
     return self;
@@ -32,12 +34,10 @@
 - (void)reset {
     _nodeStack = [NSMutableArray array];
     _opStack = [NSMutableArray array];
-    _isRadians = YES;
     _isTyping = NO;
     _expectingOperator = NO;
     _shouldResetOnDigit = NO;
     _shouldPushOnDigit = NO;
-    _encodingMode = UDCalcEncodingModeNone;
     [self.inputBuffer performClearEntry];
 }
 
@@ -515,9 +515,13 @@
         if (self.isTyping) {
             [self.inputBuffer performClearEntry];
             self.isTyping = NO;
-        } else {
-            [self reset];
         }
+        self.expectingOperator = NO;
+        return;
+    }
+
+    if (op == UDOpClearAll) {
+        [self reset];
         return;
     }
 
