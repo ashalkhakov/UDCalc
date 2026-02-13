@@ -592,7 +592,13 @@
 }
 
 - (NSString *)currentDisplayValue {
-    return [self stringForValue:[self currentInputValue]];
+    UDValue val = [self currentInputValue];
+
+    if (self.isTyping) {
+        return [self.inputBuffer stringForValue:val showThousandsSeparators:self.showThousandsSeparators decimalPlaces:15];
+    } else {
+        return [self stringForValue:val];
+    }
 }
 
 - (NSArray<UDNumberNode *> *)currentStackValues {
@@ -615,7 +621,7 @@
 }
 
 - (NSString *)stringForValue:(UDValue)value {
-    return [self.inputBuffer stringForValue:value showThousandsSeparators:self.showThousandsSeparators];
+    return [self.inputBuffer stringForValue:value showThousandsSeparators:self.showThousandsSeparators decimalPlaces:self.decimalPlaces];
 }
 
 - (NSString *)currentValueEncoded {

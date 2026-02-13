@@ -242,10 +242,10 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
     return UDValueMakeDouble(value);
 }
 
-- (NSString *)stringForValue:(UDValue)value showThousandsSeparators:(BOOL)showThousandsSeparators {
+- (NSString *)stringForValue:(UDValue)value showThousandsSeparators:(BOOL)showThousandsSeparators decimalPlaces:(NSInteger)places {
     return _isIntegerMode
-        ? [UDValueFormatter stringForValue:value base:self.inputBase showThousandsSeparators:showThousandsSeparators]
-        : [UDValueFormatter stringForValue:value base:UDBaseDec showThousandsSeparators:showThousandsSeparators];
+        ? [UDValueFormatter stringForValue:value base:self.inputBase showThousandsSeparators:showThousandsSeparators decimalPlaces:places]
+        : [UDValueFormatter stringForValue:value base:UDBaseDec showThousandsSeparators:showThousandsSeparators decimalPlaces:places];
 }
 
 @end

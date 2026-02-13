@@ -9,7 +9,7 @@
 
 @implementation UDValueFormatter
 
-+ (NSString *)stringForValue:(UDValue)val base:(UDBase)base showThousandsSeparators:(BOOL)showThousandsSeparators {
++ (NSString *)stringForValue:(UDValue)val base:(UDBase)base showThousandsSeparators:(BOOL)showThousandsSeparators decimalPlaces:(NSInteger)places {
     // 1. Handle Errors
     if (val.type == UDValueTypeErr) {
         return @"Error";
@@ -18,18 +18,20 @@
     // 2. Handle Doubles (Scientific Mode)
     // Doubles ignore the 'base' and always print as Decimal
     if (val.type == UDValueTypeDouble) {
-        if (showThousandsSeparators) {
-            NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-            formatter.numberStyle = NSNumberFormatterDecimalStyle; // e.g. 1,234.567
-            formatter.usesGroupingSeparator = YES;
-            formatter.maximumFractionDigits = 10; // Match your previous %.10g precision
-            
-            return [formatter stringFromNumber:@(val.v.doubleValue)];
+        NSNumberFormatter *fmt = [[NSNumberFormatter alloc] init];
+        fmt.numberStyle = NSNumberFormatterDecimalStyle;
+        fmt.usesGroupingSeparator = showThousandsSeparators;
+        
+        if (places == -1) {
+            // AUTO Mode (Behavior like %.10g)
+            fmt.maximumFractionDigits = 10;
         } else {
-            // Remove trailing zeros (e.g., "5.00" -> "5")
-            NSString *s = [NSString stringWithFormat:@"%.10g", val.v.doubleValue];
-            return s;
+            // FIXED Mode (Behavior like %.Nf)
+            fmt.maximumFractionDigits = places;
         }
+        fmt.minimumFractionDigits = 0; // Don't force trailing zeros
+
+        return [fmt stringFromNumber:@(val.v.doubleValue)];
     }
 
     // 3. Handle Integers (Programmer Mode)

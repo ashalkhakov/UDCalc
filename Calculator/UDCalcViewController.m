@@ -47,6 +47,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     self.calc.inputBase = settings.inputBase;
     self.calc.isBinaryViewShown = settings.showBinaryView;
     self.calc.showThousandsSeparators = settings.showThousandsSeparators;
+    self.calc.decimalPlaces = settings.decimalPlaces;
 
     // Update Segment Control UI to match loaded state
     if (settings.encodingMode == UDCalcEncodingModeNone) {
@@ -81,6 +82,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     settings.inputBase = self.calc.inputBase;
     settings.showBinaryView = self.calc.isBinaryViewShown;
     settings.showThousandsSeparators = self.calc.showThousandsSeparators;
+    settings.decimalPlaces = self.calc.decimalPlaces;
     
     [settings forceSync];
 }
@@ -236,6 +238,12 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
 - (IBAction)showThousandsSeparators:(NSMenuItem *)sender {
     self.calc.showThousandsSeparators = !self.calc.showThousandsSeparators;
+    [self updateUI];
+}
+
+- (IBAction)changeDecimalPlaces:(NSMenuItem *)sender {
+    self.calc.decimalPlaces = sender.tag;
+        
     [self updateUI];
 }
 
@@ -653,6 +661,12 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
         if (action == @selector(showThousandsSeparators:)) {
             menuItem.state = self.calc.showThousandsSeparators ? NSControlStateValueOn : NSControlStateValueOff;
             
+            return YES;
+        }
+
+        if ([item action] == @selector(changeDecimalPlaces:)) {
+            NSInteger current = self.calc.decimalPlaces;
+            [(NSMenuItem *)item setState:(item.tag == current ? NSControlStateValueOn : NSControlStateValueOff)];
             return YES;
         }
     }

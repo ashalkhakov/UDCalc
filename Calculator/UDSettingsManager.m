@@ -15,6 +15,7 @@ static NSString * const kUDKeyIsRadians                 = @"UDIsRadians";
 static NSString * const kUDKeyInputBase                 = @"UDInputBase";
 static NSString * const kUDKeyShowBinaryView            = @"UDShowBinaryView";
 static NSString * const kUDKeyShowThousandsSeparators   = @"UDShowThousandsSeparators";
+static NSString * const kUDKeyDecimalPlaces             = @"UDDecimalPlaces";
 
 @implementation UDSettingsManager
 
@@ -39,7 +40,8 @@ static NSString * const kUDKeyShowThousandsSeparators   = @"UDShowThousandsSepar
         kUDKeyIsRadians: @(NO),     // Default to Degrees
         kUDKeyInputBase: @(UDBaseDec),
         kUDKeyShowBinaryView: @(YES),
-        kUDKeyShowThousandsSeparators: @(NO)
+        kUDKeyShowThousandsSeparators: @(NO),
+        kUDKeyDecimalPlaces: @(15)
     }];
 }
 
@@ -121,6 +123,18 @@ static NSString * const kUDKeyShowThousandsSeparators   = @"UDShowThousandsSepar
 
 - (void)setShowThousandsSeparators:(BOOL)showThousandsSeparators {
     [[NSUserDefaults standardUserDefaults] setBool:showThousandsSeparators forKey:kUDKeyShowThousandsSeparators];
+}
+
+// --- Decimal Places ---
+- (NSInteger)decimalPlaces {
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:kUDKeyDecimalPlaces] == nil) {
+        return 15;
+    }
+    return [[NSUserDefaults standardUserDefaults] integerForKey:kUDKeyDecimalPlaces];
+}
+
+- (void)setDecimalPlaces:(NSInteger)places {
+    [[NSUserDefaults standardUserDefaults] setInteger:places forKey:kUDKeyDecimalPlaces];
 }
 
 @end

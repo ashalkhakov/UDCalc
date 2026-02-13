@@ -23,5 +23,6 @@
 @property (nonatomic, assign) UDBase inputBase;
 @property (nonatomic, assign) BOOL showBinaryView;
 @property (nonatomic, assign) BOOL showThousandsSeparators;
+@property (nonatomic, assign) NSInteger decimalPlaces;
 
 @end

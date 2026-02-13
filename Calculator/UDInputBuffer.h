@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (UDValue)finalizeValue;
 
 // Returns the string representation for the Calculator Display
-- (NSString *)stringForValue:(UDValue)value showThousandsSeparators:(BOOL)showThousandsSeparators;
+- (NSString *)stringForValue:(UDValue)value showThousandsSeparators:(BOOL)showThousandsSeparators decimalPlaces:(NSInteger)places;
 
 @end
 

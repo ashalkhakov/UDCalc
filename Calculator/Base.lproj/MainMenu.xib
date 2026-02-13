@@ -192,6 +192,109 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="ZuE-Dk-mfB"/>
+                            <menuItem title="Decimal Places" id="jSd-bu-SPf">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Decimal Places" id="KDx-K4-Cyf">
+                                    <items>
+                                        <menuItem title="0" id="u7g-fR-0mp">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="Jmc-RJ-qJB"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="1" tag="1" id="582-dg-pLx">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="GXo-EZ-PEV"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="2" tag="2" id="TOQ-5T-0AA">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="z56-CZ-Uiy"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="3" tag="3" id="fJn-fg-Pv8">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="nvw-PK-ISl"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="4" tag="4" id="xfx-DO-iMf">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="Ng7-cd-GOi"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="5" tag="5" id="Bb1-n9-xFf">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="eFM-zP-eWn"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="6" tag="6" id="XIx-4w-Wa8">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="q6O-ma-oUE"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="7" tag="7" id="nku-hD-Dxe">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="yY1-sb-1ON"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="8" tag="8" id="sZF-hC-FzH">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="gSP-Vb-Rtf"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="9" tag="9" id="YLB-U2-N3c">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="w6o-du-DOm"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="10" tag="10" id="7Sa-9h-T61">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="VqL-za-ULV"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="11" tag="11" id="dVi-4w-GdO">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="bE1-xQ-cLL"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="12" tag="12" id="WDK-1x-vtY">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="ffQ-hD-UfS"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="13" tag="13" id="RFh-0K-QSX">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="hlj-Bm-OpL"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="14" tag="14" id="4jH-6m-9zu">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="6Ds-Eu-VAS"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="15" tag="15" id="pMJ-cq-DHB">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDecimalPlaces:" target="-1" id="gfC-H7-GBz"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
                             <menuItem title="Enter Full Screen" keyEquivalent="f" id="4J7-dP-txa">
                                 <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                 <connections>
