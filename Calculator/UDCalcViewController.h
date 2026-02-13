@@ -19,7 +19,7 @@ extern NSString * const UDCalcDidFinishCalculationNotification;
 extern NSString * const UDCalcFormulaKey; // UDASTNode*
 extern NSString * const UDCalcResultKey;  // double
 
-@interface UDCalcViewController : NSViewController <NSTableViewDataSource, NSTableViewDelegate, UDCalcDelegate, UDBitDisplayDelegate>
+@interface UDCalcViewController : NSViewController <NSTableViewDataSource, NSTableViewDelegate, NSUserInterfaceValidations, UDCalcDelegate, UDBitDisplayDelegate>
 
 @property (nonatomic, weak) IBOutlet NSTextField *displayField;
 

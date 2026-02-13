@@ -46,6 +46,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     self.calc.isRPNMode = settings.isRPN;
     self.calc.inputBase = settings.inputBase;
     self.calc.isBinaryViewShown = settings.showBinaryView;
+    self.calc.showThousandsSeparators = settings.showThousandsSeparators;
 
     // Update Segment Control UI to match loaded state
     if (settings.encodingMode == UDCalcEncodingModeNone) {
@@ -79,6 +80,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     settings.isRPN = self.calc.isRPNMode;
     settings.inputBase = self.calc.inputBase;
     settings.showBinaryView = self.calc.isBinaryViewShown;
+    settings.showThousandsSeparators = self.calc.showThousandsSeparators;
     
     [settings forceSync];
 }
@@ -230,6 +232,11 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
     self.calc.mode = mode;
     [self updateScientificButtons];
+}
+
+- (IBAction)showThousandsSeparators:(NSMenuItem *)sender {
+    self.calc.showThousandsSeparators = !self.calc.showThousandsSeparators;
+    [self updateUI];
 }
 
 - (IBAction)digitPressed:(NSButton *)sender {
@@ -618,11 +625,38 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
 #pragma mark - Copy & Paste
 
-- (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
-    if (menuItem.action == @selector(paste:)) {
-        // Only enable Paste if the clipboard has a string
-        return [[NSPasteboard generalPasteboard] canReadItemWithDataConformingToTypes:@[NSPasteboardTypeString]];
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)item {
+    if ([(NSObject *)item isKindOfClass:[NSMenuItem class]]) {
+        NSMenuItem *menuItem = (NSMenuItem *)item;
+        SEL action = item.action;
+        
+        if (action == @selector(paste:)) {
+            // Only enable Paste if the clipboard has a string
+            return [[NSPasteboard generalPasteboard] canReadItemWithDataConformingToTypes:@[NSPasteboardTypeString]];
+        }
+        
+        if (action == @selector(changeMode:)) {
+            
+            UDCalcMode targetMode = (UDCalcMode)menuItem.tag;
+            
+            menuItem.state = self.calc.mode == targetMode ? NSControlStateValueOn : NSControlStateValueOff;
+            
+            return YES; // The item is enabled
+        }
+        
+        if (action == @selector(changeRPNMode:)) {
+            menuItem.state = self.calc.isRPNMode ? NSControlStateValueOn : NSControlStateValueOff;
+            
+            return YES;
+        }
+        
+        if (action == @selector(showThousandsSeparators:)) {
+            menuItem.state = self.calc.showThousandsSeparators ? NSControlStateValueOn : NSControlStateValueOff;
+            
+            return YES;
+        }
     }
+
     return YES;
 }
 

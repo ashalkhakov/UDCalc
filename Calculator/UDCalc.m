@@ -615,7 +615,7 @@
 }
 
 - (NSString *)stringForValue:(UDValue)value {
-    return [self.inputBuffer stringForValue:value];
+    return [self.inputBuffer stringForValue:value showThousandsSeparators:self.showThousandsSeparators];
 }
 
 - (NSString *)currentValueEncoded {

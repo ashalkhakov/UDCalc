@@ -35,6 +35,7 @@ typedef NS_ENUM(NSInteger, UDCalcEncodingMode) {
 @property (nonatomic, assign) UDCalcMode mode;
 @property (nonatomic, assign) UDBase inputBase;
 @property (nonatomic, assign) UDCalcEncodingMode encodingMode;
+@property (nonatomic, assign) BOOL showThousandsSeparators;
 @property (nonatomic, weak) id<UDCalcDelegate> delegate;
 @property (nonatomic, strong) UDInputBuffer *inputBuffer;
 @property (nonatomic, assign) BOOL isRadians;

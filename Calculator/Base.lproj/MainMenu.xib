@@ -179,18 +179,19 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>
+                            <menuItem title="Show Thousands Separators" id="1yT-NC-9mW">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showThousandsSeparators:" target="-1" id="fTn-y1-8dS"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="7Zr-Xp-Z78"/>
                             <menuItem title="RPN Mode" tag="2" keyEquivalent="r" id="l56-dn-s0o">
                                 <connections>
                                     <action selector="changeRPNMode:" target="-1" id="ER9-27-j5m"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="ZuE-Dk-mfB"/>
-                            <menuItem title="Show Sidebar" keyEquivalent="s" id="kIP-vf-haE">
-                                <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
-                                <connections>
-                                    <action selector="toggleSidebar:" target="-1" id="iwa-gc-5KM"/>
-                                </connections>
-                            </menuItem>
                             <menuItem title="Enter Full Screen" keyEquivalent="f" id="4J7-dP-txa">
                                 <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                 <connections>

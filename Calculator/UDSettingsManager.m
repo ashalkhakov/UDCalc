@@ -8,12 +8,13 @@
 #import "UDSettingsManager.h"
 
 // Constants for NSUserDefaults Keys
-static NSString * const kUDKeyCalcMode          = @"UDCalcMode";
-static NSString * const kUDKeyRPNMode           = @"UDRPNMode";
-static NSString * const kUDKeyEncodingMode      = @"UDEncodingMode";
-static NSString * const kUDKeyIsRadians         = @"UDIsRadians";
-static NSString * const kUDKeyInputBase         = @"UDInputBase";
-static NSString * const kUDKeyShowBinaryView    = @"UDShowBinaryView";
+static NSString * const kUDKeyCalcMode                  = @"UDCalcMode";
+static NSString * const kUDKeyRPNMode                   = @"UDRPNMode";
+static NSString * const kUDKeyEncodingMode              = @"UDEncodingMode";
+static NSString * const kUDKeyIsRadians                 = @"UDIsRadians";
+static NSString * const kUDKeyInputBase                 = @"UDInputBase";
+static NSString * const kUDKeyShowBinaryView            = @"UDShowBinaryView";
+static NSString * const kUDKeyShowThousandsSeparators   = @"UDShowThousandsSeparators";
 
 @implementation UDSettingsManager
 
@@ -37,7 +38,8 @@ static NSString * const kUDKeyShowBinaryView    = @"UDShowBinaryView";
         kUDKeyEncodingMode: @(UDCalcEncodingModeNone), // Default to None
         kUDKeyIsRadians: @(NO),     // Default to Degrees
         kUDKeyInputBase: @(UDBaseDec),
-        kUDKeyShowBinaryView: @(YES)
+        kUDKeyShowBinaryView: @(YES),
+        kUDKeyShowThousandsSeparators: @(NO)
     }];
 }
 
@@ -110,6 +112,15 @@ static NSString * const kUDKeyShowBinaryView    = @"UDShowBinaryView";
 
 - (void)setShowBinaryView:(BOOL)showBinaryView {
     [[NSUserDefaults standardUserDefaults] setBool:showBinaryView forKey:kUDKeyShowBinaryView];
+}
+
+// --- Show Thousands Separators ---
+- (BOOL)showThousandsSeparators {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kUDKeyShowThousandsSeparators];
+}
+
+- (void)setShowThousandsSeparators:(BOOL)showThousandsSeparators {
+    [[NSUserDefaults standardUserDefaults] setBool:showThousandsSeparators forKey:kUDKeyShowThousandsSeparators];
 }
 
 @end

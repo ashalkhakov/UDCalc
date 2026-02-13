@@ -45,7 +45,7 @@
 - (NSString *)prettyPrint {
     // Format nicely: Remove trailing zeros (e.g. 5.0 -> 5)
     // %.8g uses significant digits, usually cleanest for calcs
-    return [UDValueFormatter stringForValue:self.value base:UDBaseDec];
+    return [UDValueFormatter stringForValue:self.value base:UDBaseDec showThousandsSeparators:NO];
 }
 
 - (BOOL)isEqual:(id)object {

@@ -242,66 +242,10 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
     return UDValueMakeDouble(value);
 }
 
-- (NSString *)displayString {
-    if (self.isIntegerMode) {
-        long long val = self.mantissaBuffer;
-
-        return [UDValueFormatter stringForLong:val base:self.inputBase];
-    }
-
-    NSMutableString *display = [NSMutableString string];
-    
-    // 1. Mantissa Sign
-    if (self.isMantissaNegative) {
-        [display appendString:@"-"];
-    }
-    
-    // 2. Mantissa Digits
-    // Convert long long to string to manipulate it
-    NSString *rawDigits = [NSString stringWithFormat:@"%lld", self.mantissaBuffer];
-    
-    if (self.decimalShift == 0) {
-        // Integer Mode
-        [display appendString:rawDigits];
-        if (self.hasHitDecimal) {
-            [display appendString:@"."];
-        }
-    } else {
-        // Decimal Mode: We need to insert the dot manually
-        // Pad with leading zeros if shift > length (e.g. shift 3, digits 5 -> 0.005)
-        NSInteger length = rawDigits.length;
-        
-        if (self.decimalShift >= length) {
-            [display appendString:@"0."];
-            // Add padding zeros
-            for (NSInteger i = 0; i < (self.decimalShift - length); i++) {
-                [display appendString:@"0"];
-            }
-            [display appendString:rawDigits];
-        } else {
-            // Insert dot in middle (e.g. 1234, shift 2 -> 12.34)
-            NSInteger splitIndex = length - self.decimalShift;
-            NSString *integerPart = [rawDigits substringToIndex:splitIndex];
-            NSString *fractionPart = [rawDigits substringFromIndex:splitIndex];
-            [display appendFormat:@"%@.%@", integerPart, fractionPart];
-        }
-    }
-    
-    // 3. Exponent
-    if (self.inExponentMode) {
-        [display appendString:@"E"];
-        if (self.isExponentNegative) {
-            [display appendString:@"-"];
-        }
-        // Always show exponent digit, even if 0, for clarity
-        [display appendFormat:@"%lld", self.exponentBuffer];
-    }
-    
-    return display;
-}
-
-- (NSString *)stringForValue:(UDValue)value {
-    return _isIntegerMode ? [UDValueFormatter stringForValue:value base:self.inputBase] : [UDValueFormatter stringForValue:value base:UDBaseDec];
+- (NSString *)stringForValue:(UDValue)value showThousandsSeparators:(BOOL)showThousandsSeparators {
+    return _isIntegerMode
+        ? [UDValueFormatter stringForValue:value base:self.inputBase showThousandsSeparators:showThousandsSeparators]
+        : [UDValueFormatter stringForValue:value base:UDBaseDec showThousandsSeparators:showThousandsSeparators];
 }
 
 @end
