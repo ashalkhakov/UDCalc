@@ -7,7 +7,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface UDTapeWindowController : NSWindowController
+@interface UDTapeWindowController : NSWindowController <NSWindowDelegate>
 
 // Public method to append a line to the text view
 - (void)appendLog:(NSString *)logLine;

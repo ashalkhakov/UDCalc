@@ -7,11 +7,14 @@
 
 #import "UDTapeWindowController.h"
 #import "UDCalcViewController.h"
+#import "UDSettingsManager.h"
 
 @interface UDTapeWindowController ()
 
 // Connect this outlet to the NSTextView in Interface Builder
 @property (unsafe_unretained) IBOutlet NSTextView *textView;
+
+@property (nonatomic, assign) BOOL isAppTerminating;
 
 @end
 
@@ -19,9 +22,33 @@
 
 - (void)windowDidLoad {
     [super windowDidLoad];
+    
+    self.window.delegate = self;
+    self.window.styleMask |= NSWindowStyleMaskNonactivatingPanel;
+    
+    ((NSPanel *)self.window).becomesKeyOnlyIfNeeded = YES;
 
     // Set a nice monospaced font so numbers align perfectly
     //[self.textView setFont:[NSFont monospacedDigitSystemFontOfSize:14.0 weight:NSFontWeightRegular]];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(appWillTerminate:)
+                                                 name:NSApplicationWillTerminateNotification
+                                               object:nil];
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)appWillTerminate:(NSNotification *)notification {
+    self.isAppTerminating = YES;
+}
+
+- (void)windowWillClose:(NSNotification *)notification {
+    if (!self.isAppTerminating) {
+        [UDSettingsManager sharedManager].showTapeWindow = NO;
+    }
 }
 
 - (void)appendLog:(NSString *)logLine {

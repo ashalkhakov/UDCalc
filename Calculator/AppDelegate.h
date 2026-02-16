@@ -13,7 +13,7 @@
 #import "UDTape.h"
 #import "UDTapeWindowController.h"
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate, NSUserInterfaceValidations>
 
 @property (nonatomic, strong) UDUnitConverter *unitConverter;
 @property (nonatomic, strong) UDConversionHistoryManager *historyManager;

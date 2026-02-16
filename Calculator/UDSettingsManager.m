@@ -13,6 +13,7 @@ static NSString * const kUDKeyRPNMode                   = @"UDRPNMode";
 static NSString * const kUDKeyEncodingMode              = @"UDEncodingMode";
 static NSString * const kUDKeyIsRadians                 = @"UDIsRadians";
 static NSString * const kUDKeyInputBase                 = @"UDInputBase";
+static NSString * const kUDKeyShowTapeWindow            = @"UDShowTapeWindow";
 static NSString * const kUDKeyShowBinaryView            = @"UDShowBinaryView";
 static NSString * const kUDKeyShowThousandsSeparators   = @"UDShowThousandsSeparators";
 static NSString * const kUDKeyDecimalPlaces             = @"UDDecimalPlaces";
@@ -39,6 +40,7 @@ static NSString * const kUDKeyDecimalPlaces             = @"UDDecimalPlaces";
         kUDKeyEncodingMode: @(UDCalcEncodingModeNone), // Default to None
         kUDKeyIsRadians: @(NO),     // Default to Degrees
         kUDKeyInputBase: @(UDBaseDec),
+        kUDKeyShowTapeWindow: @(NO),
         kUDKeyShowBinaryView: @(YES),
         kUDKeyShowThousandsSeparators: @(NO),
         kUDKeyDecimalPlaces: @(15)
@@ -105,6 +107,15 @@ static NSString * const kUDKeyDecimalPlaces             = @"UDDecimalPlaces";
 
 - (void)setInputBase:(UDBase)inputBase {
     [[NSUserDefaults standardUserDefaults] setInteger:inputBase forKey:kUDKeyInputBase];
+}
+
+// --- Show Tape Window ---
+- (BOOL)showTapeWindow {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kUDKeyShowTapeWindow];
+}
+
+- (void)setShowTapeWindow:(BOOL)showTapeWindow {
+    [[NSUserDefaults standardUserDefaults] setBool:showTapeWindow forKey:kUDKeyShowTapeWindow];
 }
 
 // --- Show Binary View ---

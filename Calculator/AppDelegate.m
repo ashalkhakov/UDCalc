@@ -62,6 +62,11 @@
     [self.window makeFirstResponder:self.calcViewController];
 
     [self updateRecentMenu];
+
+    // open the tape window
+    if ([UDSettingsManager sharedManager].showTapeWindow) {
+        [self showTape:nil];
+    }
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
@@ -109,7 +114,16 @@
         self.tapeWindowController = [[UDTapeWindowController alloc] initWithWindowNibName:@"UDTapeWindow"];
         self.tape.windowController = self.tapeWindowController;
     }
-    [self.tapeWindowController showWindow:self];
+    
+    BOOL isVisible = self.tapeWindowController.window.isVisible;
+    
+    if (isVisible) {
+        [self.tapeWindowController close];
+    } else {
+        [self.tapeWindowController showWindow:self];
+        
+        [UDSettingsManager sharedManager].showTapeWindow = YES;
+    }
 }
 
 -(void)createConverterWindow {
@@ -203,6 +217,16 @@
 - (void)clearHistory {
     [self.historyManager clearHistory];
     [self updateRecentMenu];
+}
+
+- (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
+    if ([item action] == @selector(showTape:) && [(NSObject *)item isKindOfClass:[NSMenuItem class]]) {
+        BOOL isVisible = self.tapeWindowController.window.isVisible;
+        [(NSMenuItem *)item setTitle: isVisible? @"Hide Paper Tape" : @"Show Paper Tape"];
+        return YES;
+    }
+
+    return YES;
 }
 
 @end
