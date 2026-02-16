@@ -271,10 +271,7 @@
     // % (Percent) - Context sensitive, keeping logic similar but high precedence
     self.table[@(UDOpPercent)] = [UDOpInfo infoWithSymbol:@"%" tag:UDOpPercent placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *current = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        if (ctx.pendingOp == UDOpAdd || ctx.pendingOp == UDOpSub) {
-            return [UDPostfixOpNode symbol:UDConstPercent child:current];
-        }
-        return [UDBinaryOpNode op:UDConstDiv left:current right:[UDNumberNode value:UDValueMakeDouble(100)] precedence:60];
+        return [UDPostfixOpNode symbol:UDConstPercent child:current];
     }];
 
     // Standard Math Functions (Precedence 60)

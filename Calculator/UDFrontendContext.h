@@ -114,7 +114,6 @@ typedef NS_ENUM(NSInteger, UDOp) {
 @interface UDFrontendContext : NSObject
 // The current piles of blocks
 @property (nonatomic, strong) NSMutableArray<UDASTNode *> *nodeStack;
-@property (nonatomic, assign) UDOp pendingOp;
 
 // The Machine Settings (Snapshots)
 @property (nonatomic, assign) BOOL isRadians;

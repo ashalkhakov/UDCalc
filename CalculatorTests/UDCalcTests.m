@@ -781,6 +781,49 @@
     XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator evaluateCurrentExpression]), 6.0, 0.0001);
 }
 
+- (void)testPercentOfValue {
+    // 5% = 0.05
+    [self.calculator inputDigit:5];
+    [self.calculator performOperation:UDOpPercent];
+    [self.calculator performOperation:UDOpEq];
+
+    // --- Structural Verification ---
+    // Expected: 5%
+    UDASTNode *expectedTree = [UDPostfixOpNode symbol:@"%"
+                                                child:[UDNumberNode value:UDValueMakeDouble(5.0)]];
+    
+    XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
+    XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch");
+    
+    // --- Value Verification ---
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator evaluateCurrentExpression]), 0.05, 0.0001);
+}
+
+- (void)testPercentAddToValue {
+    // 100 * 5% = 5
+    [self.calculator inputDigit:1];
+    [self.calculator inputDigit:0];
+    [self.calculator inputDigit:0];
+    [self.calculator performOperation:UDOpMul];
+    [self.calculator inputDigit:5];
+    [self.calculator performOperation:UDOpPercent];
+    [self.calculator performOperation:UDOpEq];
+
+    // --- Structural Verification ---
+    // Expected: (* 100 (% 5))
+    UDASTNode *expectedTree = [UDBinaryOpNode op:@"*"
+                                            left:[UDNumberNode value:UDValueMakeDouble(100.0)]
+                                           right:[UDPostfixOpNode symbol:@"%"
+                                                                   child:[UDNumberNode value:UDValueMakeDouble(5.0)]]
+                                      precedence:UDASTPrecedenceMul];
+    
+    XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
+    XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch");
+    
+    // --- Value Verification ---
+    XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator evaluateCurrentExpression]), 5.0, 0.0001);
+}
+
 #pragma mark - Test Reset vs Continue
 
 - (void)testResultChaining {

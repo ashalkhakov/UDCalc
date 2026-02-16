@@ -561,7 +561,6 @@
     
     UDFrontendContext *context = [[UDFrontendContext alloc] init];
     context.nodeStack = self.nodeStack;
-    context.pendingOp = UDOpNone;
     context.isRadians = self.isRadians;
     context.memoryValue = self.memoryRegister;
     

@@ -39,8 +39,12 @@
         UDPostfixOpNode *pn = (UDPostfixOpNode *)node;
         [self visitNode:pn.child into:prog withIntegerMode:integerMode];
         
-        if ([pn.symbol isEqualToString:@"%"]) NSLog(@"Not implemented yet: percentage");
-        else if ([pn.symbol isEqualToString:@"!"]) [prog addObject:[UDInstruction op:UDOpcodeFact]];
+        if ([pn.symbol isEqualToString:@"%"]) {
+            [prog addObject:[UDInstruction push:UDValueMakeDouble(100.0)]];
+            [prog addObject:[UDInstruction op:UDOpcodeDiv]];
+        } else if ([pn.symbol isEqualToString:@"!"]) {
+            [prog addObject:[UDInstruction op:UDOpcodeFact]];
+        }
         else NSLog(@"Unhandled postfix op: %@", pn.symbol);
     }
     
