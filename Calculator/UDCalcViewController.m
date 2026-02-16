@@ -86,7 +86,9 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     self.bitWrapperHeightConstraint.constant = settings.showBinaryView ? self.standardBitWrapperHeight : 0;
 
     [self setCalculatorMode:settings.calcMode animate:NO];
-    [self setIsBinaryViewShown:settings.showBinaryView];
+    if (self.calc.mode == UDCalcModeProgrammer) {
+        [self setIsBinaryViewShown:settings.showBinaryView];
+    }
 
     [self updateUIForRPNMode:self.calc.isRPNMode];
 }
@@ -234,6 +236,8 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
         self.bitDisplayView.hidden = NO;    // Ensure inner view is visible
     } else {
         self.programmerInputView.hidden = YES;
+        self.bitDisplayWrapperView.hidden = YES;
+        self.bitDisplayView.hidden = YES;
     }
     if (isScientific) {
         self.scientificView.hidden = NO;
