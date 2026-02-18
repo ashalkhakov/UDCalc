@@ -1,17 +1,16 @@
 //
-//  UDOpRegistry.m
+//  UDFrontend.m
 //  Calculator
 //
 //  Created by Artyom Shalkhakov on 18.01.2026.
 //
 
 #import "UDFrontend.h"
-#import "UDCalc.h" // Needs your UDOp Enum definition
+#import "UDCalc.h"
 #import "UDAST.h"
 #import "UDConstants.h"
 
 @implementation UDOpInfo
-
 + (instancetype)infoWithSymbol:(NSString *)sym tag:(NSInteger)tag placement:(UDOpPlacement)place assoc:(UDOpAssociativity)assoc precedence:(NSInteger)precedence action:(UDFrontendAction)action {
     UDOpInfo *i = [[UDOpInfo alloc] init];
     i->_symbol = sym;
@@ -23,12 +22,9 @@
     return i;
 }
 
-+ (instancetype) infoWithSymbol:(NSString *)sym
-                            tag:(NSInteger)tag
-                         action:(UDFrontendAction)action {
++ (instancetype)infoWithSymbol:(NSString *)sym tag:(NSInteger)tag action:(UDFrontendAction)action {
     return [UDOpInfo infoWithSymbol:sym tag:tag placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:0 action:action];
 }
-
 @end
 
 @interface UDFrontend ()
@@ -54,21 +50,16 @@
 
 - (void)buildTable {
     self.table = [[NSMutableDictionary alloc] init];
+    
+    // We need a weak reference to self to use inside the blocks
+    // because self -> table -> block -> self would cause a memory leak.
+    __weak typeof(self) weakSelf = self;
 
     // ============================================================
-    // PRECEDENCE TABLE (Scaled for Programmer Mode)
-    // ============================================================
-    // 60: Functions, Exponents, Standard Unary (-, !)
-    // 50: Programmer Unary (Byte/Word Flip)
-    // 40: Multiplicative (*, /)
-    // 30: Additive (+, -)
-    // 20: Shifts (<<, >>, ROL, ROR)
-    // 15: Bitwise AND (&)
-    // 10: Bitwise XOR (^)
-    //  5: Bitwise OR (|), NOR
+    // PRECEDENCE TABLE
     // ============================================================
 
-    // --- PARENTHESES & MEMORY (Precedence 0 / Special) ---
+    // --- PARENTHESES & MEMORY ---
     self.table[@(UDOpParenLeft)] = [UDOpInfo infoWithSymbol:@"(" tag:UDOpParenLeft placement:UDOpPlacementPrefix assoc:UDOpAssocNone precedence:0 action:nil];
     self.table[@(UDOpParenRight)] = [UDOpInfo infoWithSymbol:@")" tag:UDOpParenRight placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:0 action:nil];
     
@@ -80,227 +71,185 @@
     // TIER 1: LOGIC & BITWISE (Low Precedence)
     // ============================================================
     
-    // OR (|) - Precedence 5
-    self.table[@(UDOpBitwiseOr)] = [UDOpInfo infoWithSymbol:@"|" tag:UDOpBitwiseOr placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:5 action:[self binaryOp:UDConstBitOr prec:5]];
+    // OR (|)
+    self.table[@(UDOpBitwiseOr)] = [UDOpInfo infoWithSymbol:UDConstBitOr tag:UDOpBitwiseOr placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:5 action:[self binaryOp:UDOpBitwiseOr]];
 
-    // NOR - Precedence 5
-    // Implemented as NOT( A OR B )
+    // NOR (Implemented as ~ (A | B))
     self.table[@(UDOpBitwiseNor)] = [UDOpInfo infoWithSymbol:@"NOR" tag:UDOpBitwiseNor placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:5 action:^UDASTNode *(UDFrontendContext *ctx) {
+        // Pop args
         UDASTNode *right = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         UDASTNode *left = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         
-        UDASTNode *orNode = [UDBinaryOpNode op:UDConstBitOr left:left right:right precedence:5];
-        return [UDUnaryOpNode op:UDConstBitNeg child:orNode];
+        // Lookup Info
+        UDOpInfo *orInfo = [weakSelf infoForOp:UDOpBitwiseOr];
+        UDOpInfo *notInfo = [weakSelf infoForOp:UDOpComp1]; // Using 1's comp (~) as NOT
+        
+        // Build AST: NOT( OR(a, b) )
+        UDASTNode *orNode = [UDBinaryOpNode info:orInfo left:left right:right];
+        return [UDUnaryOpNode info:notInfo child:orNode];
     }];
 
-    // XOR (^) - Precedence 10
-    self.table[@(UDOpBitwiseXor)] = [UDOpInfo infoWithSymbol:@"XOR" tag:UDOpBitwiseXor placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:10 action:[self binaryOp:UDConstBitXor prec:10]];
+    // XOR (^)
+    self.table[@(UDOpBitwiseXor)] = [UDOpInfo infoWithSymbol:UDConstBitXor tag:UDOpBitwiseXor placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:10 action:[self binaryOp:UDOpBitwiseXor]];
 
-    // AND (&) - Precedence 15
-    self.table[@(UDOpBitwiseAnd)] = [UDOpInfo infoWithSymbol:@"AND" tag:UDOpBitwiseAnd placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:15 action:[self binaryOp:UDConstBitAnd prec:15]];
+    // AND (&)
+    self.table[@(UDOpBitwiseAnd)] = [UDOpInfo infoWithSymbol:UDConstBitAnd tag:UDOpBitwiseAnd placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:15 action:[self binaryOp:UDOpBitwiseAnd]];
 
     // ============================================================
     // TIER 2: SHIFTS (Precedence 20)
     // ============================================================
 
     // << (Left Shift)
-    self.table[@(UDOpShiftLeft)] = [UDOpInfo infoWithSymbol:@"<<" tag:UDOpShiftLeft placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:20 action:[self binaryOp:@"<<" prec:20]];
+    self.table[@(UDOpShiftLeft)] = [UDOpInfo infoWithSymbol:@"<<" tag:UDOpShiftLeft placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:20 action:[self binaryOp:UDOpShiftLeft]];
 
     // >> (Right Shift)
-    self.table[@(UDOpShiftRight)] = [UDOpInfo infoWithSymbol:@">>" tag:UDOpShiftRight placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:20 action:[self binaryOp:@">>" prec:20]];
+    self.table[@(UDOpShiftRight)] = [UDOpInfo infoWithSymbol:@">>" tag:UDOpShiftRight placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:20 action:[self binaryOp:UDOpShiftRight]];
 
     // ============================================================
     // TIER 3: STANDARD ARITHMETIC (Precedence 30 - 40)
     // ============================================================
 
-    // + (Add) - Precedence 30
-    self.table[@(UDOpAdd)] = [UDOpInfo infoWithSymbol:@"+" tag:UDOpAdd placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:30 action:[self binaryOp:UDConstAdd prec:30]];
+    // + (Add)
+    self.table[@(UDOpAdd)] = [UDOpInfo infoWithSymbol:UDConstAdd tag:UDOpAdd placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:30 action:[self binaryOp:UDOpAdd]];
 
-    // - (Sub) - Precedence 30
-    self.table[@(UDOpSub)] = [UDOpInfo infoWithSymbol:@"-" tag:UDOpSub placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:30 action:[self binaryOp:UDConstSub prec:30]];
+    // - (Sub)
+    self.table[@(UDOpSub)] = [UDOpInfo infoWithSymbol:UDConstSub tag:UDOpSub placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:30 action:[self binaryOp:UDOpSub]];
 
-    // * (Multiply) - Precedence 40
-    self.table[@(UDOpMul)] = [UDOpInfo infoWithSymbol:@"×" tag:UDOpMul placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:40 action:[self binaryOp:UDConstMul prec:40]];
+    // * (Multiply)
+    self.table[@(UDOpMul)] = [UDOpInfo infoWithSymbol:UDConstMul tag:UDOpMul placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:40 action:[self binaryOp:UDOpMul]];
 
-    // / (Divide) - Precedence 40
-    self.table[@(UDOpDiv)] = [UDOpInfo infoWithSymbol:@"÷" tag:UDOpDiv placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:40 action:[self binaryOp:UDConstDiv prec:40]];
+    // / (Divide)
+    self.table[@(UDOpDiv)] = [UDOpInfo infoWithSymbol:UDConstDiv tag:UDOpDiv placement:UDOpPlacementInfix assoc:UDOpAssocLeft precedence:40 action:[self binaryOp:UDOpDiv]];
 
     // ============================================================
     // TIER 4: PROGRAMMER UNARY (Precedence 50)
     // ============================================================
 
-    // Byte Flip - Unary Prefix (Right-to-Left)
-    self.table[@(UDOpByteFlip)] = [UDOpInfo infoWithSymbol:@"ByteFlip" tag:UDOpByteFlip placement:UDOpPlacementPostfix assoc:UDOpAssocRight precedence:50 action:^UDASTNode *(UDFrontendContext *ctx) {
+    // Byte Flip
+    self.table[@(UDOpByteFlip)] = [UDOpInfo infoWithSymbol:UDConstFlipB tag:UDOpByteFlip placement:UDOpPlacementPostfix assoc:UDOpAssocRight precedence:50 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *top = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        return [UDFunctionNode func:UDConstFlipB args:@[top]]; // "flip_b" handled in backend
+        return [UDFunctionNode func:UDConstFlipB args:@[top]];
     }];
 
-    // Word Flip - Unary Prefix (Right-to-Left)
-    self.table[@(UDOpWordFlip)] = [UDOpInfo infoWithSymbol:@"WordFlip" tag:UDOpWordFlip placement:UDOpPlacementPostfix assoc:UDOpAssocRight precedence:50 action:^UDASTNode *(UDFrontendContext *ctx) {
+    // Word Flip
+    self.table[@(UDOpWordFlip)] = [UDOpInfo infoWithSymbol:UDConstFlipW tag:UDOpWordFlip placement:UDOpPlacementPostfix assoc:UDOpAssocRight precedence:50 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *top = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        return [UDFunctionNode func:UDConstFlipW args:@[top]]; // "flip_w" handled in backend
+        return [UDFunctionNode func:UDConstFlipW args:@[top]];
     }];
 
-    // 1's Complement (Bitwise NOT) -> ~x
-    // Symbol: "~" or "NOT"
-    self.table[@(UDOpComp1)] = [UDOpInfo infoWithSymbol:@"~"
-                                                    tag:UDOpComp1
-                                              placement:UDOpPlacementPostfix
-                                                  assoc:UDOpAssocRight
-                                             precedence:50
-                                                 action:^UDASTNode *(UDFrontendContext *ctx) {
-        UDASTNode *val = [ctx.nodeStack lastObject];
-        [ctx.nodeStack removeLastObject];
-        
-        // Return Unary Op Node: (~ val)
-        return [UDUnaryOpNode op:UDConstBitNeg child:val];
+    // 1's Complement (~)
+    self.table[@(UDOpComp1)] = [UDOpInfo infoWithSymbol:UDConstBitNeg tag:UDOpComp1 placement:UDOpPlacementPostfix assoc:UDOpAssocRight precedence:50 action:^UDASTNode *(UDFrontendContext *ctx) {
+        UDASTNode *val = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
+        UDOpInfo *info = [weakSelf infoForOp:UDOpComp1];
+
+        return [UDUnaryOpNode info:info child:val];
     }];
 
-    // 2's Complement (Negation) -> -x
-    // Symbol: "2's" or "NEG"
-    // Note: We already have a generic negation operator ('-'), but programmer mode
-    // often treats this distinctly as "2's Comp".
-    // We can reuse the existing negation logic or make a specific node.
-    self.table[@(UDOpComp2)] = [UDOpInfo infoWithSymbol:@"NEG"
-                                                    tag:UDOpComp2
-                                              placement:UDOpPlacementPostfix
-                                                  assoc:UDOpAssocRight
-                                             precedence:50
-                                                 action:^UDASTNode *(UDFrontendContext *ctx) {
-        UDASTNode *val = [ctx.nodeStack lastObject];
-        [ctx.nodeStack removeLastObject];
-        
-        // 2's Complement is just Arithmetic Negation in binary representation
-        return [UDUnaryOpNode op:UDConstNeg child:val];
+    // 2's Complement (NEG)
+    self.table[@(UDOpComp2)] = [UDOpInfo infoWithSymbol:UDConstNeg tag:UDOpComp2 placement:UDOpPlacementPostfix assoc:UDOpAssocRight precedence:50 action:^UDASTNode *(UDFrontendContext *ctx) {
+        UDASTNode *val = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
+        // This is semantically equivalent to standard Negation
+        UDOpInfo *negInfo = [weakSelf infoForOp:UDOpNegate];
+
+        return [UDUnaryOpNode info:negInfo child:val];
     }];
 
     // ============================================================
-    // ROTATE SHORTCUTS: Unary (ROL, ROR) -> Binary (x rot 1)
+    // ROTATE SHORTCUTS
     // ============================================================
 
-    // Rotate Left by 1 (ROL)
-    // Usage: 5 ROL -> 10 (in 8-bit mode: 00000101 -> 00001010)
-    self.table[@(UDOpRotateLeft)] = [UDOpInfo infoWithSymbol:@"ROL"
-                                                         tag:UDOpRotateLeft
-                                                   placement:UDOpPlacementPostfix
-                                                       assoc:UDOpAssocNone
-                                                  precedence:60 // High Precedence matches Factorial/Square
-                                                      action:^UDASTNode *(UDFrontendContext *ctx) {
-        // 1. Pop value
-        UDASTNode *val = [ctx.nodeStack lastObject];
-        [ctx.nodeStack removeLastObject];
-        
-        // 2. Create Constant "1"
+    // Rotate Left (ROL) -> Binary (x ROL 1)
+    self.table[@(UDOpRotateLeft)] = [UDOpInfo infoWithSymbol:UDConstRotateLeft tag:UDOpRotateLeft placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
+        UDASTNode *val = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         UDASTNode *one = [UDNumberNode value:UDValueMakeDouble(1)];
         
-        // 3. Return Binary Node: (val rol 1)
-        return [UDBinaryOpNode op:UDConstRotateLeft left:val right:one precedence:20];
+        UDOpInfo *rolInfo = [weakSelf infoForOp:UDOpRotateLeft];
+        return [UDBinaryOpNode info:rolInfo left:val right:one];
     }];
 
-    // Rotate Right by 1 (ROR)
-    // Usage: 5 ROR -> (depends on word size, likely very large in 64-bit)
-    self.table[@(UDOpRotateRight)] = [UDOpInfo infoWithSymbol:@"ROR"
-                                                          tag:UDOpRotateRight
-                                                    placement:UDOpPlacementPostfix
-                                                        assoc:UDOpAssocNone
-                                                   precedence:60
-                                                       action:^UDASTNode *(UDFrontendContext *ctx) {
-        UDASTNode *val = [ctx.nodeStack lastObject];
-        [ctx.nodeStack removeLastObject];
-        
+    // Rotate Right (ROR) -> Binary (x ROR 1)
+    self.table[@(UDOpRotateRight)] = [UDOpInfo infoWithSymbol:UDConstRotateRight tag:UDOpRotateRight placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
+        UDASTNode *val = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         UDASTNode *one = [UDNumberNode value:UDValueMakeDouble(1)];
         
-        // Return Binary Node: (val ror 1)
-        return [UDBinaryOpNode op:UDConstRotateRight left:val right:one precedence:20];
+        UDOpInfo *rorInfo = [weakSelf infoForOp:UDOpRotateRight];
+        return [UDBinaryOpNode info:rorInfo left:val right:one];
     }];
 
     // ============================================================
     // SHORTCUTS: Unary Shift (<< 1, >> 1)
-    // Acts like x!, but generates AST for (x << 1)
     // ============================================================
 
-    // << 1 (Shift Left by 1)
-    self.table[@(UDOpShift1Left)] = [UDOpInfo infoWithSymbol:@"<<1"
-                                                         tag:UDOpShift1Left
-                                                   placement:UDOpPlacementPostfix
-                                                       assoc:UDOpAssocNone
-                                                  precedence:60 // High Precedence (binds tight)
-                                                      action:^UDASTNode *(UDFrontendContext *ctx) {
-        // 1. Pop the value to be shifted
-        UDASTNode *val = [ctx.nodeStack lastObject];
-        [ctx.nodeStack removeLastObject];
-        
-        // 2. Create a "1" node
+    // << 1
+    self.table[@(UDOpShift1Left)] = [UDOpInfo infoWithSymbol:UDConstShiftLeft tag:UDOpShift1Left placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
+        UDASTNode *val = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         UDASTNode *one = [UDNumberNode value:UDValueMakeDouble(1)];
         
-        // 3. Return a standard Binary Node: (val << 1)
-        // We use the standard Shift Precedence (20) for the node itself,
-        // but the Parser used Precedence 60 to grab 'val'.
-        return [UDBinaryOpNode op:UDConstShiftLeft left:val right:one precedence:20];
+        UDOpInfo *shiftInfo = [weakSelf infoForOp:UDOpShiftLeft];
+        return [UDBinaryOpNode info:shiftInfo left:val right:one];
     }];
 
-    // >> 1 (Shift Right by 1)
-    self.table[@(UDOpShift1Right)] = [UDOpInfo infoWithSymbol:@">>1"
-                                                          tag:UDOpShift1Right
-                                                    placement:UDOpPlacementPostfix
-                                                        assoc:UDOpAssocNone
-                                                   precedence:60
-                                                       action:^UDASTNode *(UDFrontendContext *ctx) {
-        UDASTNode *val = [ctx.nodeStack lastObject];
-        [ctx.nodeStack removeLastObject];
-        
+    // >> 1
+    self.table[@(UDOpShift1Right)] = [UDOpInfo infoWithSymbol:UDConstShiftRight tag:UDOpShift1Right placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
+        UDASTNode *val = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         UDASTNode *one = [UDNumberNode value:UDValueMakeDouble(1)];
         
-        // Return standard Binary Node: (val >> 1)
-        return [UDBinaryOpNode op:UDConstShiftRight left:val right:one precedence:20];
+        UDOpInfo *shiftInfo = [weakSelf infoForOp:UDOpShiftRight];
+        return [UDBinaryOpNode info:shiftInfo left:val right:one];
     }];
 
     // ============================================================
     // TIER 5: HIGH MATH / FUNCTIONS (Precedence 60)
     // ============================================================
     
-    // Negate (Uniary -)
-    self.table[@(UDOpNegate)] = [UDOpInfo infoWithSymbol:@"-" tag:UDOpNegate placement:UDOpPlacementPrefix assoc:UDOpAssocRight precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
+    // Negate (Unary -)
+    self.table[@(UDOpNegate)] = [UDOpInfo infoWithSymbol:UDConstNeg tag:UDOpNegate placement:UDOpPlacementPrefix assoc:UDOpAssocRight precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *top = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
+        
+        // Fold Constants if possible
         if ([top isKindOfClass:[UDNumberNode class]]) {
             return [UDNumberNode value:UDValueMakeDouble(-1 * UDValueAsDouble([(UDNumberNode*)top value]))];
         }
-        return [UDUnaryOpNode op:UDConstNeg child:top];
+        
+        UDOpInfo *info = [weakSelf infoForOp:UDOpNegate];
+        return [UDUnaryOpNode info:info child:top];
     }];
 
-    // % (Percent) - Context sensitive, keeping logic similar but high precedence
-    self.table[@(UDOpPercent)] = [UDOpInfo infoWithSymbol:@"%" tag:UDOpPercent placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
+    // % (Percent)
+    self.table[@(UDOpPercent)] = [UDOpInfo infoWithSymbol:UDConstPercent tag:UDOpPercent placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *current = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        return [UDPostfixOpNode symbol:UDConstPercent child:current];
+        
+        UDOpInfo *info = [weakSelf infoForOp:UDOpPercent];
+        return [UDPostfixOpNode info:info child:current];
     }];
 
-    // Standard Math Functions (Precedence 60)
-    self.table[@(UDOpSquare)] = [UDOpInfo infoWithSymbol:@"²" tag:UDOpSquare placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
+    // Standard Math Functions
+    self.table[@(UDOpSquare)] = [UDOpInfo infoWithSymbol:UDConstPow tag:UDOpSquare placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *base = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         return [UDFunctionNode func:UDConstPow args:@[base, [UDNumberNode value:UDValueMakeDouble(2)]]];
     }];
-
-    self.table[@(UDOpCube)] = [UDOpInfo infoWithSymbol:@"³" tag:UDOpCube placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
+    
+    self.table[@(UDOpCube)] = [UDOpInfo infoWithSymbol:UDConstPow tag:UDOpCube placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *base = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         return [UDFunctionNode func:UDConstPow args:@[base, [UDNumberNode value:UDValueMakeDouble(3)]]];
     }];
 
-    // Power (x^y) - Right Associative
-    self.table[@(UDOpPow)] = [UDOpInfo infoWithSymbol:@"^" tag:UDOpPow placement:UDOpPlacementInfix assoc:UDOpAssocRight precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
+    // Power (^)
+    self.table[@(UDOpPow)] = [UDOpInfo infoWithSymbol:UDConstPow tag:UDOpPow placement:UDOpPlacementInfix assoc:UDOpAssocRight precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *exp = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         UDASTNode *base = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         return [UDFunctionNode func:UDConstPow args:@[base, exp]];
     }];
 
     // Roots
-    self.table[@(UDOpSqrt)] = [UDOpInfo infoWithSymbol:@"√" tag:UDOpSqrt placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
+    self.table[@(UDOpSqrt)] = [UDOpInfo infoWithSymbol:UDConstSqrt tag:UDOpSqrt placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *arg = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         return [UDFunctionNode func:UDConstSqrt args:@[arg]];
     }];
 
-    self.table[@(UDOpCbrt)] = [UDOpInfo infoWithSymbol:@"∛" tag:UDOpCbrt placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
+    self.table[@(UDOpCbrt)] = [UDOpInfo infoWithSymbol:UDConstPow tag:UDOpCbrt placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *arg = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        UDASTNode *oneThird = [UDBinaryOpNode op:UDConstDiv left:[UDNumberNode value:UDValueMakeDouble(1)] right:[UDNumberNode value:UDValueMakeDouble(3)] precedence:60];
+        UDASTNode *oneThird = [UDBinaryOpNode info:[weakSelf infoForOp:UDOpDiv] left:[UDNumberNode value:UDValueMakeDouble(1)] right:[UDNumberNode value:UDValueMakeDouble(3)]];
         return [UDFunctionNode func:UDConstPow args:@[arg, oneThird]];
     }];
 
@@ -324,25 +273,29 @@
         // 3. Create (1 / n)
         // We hardcode precedence 60 here to ensure tight binding in the AST
         UDASTNode *one = [UDNumberNode value:UDValueMakeDouble(1)];
-        UDASTNode *exponent = [UDBinaryOpNode op:UDConstDiv left:one right:n precedence:60];
+        UDASTNode *exponent = [UDBinaryOpNode info:[weakSelf infoForOp:UDOpDiv] left:one right:n];
         
         // 4. Return pow(x, 1/n)
         return [UDFunctionNode func:UDConstPow args:@[x, exponent]];
     }];
 
-    self.table[@(UDOpInvert)] = [UDOpInfo infoWithSymbol:@"1/x" tag:UDOpCbrt placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
+    // 1/x (Invert)
+    self.table[@(UDOpInvert)] = [UDOpInfo infoWithSymbol:UDConstDiv tag:UDOpInvert placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *arg = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        UDASTNode *oneX = [UDBinaryOpNode op:UDConstDiv left:[UDNumberNode value:UDValueMakeDouble(1)] right:arg precedence:60];
-        return oneX;
+
+        UDOpInfo *divInfo = [weakSelf infoForOp:UDOpDiv];
+        return [UDBinaryOpNode info:divInfo left:[UDNumberNode value:UDValueMakeDouble(1)] right:arg];
     }];
 
-    // Factorial
+    // Factorial (!)
     self.table[@(UDOpFactorial)] = [UDOpInfo infoWithSymbol:@"!" tag:UDOpFactorial placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *arg = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        return [UDPostfixOpNode symbol:@"!" child:arg];
+
+        UDOpInfo *info = [weakSelf infoForOp:UDOpFactorial];
+        return [UDPostfixOpNode info:info child:arg];
     }];
 
-    // Trig & Logs (Keeping existing logic)
+    // Trig & Logs
     self.table[@(UDOpSin)] = [UDOpInfo infoWithSymbol:@"sin" tag:UDOpSin placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstSin]];
     self.table[@(UDOpCos)] = [UDOpInfo infoWithSymbol:@"cos" tag:UDOpCos placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstCos]];
     self.table[@(UDOpTan)] = [UDOpInfo infoWithSymbol:@"tan" tag:UDOpTan placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstTan]];
@@ -350,30 +303,85 @@
                                                          tag:UDOpSinInverse
                                                    placement:UDOpPlacementPostfix
                                                        assoc:UDOpAssocNone
-                                                  precedence:60 // Highest
+                                                  precedence:60
                                                       action:[self trigOp:UDConstASin]];
+
     self.table[@(UDOpCosInverse)] = [UDOpInfo infoWithSymbol:@"cos⁻¹"
                                                          tag:UDOpCosInverse
                                                    placement:UDOpPlacementPostfix
                                                        assoc:UDOpAssocNone
-                                                  precedence:60 // Highest
+                                                  precedence:60
                                                       action:[self trigOp:UDConstACos]];
+
     self.table[@(UDOpTanInverse)] = [UDOpInfo infoWithSymbol:@"tan⁻¹"
                                                          tag:UDOpTanInverse
                                                    placement:UDOpPlacementPostfix
                                                        assoc:UDOpAssocNone
-                                                  precedence:60 // Highest
+                                                  precedence:60
                                                       action:[self trigOp:UDConstATan]];
-    self.table[@(UDOpSinh)] = [UDOpInfo infoWithSymbol:@"sinh" tag:UDOpSinh placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstSinH]];
-    self.table[@(UDOpCosh)] = [UDOpInfo infoWithSymbol:@"cosh" tag:UDOpCosh placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstCos]];
-    self.table[@(UDOpTanh)] = [UDOpInfo infoWithSymbol:@"tanh" tag:UDOpTanh placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstTanH]];
-    self.table[@(UDOpSinhInverse)] = [UDOpInfo infoWithSymbol:@"sinh⁻¹" tag:UDOpSinhInverse placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstASinH]];
-    self.table[@(UDOpCoshInverse)] = [UDOpInfo infoWithSymbol:@"cosh⁻¹" tag:UDOpCoshInverse placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstACosH]];
-    self.table[@(UDOpTanhInverse)] = [UDOpInfo infoWithSymbol:@"tanh⁻¹" tag:UDOpTanhInverse placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self trigOp:UDConstATanH]];
+    self.table[@(UDOpSinh)] = [UDOpInfo infoWithSymbol:@"sinh"
+                                                   tag:UDOpSinh
+                                             placement:UDOpPlacementPostfix
+                                                 assoc:UDOpAssocNone
+                                            precedence:60
+                                                action:[self funcOp:UDConstSinH]];
+    self.table[@(UDOpCosh)] = [UDOpInfo infoWithSymbol:@"cosh"
+                                                   tag:UDOpCosh
+                                             placement:UDOpPlacementPostfix
+                                                 assoc:UDOpAssocNone
+                                            precedence:60
+                                                action:[self funcOp:UDConstCosH]];
+    self.table[@(UDOpTanh)] = [UDOpInfo infoWithSymbol:@"tanh"
+                                                   tag:UDOpTanh
+                                             placement:UDOpPlacementPostfix
+                                                 assoc:UDOpAssocNone
+                                            precedence:60
+                                                action:[self funcOp:UDConstTanH]];
+    self.table[@(UDOpSinhInverse)] = [UDOpInfo infoWithSymbol:@"sinh⁻¹"
+                                                          tag:UDOpSinhInverse
+                                                    placement:UDOpPlacementPostfix
+                                                        assoc:UDOpAssocNone
+                                                   precedence:60
+                                                       action:[self funcOp:UDConstASinH]];
 
-    self.table[@(UDOpLn)]  = [UDOpInfo infoWithSymbol:@"ln" tag:UDOpLn placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self funcOp:UDConstLn]];
-    self.table[@(UDOpLog10)] = [UDOpInfo infoWithSymbol:@"log_10" tag:UDOpLog10 placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self funcOp:UDConstLog10]];
-    self.table[@(UDOpLog2)] = [UDOpInfo infoWithSymbol:@"log_2" tag:UDOpLog10 placement:UDOpPlacementPostfix assoc:UDOpAssocNone precedence:60 action:[self funcOp:UDConstLog2]];
+    self.table[@(UDOpCoshInverse)] = [UDOpInfo infoWithSymbol:@"cosh⁻¹"
+                                                          tag:UDOpCoshInverse
+                                                    placement:UDOpPlacementPostfix
+                                                        assoc:UDOpAssocNone
+                                                   precedence:60
+                                                       action:[self funcOp:UDConstACosH]];
+
+    self.table[@(UDOpTanhInverse)] = [UDOpInfo infoWithSymbol:@"tanh⁻¹"
+                                                          tag:UDOpTanhInverse
+                                                    placement:UDOpPlacementPostfix
+                                                        assoc:UDOpAssocNone
+                                                   precedence:60
+                                                       action:[self funcOp:UDConstATanH]];
+
+    // ============================================================
+    // LOGARITHMS
+    // ============================================================
+
+    self.table[@(UDOpLn)] = [UDOpInfo infoWithSymbol:@"ln"
+                                                 tag:UDOpLn
+                                           placement:UDOpPlacementPostfix
+                                               assoc:UDOpAssocNone
+                                          precedence:60
+                                              action:[self funcOp:UDConstLn]];
+
+    self.table[@(UDOpLog10)] = [UDOpInfo infoWithSymbol:@"log₁₀"
+                                                    tag:UDOpLog10
+                                              placement:UDOpPlacementPostfix
+                                                  assoc:UDOpAssocNone
+                                             precedence:60
+                                                 action:[self funcOp:UDConstLog10]];
+
+    self.table[@(UDOpLog2)] = [UDOpInfo infoWithSymbol:@"log₂"
+                                                   tag:UDOpLog2
+                                             placement:UDOpPlacementPostfix
+                                                 assoc:UDOpAssocNone
+                                            precedence:60
+                                                action:[self funcOp:UDConstLog2]];
 
     // log_y(x) (Log Base Y)
     // Input Sequence: Value [Op] Base
@@ -398,7 +406,7 @@
         
         // 4. Return Division Node
         // Use Precedence 60 to ensure this entire block is treated as a single unit
-        return [UDBinaryOpNode op:UDConstDiv left:lnX right:lnY precedence:60];
+        return [UDBinaryOpNode info:[weakSelf infoForOp:UDOpDiv] left:lnX right:lnY];
     }];
 
     // Rand
@@ -407,12 +415,16 @@
     }];
 }
 
-// Helpers
-- (UDFrontendAction)binaryOp:(NSString *)sym prec:(NSInteger)prec {
+#pragma mark - Helpers
+
+- (UDFrontendAction)binaryOp:(NSInteger)opTag {
+    __weak typeof(self) weakSelf = self;
     return ^UDASTNode *(UDFrontendContext *ctx) {
         UDASTNode *r = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
         UDASTNode *l = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        return [UDBinaryOpNode op:sym left:l right:r precedence:prec];
+
+        UDOpInfo *info = [weakSelf infoForOp:opTag];
+        return [UDBinaryOpNode info:info left:l right:r];
     };
 }
 

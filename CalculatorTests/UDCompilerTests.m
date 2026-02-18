@@ -10,6 +10,7 @@
 #import "UDAST.h"
 #import "UDInstruction.h"
 #import "UDConstants.h"
+#import "UDFrontend.h"
 
 @interface UDCompilerTests : XCTestCase
 @end
@@ -61,7 +62,7 @@
 
 - (void)testSimpleArithmeticFloat {
     // AST: 10 + 20
-    UDASTNode *root = [UDBinaryOpNode op:UDConstAdd left:[self num:10] right:[self num:20] precedence:1];
+    UDASTNode *root = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd] left:[self num:10] right:[self num:20]];
     
     NSArray *prog = [UDCompiler compile:root withIntegerMode:NO];
     
@@ -74,7 +75,7 @@
 
 - (void)testSimpleArithmeticInteger {
     // AST: 10 + 20 (Integer Mode)
-    UDASTNode *root = [UDBinaryOpNode op:UDConstAdd left:[self num:10] right:[self num:20] precedence:1];
+    UDASTNode *root = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd] left:[self num:10] right:[self num:20]];
     
     NSArray *prog = [UDCompiler compile:root withIntegerMode:YES];
     
@@ -92,8 +93,8 @@
     //   / \
     //  3   4
     
-    UDASTNode *addNode = [UDBinaryOpNode op:UDConstAdd left:[self num:3] right:[self num:4] precedence:1];
-    UDASTNode *root = [UDBinaryOpNode op:UDConstMul left:addNode right:[self num:5] precedence:2];
+    UDASTNode *addNode = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd] left:[self num:3] right:[self num:4]];
+    UDASTNode *root = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul] left:addNode right:[self num:5]];
     
     NSArray *prog = [UDCompiler compile:root withIntegerMode:NO];
     
@@ -108,7 +109,7 @@
 
 - (void)testUnaryOperations {
     // AST: -5 (Negate)
-    UDASTNode *root = [UDUnaryOpNode op:UDConstNeg child:[self num:5]];
+    UDASTNode *root = [UDUnaryOpNode info:[[UDFrontend shared] infoForOp:UDOpNegate] child:[self num:5]];
     
     NSArray *prog = [UDCompiler compile:root withIntegerMode:NO];
     
@@ -120,7 +121,7 @@
 
 - (void)testBitwiseOperations {
     // AST: 5 & 3 (Bitwise AND)
-    UDASTNode *root = [UDBinaryOpNode op:UDConstBitAnd left:[self num:5] right:[self num:3] precedence:0];
+    UDASTNode *root = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpBitwiseAnd] left:[self num:5] right:[self num:3]];
     
     NSArray *prog = [UDCompiler compile:root withIntegerMode:YES];
     
@@ -131,7 +132,7 @@
 
 - (void)testBitwiseNot {
     // AST: ~7
-    UDASTNode *root = [UDUnaryOpNode op:@"~" child:[self num:7]];
+    UDASTNode *root = [UDUnaryOpNode info:[[UDFrontend shared] infoForOp:UDOpComp1] child:[self num:7]];
     
     NSArray *prog = [UDCompiler compile:root withIntegerMode:YES];
     
@@ -142,7 +143,7 @@
 
 - (void)testFactorial {
     // AST: 5!
-    UDASTNode *root = [UDPostfixOpNode symbol:@"!" child:[self num:5]];
+    UDASTNode *root = [UDPostfixOpNode info:[[UDFrontend shared] infoForOp:UDOpFactorial] child:[self num:5]];
     
     NSArray *prog = [UDCompiler compile:root withIntegerMode:YES];
     
@@ -193,7 +194,7 @@
     
     UDFunctionNode *pow1 = [UDFunctionNode func:UDConstPow args:@[[self num:3], [self num:2]]];
     UDFunctionNode *pow2 = [UDFunctionNode func:UDConstPow args:@[[self num:4], [self num:2]]];
-    UDBinaryOpNode *add  = [UDBinaryOpNode op:UDConstAdd left:pow1 right:pow2 precedence:1];
+    UDBinaryOpNode *add  = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd] left:pow1 right:pow2];
     UDFunctionNode *root = [UDFunctionNode func:UDConstSqrt args:@[add]];
     
     NSArray *prog = [UDCompiler compile:root withIntegerMode:NO];

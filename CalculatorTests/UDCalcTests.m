@@ -7,6 +7,7 @@
 
 #import <XCTest/XCTest.h>
 #import "UDCalc.h"
+#import "UDFrontend.h"
 #import "UDConstants.h"
 
 @interface UDCalcTests : XCTestCase
@@ -35,10 +36,9 @@
     [self.calculator performOperation:UDOpEq];
 
     // Construct Expected Tree Manually
-    UDASTNode *expected = [UDBinaryOpNode op:@"+"
-                                        left:[UDNumberNode value:UDValueMakeDouble(2)]
-                                       right:[UDNumberNode value:UDValueMakeDouble(3)]
-                                  precedence:UDASTPrecedenceAdd];
+    UDASTNode *expected = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                          left:[UDNumberNode value:UDValueMakeDouble(2)]
+                                         right:[UDNumberNode value:UDValueMakeDouble(3)]];
 
     // Check Structure
     // Note: The calculator holds an array of nodes (the stack).
@@ -59,10 +59,9 @@
 
     // --- Structural Verification ---
     // Expected: (+ 2 3)
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"+"
-                                            left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                           right:[UDNumberNode value:UDValueMakeDouble(3.0)]
-                                      precedence:UDASTPrecedenceAdd];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                              left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                             right:[UDNumberNode value:UDValueMakeDouble(3.0)]];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch");
@@ -84,16 +83,14 @@
     // Expected: (+ 2 (* 3 4))
     
     // 1. Build the inner multiplication node: (3 * 4)
-    UDASTNode *multNode = [UDBinaryOpNode op:@"*"
-                                        left:[UDNumberNode value:UDValueMakeDouble(3.0)]
-                                       right:[UDNumberNode value:UDValueMakeDouble(4.0)]
-                                  precedence:UDASTPrecedenceMul];
+    UDASTNode *multNode = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                          left:[UDNumberNode value:UDValueMakeDouble(3.0)]
+                                         right:[UDNumberNode value:UDValueMakeDouble(4.0)]];
     
     // 2. Build the root addition node: 2 + (multNode)
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"+"
-                                            left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                           right:multNode
-                                      precedence:UDASTPrecedenceAdd];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                              left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                             right:multNode];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. Did operator precedence fail?");
@@ -117,19 +114,17 @@
     // Expected: (* (P (+ 2 3)) 4)
     
     // 1. Inner Addition: 2 + 3
-    UDASTNode *addNode = [UDBinaryOpNode op:@"+"
-                                       left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                      right:[UDNumberNode value:UDValueMakeDouble(3.0)]
-                                 precedence:UDASTPrecedenceAdd];
+    UDASTNode *addNode = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                         left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                        right:[UDNumberNode value:UDValueMakeDouble(3.0)]];
     
     // 2. Parenthesis Wrapper: ( ... )
     UDASTNode *parenNode = [UDParenNode wrap:addNode];
     
     // 3. Root Multiplication: parenNode * 4
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"*"
-                                            left:parenNode
-                                           right:[UDNumberNode value:UDValueMakeDouble(4.0)]
-                                      precedence:UDASTPrecedenceMul];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                              left:parenNode
+                                             right:[UDNumberNode value:UDValueMakeDouble(4.0)]];
 
     XCTAssertEqual(self.calculator.nodeStack.count, 1);
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. Parentheses logic failed.");
@@ -164,24 +159,21 @@
     // Expected: (P (* (P (+ 1 2)) (P (+ 3 4))))
     
     // 1. Left Group: (1 + 2)
-    UDASTNode *leftAdd = [UDBinaryOpNode op:@"+"
-                                       left:[UDNumberNode value:UDValueMakeDouble(1.0)]
-                                      right:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                 precedence:UDASTPrecedenceAdd];
+    UDASTNode *leftAdd = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                         left:[UDNumberNode value:UDValueMakeDouble(1.0)]
+                                        right:[UDNumberNode value:UDValueMakeDouble(2.0)]];
     UDASTNode *leftGroup = [UDParenNode wrap:leftAdd];
     
     // 2. Right Group: (3 + 4)
-    UDASTNode *rightAdd = [UDBinaryOpNode op:@"+"
-                                        left:[UDNumberNode value:UDValueMakeDouble(3.0)]
-                                       right:[UDNumberNode value:UDValueMakeDouble(4.0)]
-                                  precedence:UDASTPrecedenceAdd];
+    UDASTNode *rightAdd = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                          left:[UDNumberNode value:UDValueMakeDouble(3.0)]
+                                         right:[UDNumberNode value:UDValueMakeDouble(4.0)]];
     UDASTNode *rightGroup = [UDParenNode wrap:rightAdd];
     
     // 3. Multiplication: (1+2) * (3+4)
-    UDASTNode *multNode = [UDBinaryOpNode op:@"*"
-                                        left:leftGroup
-                                       right:rightGroup
-                                  precedence:UDASTPrecedenceMul];
+    UDASTNode *multNode = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                          left:leftGroup
+                                         right:rightGroup];
     
     // 4. Outer Wrapper: ( ... )
     UDASTNode *expectedTree = [UDParenNode wrap:multNode];
@@ -277,10 +269,9 @@
     UDASTNode *parenNode = [UDParenNode wrap:innerNode];
     
     // 2. Root: 5 * parenNode
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"*"
-                                            left:[UDNumberNode value:UDValueMakeDouble(5.0)]
-                                           right:parenNode
-                                      precedence:UDASTPrecedenceMul];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                              left:[UDNumberNode value:UDValueMakeDouble(5.0)]
+                                             right:parenNode];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. Implicit multiplication failed.");
@@ -309,16 +300,14 @@
     UDASTNode *parenNode = [UDParenNode wrap:[UDNumberNode value:UDValueMakeDouble(4.0)]];
     
     // 2. Implicit Multiply: 3 * (4)
-    UDASTNode *multNode = [UDBinaryOpNode op:@"*"
+    UDASTNode *multNode = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
                                         left:[UDNumberNode value:UDValueMakeDouble(3.0)]
-                                       right:parenNode
-                                  precedence:UDASTPrecedenceMul];
+                                       right:parenNode];
     
     // 3. Root Addition: 2 + (3 * 4)
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"+"
-                                            left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                           right:multNode
-                                      precedence:UDASTPrecedenceAdd];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                              left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                             right:multNode];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. Did precedence or implicit mul fail?");
@@ -346,24 +335,21 @@
     // Expected Tree: (* 2 (P (+ 3 (P (* 4 5)))))
     
     // 1. Innermost: 4 * 5
-    UDASTNode *innerMult = [UDBinaryOpNode op:@"*"
-                                         left:[UDNumberNode value:UDValueMakeDouble(4.0)]
-                                        right:[UDNumberNode value:UDValueMakeDouble(5.0)]
-                                   precedence:UDASTPrecedenceMul];
+    UDASTNode *innerMult = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                           left:[UDNumberNode value:UDValueMakeDouble(4.0)]
+                                          right:[UDNumberNode value:UDValueMakeDouble(5.0)]];
     UDASTNode *innerGroup = [UDParenNode wrap:innerMult];
     
     // 2. Middle: 3 + (4 * 5)
-    UDASTNode *addNode = [UDBinaryOpNode op:@"+"
-                                       left:[UDNumberNode value:UDValueMakeDouble(3.0)]
-                                      right:innerGroup
-                                 precedence:UDASTPrecedenceAdd];
+    UDASTNode *addNode = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                         left:[UDNumberNode value:UDValueMakeDouble(3.0)]
+                                        right:innerGroup];
     UDASTNode *outerGroup = [UDParenNode wrap:addNode];
     
     // 3. Root: 2 * (...)
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"*"
-                                            left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                           right:outerGroup
-                                      precedence:UDASTPrecedenceMul];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                              left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                             right:outerGroup];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. Nested parentheses failed.");
@@ -381,10 +367,9 @@
     
     // --- Structural Verification ---
     // Expected Tree: (+ 0.1 0.2)
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"+"
-                                            left:[UDNumberNode value:UDValueMakeDouble(0.1)]
-                                           right:[UDNumberNode value:UDValueMakeDouble(0.2)]
-                                      precedence:UDASTPrecedenceAdd];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                              left:[UDNumberNode value:UDValueMakeDouble(0.1)]
+                                             right:[UDNumberNode value:UDValueMakeDouble(0.2)]];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch.");
@@ -411,10 +396,9 @@
     UDASTNode *parenContent = [UDParenNode wrap:[UDNumberNode value:UDValueMakeDouble(3.0)]];
     
     // 2. Root Multiplication: 2 * (3)
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"*"
-                                            left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                           right:parenContent
-                                      precedence:UDASTPrecedenceMul];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                              left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                             right:parenContent];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. Implicit multiplication failed.");
@@ -447,24 +431,21 @@
     // Expected Tree: (* (P (+ 1 1)) (P (+ 2 2)))
     
     // 1. Left Group: (1 + 1)
-    UDASTNode *leftAdd = [UDBinaryOpNode op:@"+"
-                                       left:[UDNumberNode value:UDValueMakeDouble(1.0)]
-                                      right:[UDNumberNode value:UDValueMakeDouble(1.0)]
-                                 precedence:UDASTPrecedenceAdd];
+    UDASTNode *leftAdd = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                         left:[UDNumberNode value:UDValueMakeDouble(1.0)]
+                                        right:[UDNumberNode value:UDValueMakeDouble(1.0)]];
     UDASTNode *leftGroup = [UDParenNode wrap:leftAdd];
     
     // 2. Right Group: (2 + 2)
-    UDASTNode *rightAdd = [UDBinaryOpNode op:@"+"
-                                        left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                       right:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                  precedence:UDASTPrecedenceAdd];
+    UDASTNode *rightAdd = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                          left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                         right:[UDNumberNode value:UDValueMakeDouble(2.0)]];
     UDASTNode *rightGroup = [UDParenNode wrap:rightAdd];
     
     // 3. Root Implicit Multiplication
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"*"
-                                            left:leftGroup
-                                           right:rightGroup
-                                      precedence:UDASTPrecedenceMul];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                              left:leftGroup
+                                             right:rightGroup];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. Implicit mul between parens failed.");
@@ -493,16 +474,14 @@
     UDASTNode *parenNode = [UDParenNode wrap:[UDNumberNode value:UDValueMakeDouble(4.0)]];
     
     // 2. Implicit Multiplication: 3 * (4)
-    UDASTNode *multNode = [UDBinaryOpNode op:@"*"
-                                        left:[UDNumberNode value:UDValueMakeDouble(3.0)]
-                                       right:parenNode
-                                  precedence:UDASTPrecedenceMul];
+    UDASTNode *multNode = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                          left:[UDNumberNode value:UDValueMakeDouble(3.0)]
+                                         right:parenNode];
     
     // 3. Root Addition: 2 + (3 * 4)
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"+"
-                                            left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                           right:multNode
-                                      precedence:UDASTPrecedenceAdd];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                              left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                             right:multNode];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. Precedence of implicit mul failed.");
@@ -529,10 +508,9 @@
     // Expected Tree: (* 2 3)
     // The '+' node should NOT exist in the tree.
     
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"*"
-                                            left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                           right:[UDNumberNode value:UDValueMakeDouble(3.0)]
-                                      precedence:UDASTPrecedenceMul];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                              left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                             right:[UDNumberNode value:UDValueMakeDouble(3.0)]];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. Operator replacement failed (Did '+' remain?).");
@@ -566,10 +544,9 @@
     UDASTNode *parenNode = [UDParenNode wrap:[UDNumberNode value:UDValueMakeDouble(4.0)]];
     
     // 2. Root: 2 * (...)
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"*"
-                                            left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                           right:parenNode
-                                      precedence:UDASTPrecedenceMul];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                              left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                             right:parenNode];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1);
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. The bad operator '*' should have been ignored.");
@@ -598,10 +575,9 @@
     
     UDASTNode *parenNode = [UDParenNode wrap:[UDNumberNode value:UDValueMakeDouble(4.0)]];
     
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"*"
-                                            left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                           right:parenNode
-                                      precedence:UDASTPrecedenceMul];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                              left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                             right:parenNode];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1);
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch.");
@@ -621,8 +597,8 @@
     // Expected Tree: (1!)
 
     // 1. Postfix Node: 1!
-    UDASTNode *expectedTree = [UDPostfixOpNode symbol:@"!"
-                                                child:[UDNumberNode value:UDValueMakeDouble(0.0)]];
+    UDASTNode *expectedTree = [UDPostfixOpNode info:[[UDFrontend shared] infoForOp:UDOpFactorial]
+                                              child:[UDNumberNode value:UDValueMakeDouble(0.0)]];
     
     // Note: Even though the calculator "auto-calculates" postfix operators for the display,
     // the underlying AST node should remain on the stack until cleared.
@@ -645,8 +621,8 @@
     // Expected Tree: (3!)
     
     // 1. Postfix Node: 3!
-    UDASTNode *expectedTree = [UDPostfixOpNode symbol:@"!"
-                                                child:[UDNumberNode value:UDValueMakeDouble(3.0)]];
+    UDASTNode *expectedTree = [UDPostfixOpNode info:[[UDFrontend shared] infoForOp:UDOpFactorial]
+                                              child:[UDNumberNode value:UDValueMakeDouble(3.0)]];
     
     // Note: Even though the calculator "auto-calculates" postfix operators for the display,
     // the underlying AST node should remain on the stack until cleared.
@@ -670,14 +646,13 @@
     // Expected Tree: (+ 2 (3!))
     
     // 1. Postfix Node: 3!
-    UDASTNode *factorialNode = [UDPostfixOpNode symbol:@"!"
-                                                 child:[UDNumberNode value:UDValueMakeDouble(3.0)]];
+    UDASTNode *factorialNode = [UDPostfixOpNode info:[[UDFrontend shared] infoForOp:UDOpFactorial]
+                                               child:[UDNumberNode value:UDValueMakeDouble(3.0)]];
     
     // 2. Root Addition: 2 + (3!)
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"+"
-                                            left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                           right:factorialNode
-                                      precedence:UDASTPrecedenceAdd];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                              left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                             right:factorialNode];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. Postfix precedence failed.");
@@ -701,14 +676,13 @@
     // Expected Tree: (* (3!) 2)
     
     // 1. Postfix Node: 3!
-    UDASTNode *factorialNode = [UDPostfixOpNode symbol:@"!"
-                                                 child:[UDNumberNode value:UDValueMakeDouble(3.0)]];
+    UDASTNode *factorialNode = [UDPostfixOpNode info:[[UDFrontend shared] infoForOp:UDOpFactorial]
+                                               child:[UDNumberNode value:UDValueMakeDouble(3.0)]];
     
     // 2. Root Multiplication: (3!) * 2
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"*"
-                                            left:factorialNode
-                                           right:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                      precedence:UDASTPrecedenceMul];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                              left:factorialNode
+                                             right:[UDNumberNode value:UDValueMakeDouble(2.0)]];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. Implicit mul after postfix failed.");
@@ -735,10 +709,9 @@
     // Expected Tree: pow((2 + 3), 2)
     
     // 1. Inner Addition: 2 + 3
-    UDASTNode *addNode = [UDBinaryOpNode op:@"+"
-                                       left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                      right:[UDNumberNode value:UDValueMakeDouble(3.0)]
-                                 precedence:UDASTPrecedenceAdd];
+    UDASTNode *addNode = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                         left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                        right:[UDNumberNode value:UDValueMakeDouble(3.0)]];
     UDASTNode *parenNode = [UDParenNode wrap:addNode];
     
     // 2. Number: 2
@@ -769,10 +742,9 @@
     // Expected Tree: (* 2 3)
     // The '+' node must be completely discarded/replaced.
     
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"*"
-                                            left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                           right:[UDNumberNode value:UDValueMakeDouble(3.0)]
-                                      precedence:UDASTPrecedenceMul];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                              left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                             right:[UDNumberNode value:UDValueMakeDouble(3.0)]];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. Operator replacement failed.");
@@ -789,8 +761,8 @@
 
     // --- Structural Verification ---
     // Expected: 5%
-    UDASTNode *expectedTree = [UDPostfixOpNode symbol:@"%"
-                                                child:[UDNumberNode value:UDValueMakeDouble(5.0)]];
+    UDASTNode *expectedTree = [UDPostfixOpNode info:[[UDFrontend shared] infoForOp:UDOpPercent]
+                                              child:[UDNumberNode value:UDValueMakeDouble(5.0)]];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch");
@@ -811,11 +783,10 @@
 
     // --- Structural Verification ---
     // Expected: (* 100 (% 5))
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"*"
-                                            left:[UDNumberNode value:UDValueMakeDouble(100.0)]
-                                           right:[UDPostfixOpNode symbol:@"%"
-                                                                   child:[UDNumberNode value:UDValueMakeDouble(5.0)]]
-                                      precedence:UDASTPrecedenceMul];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpMul]
+                                              left:[UDNumberNode value:UDValueMakeDouble(100.0)]
+                                             right:[UDPostfixOpNode info:[[UDFrontend shared] infoForOp:UDOpPercent]
+                                                                   child:[UDNumberNode value:UDValueMakeDouble(5.0)]]];
     
     XCTAssertEqual(self.calculator.nodeStack.count, 1, @"Stack should have 1 root node");
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch");
@@ -845,16 +816,14 @@
     // New Expectation: (+ (+ 2 3) 5) -> CORRECT (Preserves history)
     
     // 1. Reconstruct the previous tree (2 + 3)
-    UDASTNode *prevTree = [UDBinaryOpNode op:@"+"
-                                        left:[UDNumberNode value:UDValueMakeDouble(2.0)]
-                                       right:[UDNumberNode value:UDValueMakeDouble(3.0)]
-                                  precedence:UDASTPrecedenceAdd];
+    UDASTNode *prevTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                          left:[UDNumberNode value:UDValueMakeDouble(2.0)]
+                                         right:[UDNumberNode value:UDValueMakeDouble(3.0)]];
     
     // 2. Build the new root: (prevTree + 5)
-    UDASTNode *expectedTree = [UDBinaryOpNode op:@"+"
-                                            left:prevTree
-                                           right:[UDNumberNode value:UDValueMakeDouble(5.0)]
-                                      precedence:UDASTPrecedenceAdd];
+    UDASTNode *expectedTree = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                              left:prevTree
+                                             right:[UDNumberNode value:UDValueMakeDouble(5.0)]];
 
     XCTAssertEqual(self.calculator.nodeStack.count, 1);
     XCTAssertEqualObjects(self.calculator.nodeStack.lastObject, expectedTree, @"AST structure mismatch. Result chaining should nest the previous tree.");
@@ -932,10 +901,9 @@
     [self.calculator performOperation:UDOpEq];
     
     // Construct Expected Tree Manually
-    UDASTNode *expected = [UDBinaryOpNode op:@"+"
-                                        left:[UDNumberNode value:UDValueMakeDouble(45)]
-                                       right:[UDNumberNode value:UDValueMakeDouble(1)]
-                                  precedence:UDASTPrecedenceAdd];
+    UDASTNode *expected = [UDBinaryOpNode info:[[UDFrontend shared] infoForOp:UDOpAdd]
+                                          left:[UDNumberNode value:UDValueMakeDouble(45)]
+                                         right:[UDNumberNode value:UDValueMakeDouble(1)]];
 
     // Check Structure
     // Note: The calculator holds an array of nodes (the stack).

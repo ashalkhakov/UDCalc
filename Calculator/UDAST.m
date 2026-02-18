@@ -6,10 +6,14 @@
 //
 
 #import "UDAST.h"
-#import "UDValueFormatter.h"
+#import "UDFrontend.h" // Import your operator info definition here
+#import "UDValueFormatter.h" // Assuming you have this for formatting values
+
+// Define a precedence higher than any operator for atomic values (Numbers, Parens)
+static const NSInteger kUDPrecedenceAtomic = 1000;
 
 @implementation UDASTNode
-- (UDASTPrecedence)precedence { return UDASTPrecedenceNone; }
+- (NSInteger)precedence { return 0; }
 - (NSString *)prettyPrint { return @"?"; }
 
 // Base equality implementation (fails safe)
@@ -37,15 +41,9 @@
     n->_value = v;
     return n;
 }
-
-- (UDASTPrecedence)precedence {
-    return UDASTPrecedenceValue;
-}
-
+- (NSInteger)precedence { return kUDPrecedenceAtomic; }
 - (NSString *)prettyPrint {
-    // Format nicely: Remove trailing zeros (e.g. 5.0 -> 5)
-    // %.8g uses significant digits, usually cleanest for calcs
-    return [UDValueFormatter stringForValue:self.value base:UDBaseDec showThousandsSeparators:NO decimalPlaces:15];
+    return [UDValueFormatter stringForValue:self.value base:UDBaseDec showThousandsSeparators:NO decimalPlaces:10];
 }
 
 - (BOOL)isEqual:(id)object {
@@ -92,18 +90,12 @@
 @implementation UDConstantNode
 + (instancetype)value:(UDValue)v symbol:(NSString *)sym {
     UDConstantNode *n = [UDConstantNode new];
-    n->_symbol = sym;
     n->_value = v;
+    n->_symbol = sym;
     return n;
 }
-
-- (UDASTPrecedence)precedence {
-    return UDASTPrecedenceValue;
-}
-
-- (NSString *)prettyPrint {
-    return self.symbol;
-}
+- (NSInteger)precedence { return kUDPrecedenceAtomic; }
+- (NSString *)prettyPrint { return self.symbol; }
 
 - (BOOL)isEqual:(id)object {
     if (![object isKindOfClass:[UDConstantNode class]]) return NO;
@@ -123,125 +115,151 @@
 @end
 
 // ---------------------------------------------------------
-#pragma mark - Unary Operation Node
+#pragma mark - Unary Prefix Node
 // ---------------------------------------------------------
-
 @implementation UDUnaryOpNode
-+ (instancetype)op:(NSString *)op child:(UDASTNode *)c {
-    UDUnaryOpNode *n = [UDUnaryOpNode new]; n->_op = op; n->_child = c; return n;
++ (instancetype)info:(UDOpInfo *)info child:(UDASTNode *)c {
+    UDUnaryOpNode *n = [UDUnaryOpNode new];
+    n->_info = info;
+    n->_child = c;
+    return n;
 }
+
+- (NSInteger)precedence { return self.info.precedence; }
+
 - (NSString *)prettyPrint {
-    // Logic: If child is a complex operation (5+3), wrap in parens: -(5+3)
     NSString *cStr = [self.child prettyPrint];
-    if (self.child.precedence < self.precedence) cStr = [NSString stringWithFormat:@"(%@)", cStr];
-    return [NSString stringWithFormat:@"%@%@", self.op, cStr];
+    
+    // If child is weaker than us, wrap it.
+    // Example: - (5 + 3) vs -5
+    if (self.child.precedence < self.precedence) {
+        cStr = [NSString stringWithFormat:@"(%@)", cStr];
+    }
+    return [NSString stringWithFormat:@"%@%@", self.info.symbol, cStr];
 }
 
 - (BOOL)isEqual:(id)object {
     if (![object isKindOfClass:[UDUnaryOpNode class]]) return NO;
     UDUnaryOpNode *other = (UDUnaryOpNode *)object;
-    return [self.op isEqualToString:other.op] && [self.child isEqual:other.child];
+    return (self.info.tag == other.info.tag) && [self.child isEqual:other.child];
 }
 
 - (NSUInteger)hash {
-    return [self.op hash] ^ [self.child hash];
+    return self.info.tag ^ [self.child hash];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    UDUnaryOpNode *copy = [UDUnaryOpNode op:self.op child:[self.child copy]];
+    UDUnaryOpNode *copy = [UDUnaryOpNode info:self.info child:[self.child copy]];
     return copy;
 }
 
 @end
 
+// ---------------------------------------------------------
+#pragma mark - Postfix Node
+// ---------------------------------------------------------
 @implementation UDPostfixOpNode
-+ (instancetype)symbol:(NSString *)sym child:(UDASTNode *)c {
-    UDPostfixOpNode *n = [UDPostfixOpNode new]; n->_symbol = sym; n->_child = c; return n;
++ (instancetype)info:(UDOpInfo *)info child:(UDASTNode *)c {
+    UDPostfixOpNode *n = [UDPostfixOpNode new];
+    n->_info = info;
+    n->_child = c;
+    return n;
 }
+
+- (NSInteger)precedence { return self.info.precedence; }
+
 - (NSString *)prettyPrint {
-    // Logic: (5+3)!
     NSString *cStr = [self.child prettyPrint];
-    if (self.child.precedence < self.precedence) cStr = [NSString stringWithFormat:@"(%@)", cStr];
-    return [NSString stringWithFormat:@"%@%@", cStr, self.symbol];
+    
+    // If child is weaker, wrap it.
+    // Example: (5 + 3)! vs 5!
+    if (self.child.precedence < self.precedence) {
+        cStr = [NSString stringWithFormat:@"(%@)", cStr];
+    }
+    return [NSString stringWithFormat:@"%@%@", cStr, self.info.symbol];
 }
 
 - (BOOL)isEqual:(id)object {
     if (![object isKindOfClass:[UDPostfixOpNode class]]) return NO;
     UDPostfixOpNode *other = (UDPostfixOpNode *)object;
-    return [self.symbol isEqualToString:other.symbol] && [self.child isEqual:other.child];
+    return (self.info.tag == other.info.tag) && [self.child isEqual:other.child];
 }
 
 - (NSUInteger)hash {
-    return [self.symbol hash] ^ [self.child hash];
+    return self.info.tag ^ [self.child hash];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    UDPostfixOpNode *copy = [UDPostfixOpNode symbol:self.symbol child:[self.child copy]];
+    UDPostfixOpNode *copy = [UDPostfixOpNode info:self.info child:[self.child copy]];
     return copy;
 }
 
 @end
 
 // ---------------------------------------------------------
-#pragma mark - Binary Operation Node
+#pragma mark - Binary Op Node (The Logic Core)
 // ---------------------------------------------------------
-@implementation UDBinaryOpNode {
-    UDASTPrecedence _prec;
-}
-
-+ (instancetype)op:(NSString *)op left:(UDASTNode *)l right:(UDASTNode *)r precedence:(UDASTPrecedence)p {
+@implementation UDBinaryOpNode
++ (instancetype)info:(UDOpInfo *)info left:(UDASTNode *)l right:(UDASTNode *)r {
     UDBinaryOpNode *n = [UDBinaryOpNode new];
-    n->_op = op;
+    n->_info = info;
     n->_left = l;
     n->_right = r;
-    n->_prec = p;
     return n;
 }
 
-- (UDASTPrecedence)precedence {
-    return _prec;
-}
+- (NSInteger)precedence { return self.info.precedence; }
 
 - (NSString *)prettyPrint {
     NSString *lhs = [self.left prettyPrint];
     NSString *rhs = [self.right prettyPrint];
     
-    // AUTOMATIC PARENTHESES LOGIC:
-    // If the child's precedence is LOWER than ours, it needs wrapping.
-    // Example: (5 + 3) * 2
-    // Parent (*) has prec 2. Child (+) has prec 1.
-    // 1 < 2, so we add parens around "5 + 3".
+    NSInteger myPrec = self.precedence;
     
-    if (self.left.precedence < self.precedence) {
-        lhs = [NSString stringWithFormat:@"(%@)", lhs];
+    // --- LEFT CHILD CHECK ---
+    BOOL wrapLeft = NO;
+    if (self.left.precedence < myPrec) {
+        // Normal precedence rule: (1+2) * 3
+        wrapLeft = YES;
+    } else if (self.left.precedence == myPrec && self.info.associativity == UDOpAssocRight) {
+        // Right Associativity Exception: (2^3)^4
+        // If we are Right Associative, the left child must be wrapped if it has the same precedence.
+        wrapLeft = YES;
     }
     
-    // Special handling for Right Associativity (like ^) or subtraction
-    // usually requires stricter checks, but < works for standard PEMDAS.
-    if (self.right.precedence < self.precedence) {
-        rhs = [NSString stringWithFormat:@"(%@)", rhs];
+    // --- RIGHT CHILD CHECK ---
+    BOOL wrapRight = NO;
+    if (self.right.precedence < myPrec) {
+        // Normal precedence rule: 3 * (1+2)
+        wrapRight = YES;
+    } else if (self.right.precedence == myPrec && self.info.associativity == UDOpAssocLeft) {
+        // Left Associativity Exception: 1 - (2 - 3)
+        // If we are Left Associative, the right child must be wrapped if it has the same precedence.
+        wrapRight = YES;
     }
     
-    return [NSString stringWithFormat:@"%@ %@ %@", lhs, self.op, rhs];
+    if (wrapLeft)  lhs = [NSString stringWithFormat:@"(%@)", lhs];
+    if (wrapRight) rhs = [NSString stringWithFormat:@"(%@)", rhs];
+    
+    return [NSString stringWithFormat:@"%@ %@ %@", lhs, self.info.symbol, rhs];
 }
 
 - (BOOL)isEqual:(id)object {
     if (![object isKindOfClass:[UDBinaryOpNode class]]) return NO;
     UDBinaryOpNode *other = (UDBinaryOpNode *)object;
-    return [self.op isEqualToString:other.op] &&
+    return (self.info.tag == other.info.tag) &&
         [self.left isEqual:other.left] &&
         [self.right isEqual:other.right];
 }
 
 - (NSUInteger)hash {
-    return [self.op hash] ^ [self.left hash] ^ [self.right hash];
+    return self.info.tag ^ [self.left hash] ^ [self.right hash];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    UDBinaryOpNode *copy = [UDBinaryOpNode op:self.op
-                                         left:[self.left copy]
-                                        right:[self.right copy]
-                                   precedence:self.precedence];
+    UDBinaryOpNode *copy = [UDBinaryOpNode info:self.info
+                                           left:[self.left copy]
+                                          right:[self.right copy]];
     return copy;
 }
 
@@ -251,7 +269,6 @@
 #pragma mark - Function Node
 // ---------------------------------------------------------
 @implementation UDFunctionNode
-
 + (instancetype)func:(NSString *)name args:(NSArray<UDASTNode *> *)args {
     UDFunctionNode *n = [UDFunctionNode new];
     n->_name = name;
@@ -259,19 +276,15 @@
     return n;
 }
 
-- (UDASTPrecedence)precedence {
-    // Functions act like values/parentheses (they bind extremely tight)
-    return UDASTPrecedenceFunc;
-}
+// Functions bind extremely tight (like a value)
+- (NSInteger)precedence { return kUDPrecedenceAtomic; }
 
 - (NSString *)prettyPrint {
-    NSMutableArray *argStrings = [NSMutableArray array];
+    NSMutableArray *parts = [NSMutableArray array];
     for (UDASTNode *arg in self.args) {
-        [argStrings addObject:[arg prettyPrint]];
+        [parts addObject:[arg prettyPrint]];
     }
-    
-    // Format: name(arg1, arg2)
-    return [NSString stringWithFormat:@"%@(%@)", self.name, [argStrings componentsJoinedByString:@", "]];
+    return [NSString stringWithFormat:@"%@(%@)", self.name, [parts componentsJoinedByString:@", "]];
 }
 
 - (BOOL)isEqual:(id)object {
@@ -294,24 +307,19 @@
 @end
 
 // ---------------------------------------------------------
-#pragma mark - Parenthesis Node
+#pragma mark - Explicit Parenthesis Node
 // ---------------------------------------------------------
 @implementation UDParenNode
-
 + (instancetype)wrap:(UDASTNode *)node {
     UDParenNode *n = [UDParenNode new];
     n->_child = node;
     return n;
 }
 
-- (UDASTPrecedence)precedence {
-    // Acts like a solid value (highest precedence)
-    // This prevents outer operators from adding *extra* auto-parentheses.
-    return UDASTPrecedenceValue;
-}
+// Parentheses are atomic; they protect their contents from being wrapped again.
+- (NSInteger)precedence { return kUDPrecedenceAtomic; }
 
 - (NSString *)prettyPrint {
-    // Force the brackets!
     return [NSString stringWithFormat:@"(%@)", [self.child prettyPrint]];
 }
 
@@ -326,4 +334,3 @@
 }
 
 @end
-

@@ -8,20 +8,14 @@
 #import <Foundation/Foundation.h>
 #import "UDValue.h"
 
-// Precedence levels for Pretty Printing
-// Higher number = Binds tighter
-typedef NS_ENUM(NSInteger, UDASTPrecedence) {
-    UDASTPrecedenceNone   = 0,
-    UDASTPrecedenceAdd    = 1, // + -
-    UDASTPrecedenceMul    = 2, // * /
-    UDASTPrecedencePower  = 3, // ^
-    UDASTPrecedenceFunc   = 4, // sin, cos
-    UDASTPrecedenceValue  = 5  // Numbers, Constants
-};
+@class UDOpInfo;
 
 // --- BASE NODE ---
 @interface UDASTNode : NSObject
-@property (nonatomic, readonly) UDASTPrecedence precedence;
+// Returns the precedence of this node.
+// For operators, this delegates to the UDOpInfo.
+// For values (numbers/parens), this returns a "Max" value.
+- (NSInteger)precedence;
 - (NSString *)prettyPrint;
 @end
 
@@ -31,7 +25,7 @@ typedef NS_ENUM(NSInteger, UDASTPrecedence) {
 + (instancetype)value:(UDValue)v;
 @end
 
-// --- CONSTANT NODE (e.g. pi or e) ---
+// --- CONSTANT NODE (e.g. pi) ---
 @interface UDConstantNode : UDASTNode
 @property (nonatomic, copy, readonly) NSString *symbol;
 @property (nonatomic, readonly) UDValue value;
@@ -40,28 +34,33 @@ typedef NS_ENUM(NSInteger, UDASTPrecedence) {
 
 // --- UNARY PREFIX NODE (e.g. -5) ---
 @interface UDUnaryOpNode : UDASTNode
-@property (nonatomic, copy, readonly) NSString *op; // "-"
+// REFACTORED: Reference the metadata directly
+@property (nonatomic, strong, readonly) UDOpInfo *info;
 @property (nonatomic, strong, readonly) UDASTNode *child;
-+ (instancetype)op:(NSString *)op child:(UDASTNode *)c;
+
++ (instancetype)info:(UDOpInfo *)info child:(UDASTNode *)c;
 @end
 
 // --- UNARY POSTFIX NODE (e.g. 5!) ---
 @interface UDPostfixOpNode : UDASTNode
-@property (nonatomic, copy, readonly) NSString *symbol; // "!" or "%"
+// REFACTORED: Reference the metadata directly
+@property (nonatomic, strong, readonly) UDOpInfo *info;
 @property (nonatomic, strong, readonly) UDASTNode *child;
-+ (instancetype)symbol:(NSString *)sym child:(UDASTNode *)c;
+
++ (instancetype)info:(UDOpInfo *)info child:(UDASTNode *)c;
 @end
 
 // --- BINARY OPERATOR NODE (e.g., 5 + 3) ---
 @interface UDBinaryOpNode : UDASTNode
-@property (nonatomic, readonly) NSString *op;
+// REFACTORED: Reference the metadata directly
+@property (nonatomic, strong, readonly) UDOpInfo *info;
 @property (nonatomic, strong, readonly) UDASTNode *left;
 @property (nonatomic, strong, readonly) UDASTNode *right;
 
-+ (instancetype)op:(NSString *)op left:(UDASTNode *)l right:(UDASTNode *)r precedence:(UDASTPrecedence)p;
++ (instancetype)info:(UDOpInfo *)info left:(UDASTNode *)l right:(UDASTNode *)r;
 @end
 
-// --- FUNCTION CALL NODE (e.g., sin(30), pow(2, 3)) ---
+// --- FUNCTION CALL NODE (e.g., sin(30)) ---
 @interface UDFunctionNode : UDASTNode
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSArray<UDASTNode *> *args;

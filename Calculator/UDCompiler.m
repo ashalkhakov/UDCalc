@@ -6,6 +6,8 @@
 //
 
 #import "UDCompiler.h"
+#import "UDFrontend.h"
+#import "UDFrontendContext.h"
 #import "UDConstants.h"
 
 @implementation UDCompiler
@@ -29,23 +31,23 @@
     else if ([node isKindOfClass:[UDUnaryOpNode class]]) {
         UDUnaryOpNode *un = (UDUnaryOpNode *)node;
         [self visitNode:un.child into:prog withIntegerMode:integerMode];
-        
-        if ([un.op isEqualToString:UDConstNeg]) [prog addObject:[UDInstruction op:integerMode ? UDOpcodeNegI : UDOpcodeNeg]];
-        else if ([un.op isEqualToString:@"~"]) [prog addObject:[UDInstruction op:UDOpcodeBitNot]];
-        else NSLog(@"Unhandled unary prefix op: %@", un.op);
+
+        if (un.info.tag == UDOpNegate) [prog addObject:[UDInstruction op:integerMode ? UDOpcodeNegI : UDOpcodeNeg]];
+        else if (un.info.tag == UDOpComp1) [prog addObject:[UDInstruction op:UDOpcodeBitNot]];
+        else NSLog(@"Unhandled unary prefix op: %ld", un.info.tag);
     }
     
     else if ([node isKindOfClass:[UDPostfixOpNode class]]) {
         UDPostfixOpNode *pn = (UDPostfixOpNode *)node;
         [self visitNode:pn.child into:prog withIntegerMode:integerMode];
         
-        if ([pn.symbol isEqualToString:@"%"]) {
+        if (pn.info.tag == UDOpPercent) {
             [prog addObject:[UDInstruction push:UDValueMakeDouble(100.0)]];
             [prog addObject:[UDInstruction op:UDOpcodeDiv]];
-        } else if ([pn.symbol isEqualToString:@"!"]) {
+        } else if (pn.info.tag == UDOpFactorial) {
             [prog addObject:[UDInstruction op:UDOpcodeFact]];
         }
-        else NSLog(@"Unhandled postfix op: %@", pn.symbol);
+        else NSLog(@"Unhandled postfix op: %ld", pn.info.tag);
     }
     
     // 2. BINARY OPERATOR (Recursively visit Left, then Right, then Op)
@@ -56,18 +58,18 @@
         [self visitNode:bin.right into:prog withIntegerMode:integerMode];
         
         // Emit Opcode
-        if ([bin.op isEqualToString:UDConstAdd]) [prog addObject:[UDInstruction op:integerMode? UDOpcodeAddI : UDOpcodeAdd]];
-        else if ([bin.op isEqualToString:UDConstSub]) [prog addObject:[UDInstruction op:integerMode? UDOpcodeSubI : UDOpcodeSub]];
-        else if ([bin.op isEqualToString:UDConstMul]) [prog addObject:[UDInstruction op:integerMode? UDOpcodeMulI : UDOpcodeMul]];
-        else if ([bin.op isEqualToString:UDConstDiv]) [prog addObject:[UDInstruction op:integerMode? UDOpcodeDivI : UDOpcodeDiv]];
-        else if ([bin.op isEqualToString:UDConstBitAnd]) [prog addObject:[UDInstruction op:UDOpcodeBitAnd]];
-        else if ([bin.op isEqualToString:UDConstBitOr]) [prog addObject:[UDInstruction op:UDOpcodeBitOr]];
-        else if ([bin.op isEqualToString:UDConstBitXor]) [prog addObject:[UDInstruction op:UDOpcodeBitXor]];
-        else if ([bin.op isEqualToString:UDConstShiftLeft]) [prog addObject:[UDInstruction op:UDOpcodeShiftLeft]];
-        else if ([bin.op isEqualToString:UDConstShiftRight]) [prog addObject:[UDInstruction op:UDOpcodeShiftRight]];
-        else if ([bin.op isEqualToString:UDConstRotateLeft]) [prog addObject:[UDInstruction op:UDOpcodeRotateLeft]];
-        else if ([bin.op isEqualToString:UDConstRotateRight]) [prog addObject:[UDInstruction op:UDOpcodeRotateRight]];
-        else NSLog(@"Unhandled binary op: %@", bin.op);
+        if (bin.info.tag == UDOpAdd) [prog addObject:[UDInstruction op:integerMode? UDOpcodeAddI : UDOpcodeAdd]];
+        else if (bin.info.tag == UDOpSub) [prog addObject:[UDInstruction op:integerMode? UDOpcodeSubI : UDOpcodeSub]];
+        else if (bin.info.tag == UDOpMul) [prog addObject:[UDInstruction op:integerMode? UDOpcodeMulI : UDOpcodeMul]];
+        else if (bin.info.tag == UDOpDiv) [prog addObject:[UDInstruction op:integerMode? UDOpcodeDivI : UDOpcodeDiv]];
+        else if (bin.info.tag == UDOpBitwiseAnd) [prog addObject:[UDInstruction op:UDOpcodeBitAnd]];
+        else if (bin.info.tag == UDOpBitwiseOr) [prog addObject:[UDInstruction op:UDOpcodeBitOr]];
+        else if (bin.info.tag == UDOpBitwiseXor) [prog addObject:[UDInstruction op:UDOpcodeBitXor]];
+        else if (bin.info.tag == UDOpShiftLeft) [prog addObject:[UDInstruction op:UDOpcodeShiftLeft]];
+        else if (bin.info.tag == UDOpShiftRight) [prog addObject:[UDInstruction op:UDOpcodeShiftRight]];
+        else if (bin.info.tag == UDOpRotateLeft) [prog addObject:[UDInstruction op:UDOpcodeRotateLeft]];
+        else if (bin.info.tag == UDOpRotateRight) [prog addObject:[UDInstruction op:UDOpcodeRotateRight]];
+        else NSLog(@"Unhandled binary op: %ld", bin.info.tag);
     }
     
     // 3. FUNCTION CALL
