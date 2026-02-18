@@ -1,17 +1,14 @@
 /*
  * GNUstep_main.m
  *
- * GNUstep-specific AppDelegate that creates the calculator UI
- * programmatically.
+ * Standalone programmatic calculator UI for GNUstep.
  *
- * Note: GNUstep's XIB loader (GSXib5KeyedUnarchiver) can parse the
- * Xcode XIB files, but the controller code (UDCalcViewController)
- * relies on macOS-specific APIs (NSGridView, NSStackView, etc.)
- * that GNUstep does not fully support. A programmatic UI is used
- * here as a practical alternative.
+ * This file is NOT used in the default build — the GNUmakefile now
+ * compiles the original AppDelegate.m, UDCalcViewController.m and
+ * main.m with the Xcode XIB files, which GNUstep can load natively.
  *
- * This replaces AppDelegate.m + UDCalcViewController.m + main.m
- * for the GNUstep build.
+ * It is kept here as a fallback for environments where XIB loading
+ * does not work or where a simpler single-file build is preferred.
  */
 
 #import <AppKit/AppKit.h>
