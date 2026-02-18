@@ -79,7 +79,12 @@
             [NSUnitArea squareMiles], [NSUnitArea acres], [NSUnitArea hectares]
         ],
         @"Mass" : @[
-            [NSUnitMass kilograms], [NSUnitMass grams], [NSUnitMass poundsMass],
+            [NSUnitMass kilograms], [NSUnitMass grams],
+#ifdef GNUSTEP
+            [NSUnitMass pounds],
+#else
+            [NSUnitMass poundsMass],
+#endif
             [NSUnitMass ounces], [NSUnitMass stones]
         ],
         @"Temperature" : @[

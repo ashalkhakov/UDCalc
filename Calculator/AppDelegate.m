@@ -74,9 +74,11 @@
 }
 
 
+#ifndef GNUSTEP
 - (BOOL)applicationSupportsSecureRestorableState:(NSApplication *)app {
     return YES;
 }
+#endif
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -173,10 +175,17 @@
     }
         
     // CASE B: Open Window
+#ifdef GNUSTEP
+    NSString *title = [sender title];
+    if (title && [title length] > 0) {
+        [self openConversionWithType:title];
+    }
+#else
     if (sender.identifier && [sender.identifier length] > 4) {
         NSString *type = [sender.identifier substringFromIndex:4];
         [self openConversionWithType:type];
     }
+#endif
 }
 
 - (void)addToHistory:(NSDictionary *)conversionDict {

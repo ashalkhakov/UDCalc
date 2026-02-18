@@ -24,7 +24,9 @@
     [super windowDidLoad];
     
     self.window.delegate = self;
-    self.window.styleMask |= NSWindowStyleMaskNonactivatingPanel;
+#ifndef GNUSTEP
+    [self.window setStyleMask:[self.window styleMask] | NSWindowStyleMaskNonactivatingPanel];
+#endif
     
     ((NSPanel *)self.window).becomesKeyOnlyIfNeeded = YES;
 

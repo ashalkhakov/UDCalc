@@ -1,0 +1,4 @@
+[Desktop Entry]
+Type=Application
+Categories=X-GNUstep;
+Exec=/usr/local/bin/openapp Calculator
