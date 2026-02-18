@@ -16,7 +16,7 @@ APP_NAME = Calculator
 
 SRC_DIR = Calculator
 
-# Core logic (unchanged from macOS build)
+# Source files (same as the macOS build, plus GNUstep compat shims)
 Calculator_OBJC_FILES = \
   $(SRC_DIR)/UDConstants.m \
   $(SRC_DIR)/UDInstruction.m \
@@ -34,8 +34,22 @@ Calculator_OBJC_FILES = \
   $(SRC_DIR)/UDUnitConverter.m \
   $(SRC_DIR)/UDCalcButton.m \
   $(SRC_DIR)/UDBitDisplayView.m \
-  GNUstep/UDGNUstepCompat.m \
-  GNUstep/GNUstep_main.m
+  $(SRC_DIR)/UDCalcViewController.m \
+  $(SRC_DIR)/UDConversionWindowController.m \
+  $(SRC_DIR)/UDTapeWindowController.m \
+  $(SRC_DIR)/AppDelegate.m \
+  $(SRC_DIR)/main.m \
+  GNUstep/UDGNUstepCompat.m
+
+# XIB resources (GNUstep's XIB loader can parse Xcode XIBs)
+Calculator_RESOURCE_FILES = \
+  $(SRC_DIR)/Base.lproj/MainMenu.xib \
+  $(SRC_DIR)/UDCalcView.xib \
+  $(SRC_DIR)/ConversionWindow.xib \
+  $(SRC_DIR)/UDTapeWindow.xib
+
+# Main NIB file (loaded by NSApplicationMain)
+Calculator_MAIN_MODEL_FILE = MainMenu.xib
 
 # Enable ARC
 Calculator_OBJCFLAGS = -fobjc-arc

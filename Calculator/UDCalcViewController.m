@@ -35,6 +35,10 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
     // fix up button layout
 
+#ifndef GNUSTEP
+    // mergeCellsInHorizontalRange:verticalRange: is not yet implemented
+    // in GNUstep's NSGridView — skip on GNUstep (purely cosmetic).
+
     // button "0" (basic/scientific mode)
     // merge row 5 (index 4), columns 1-2 (start 0, len 2)
     [self.basicGridView mergeCellsInHorizontalRange:NSMakeRange(0, 2)
@@ -54,6 +58,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     // merge row 6 (index 5), columns 6-7 (start 5, len 2)
     [self.programmerGridView mergeCellsInHorizontalRange:NSMakeRange(5, 2)
                                            verticalRange:NSMakeRange(5, 1)];
+#endif
     
     // Listen for the app closing
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -75,7 +80,14 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
     // Update Segment Control UI to match loaded state
     if (settings.encodingMode == UDCalcEncodingModeNone) {
+#ifdef GNUSTEP
+        // GNUstep doesn't support selectedSegment = -1 (deselect all)
+        for (NSInteger i = 0; i < self.encodingSegmentedControl.segmentCount; i++) {
+            [self.encodingSegmentedControl setSelected:NO forSegment:i];
+        }
+#else
         self.encodingSegmentedControl.selectedSegment = -1;
+#endif
     } else {
         self.encodingSegmentedControl.selectedSegment = settings.encodingMode == UDCalcEncodingModeASCII ? 0 : 1;
     }
