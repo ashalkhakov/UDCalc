@@ -81,7 +81,7 @@
 @implementation NSLayoutConstraint (UDGNUstepCompat)
 
 - (void)setConstant:(CGFloat)constant {
-    _constant = constant;
+    [self setValue:@(constant) forKey:@"_constant"];
 }
 
 @end

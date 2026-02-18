@@ -210,17 +210,10 @@ static const CGFloat kBtnH  = 32.0;
         [self.calc inputNumber:UDValueMakeDouble(M_PI)];
     } else if (op == UDOpConstE) {
         [self.calc inputNumber:UDValueMakeDouble(M_E)];
-    } else if (op == UDOpExp) {
-        /* e^x  =  e [pow] x */
+    } else if (op == UDOpExp || op == UDOpPow10) {
+        double base = (op == UDOpExp) ? M_E : 10.0;
         UDValue cur = [self.calc currentInputValue];
-        [self.calc inputNumber:UDValueMakeDouble(M_E)];
-        [self.calc performOperation:UDOpPow];
-        [self.calc inputNumber:cur];
-        [self.calc performOperation:UDOpEq];
-    } else if (op == UDOpPow10) {
-        /* 10^x */
-        UDValue cur = [self.calc currentInputValue];
-        [self.calc inputNumber:UDValueMakeDouble(10.0)];
+        [self.calc inputNumber:UDValueMakeDouble(base)];
         [self.calc performOperation:UDOpPow];
         [self.calc inputNumber:cur];
         [self.calc performOperation:UDOpEq];

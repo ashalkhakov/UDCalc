@@ -18,6 +18,7 @@
  * dispatch_once (libdispatch not available on this platform)
  * ============================================================ */
 #include <pthread.h>
+#include <sched.h>
 
 typedef long dispatch_once_t;
 
@@ -28,7 +29,7 @@ static inline void dispatch_once(dispatch_once_t *predicate, void (^block)(void)
         *predicate = 1;
     } else {
         while (*predicate != 1) {
-            /* spin */
+            sched_yield();
         }
         __sync_synchronize();
     }
