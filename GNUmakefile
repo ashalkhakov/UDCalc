@@ -31,15 +31,11 @@ Calculator_OBJC_FILES = \
   $(SRC_DIR)/UDConversionHistoryManager.m \
   $(SRC_DIR)/UDSettingsManager.m \
   $(SRC_DIR)/UDTape.m \
-  $(SRC_DIR)/UDUnitConverter.m \
+  GNUstep/UDUnitConverter_GNUstep.m \
   $(SRC_DIR)/UDCalcButton.m \
   $(SRC_DIR)/UDBitDisplayView.m \
-  $(SRC_DIR)/UDTapeWindowController.m \
-  $(SRC_DIR)/UDConversionWindowController.m \
-  $(SRC_DIR)/UDCalcViewController.m \
-  $(SRC_DIR)/AppDelegate.m \
-  $(SRC_DIR)/main.m \
-  GNUstep/UDGNUstepCompat.m
+  GNUstep/UDGNUstepCompat.m \
+  GNUstep/GNUstep_main.m
 
 # Enable ARC
 Calculator_OBJCFLAGS = -fobjc-arc

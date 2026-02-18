@@ -1,0 +1,94 @@
+# GNUmakefile.tests - Build and run Calculator tests on GNUstep
+#
+# Usage:
+#   . /usr/local/share/GNUstep/Makefiles/GNUstep.sh
+#   make -f GNUmakefile.tests
+#   make -f GNUmakefile.tests check
+#
+# Requires: gnustep-xctest (https://github.com/gnustep/tools-xctest)
+#
+# Note: Due to a linker limitation with libobjc2 constant-string section
+# markers when linking bundles via gnustep-make, tests are compiled and
+# linked directly using clang rather than going through bundle.make.
+#
+
+GNUSTEP_COMPAT_DIR = GNUstep
+SRC_DIR = Calculator
+TEST_DIR = CalculatorTests
+OUT_DIR = obj/tests
+
+CLANG = clang
+OBJCFLAGS = -fobjc-arc -fobjc-runtime=gnustep-2.2 -fblocks -DGNUSTEP \
+  -I$(SRC_DIR) -I$(GNUSTEP_COMPAT_DIR)/include \
+  -I/usr/local/include -I/usr/local/include/GNUstep \
+  -include $(GNUSTEP_COMPAT_DIR)/include/UDGNUstepCompat.h
+
+LDFLAGS = -fobjc-runtime=gnustep-2.2 -fobjc-arc \
+  -L/usr/local/lib -lgnustep-base -lXCTest -lobjc -lm \
+  -Wl,-rpath,/usr/local/lib
+
+CORE_SOURCES = \
+  $(SRC_DIR)/UDConstants.m \
+  $(SRC_DIR)/UDInstruction.m \
+  $(SRC_DIR)/UDAST.m \
+  $(SRC_DIR)/UDFrontendContext.m \
+  $(SRC_DIR)/UDFrontend.m \
+  $(SRC_DIR)/UDCompiler.m \
+  $(SRC_DIR)/UDVM.m \
+  $(SRC_DIR)/UDInputBuffer.m \
+  $(SRC_DIR)/UDValueFormatter.m \
+  $(SRC_DIR)/UDCalc.m \
+  $(SRC_DIR)/UDSettingsManager.m
+
+TEST_SOURCES = \
+  $(TEST_DIR)/UDCalcTests.m \
+  $(TEST_DIR)/UDVMTests.m \
+  $(TEST_DIR)/UDASTTests.m \
+  $(TEST_DIR)/UDCalcRPNTests.m \
+  $(TEST_DIR)/UDCompilerTests.m
+
+ALL_SOURCES = $(CORE_SOURCES) $(TEST_SOURCES)
+ALL_OBJECTS = $(patsubst %.m,$(OUT_DIR)/%.o,$(notdir $(ALL_SOURCES)))
+
+TEST_RUNNER = $(OUT_DIR)/test_runner_main.m
+TEST_BINARY = $(OUT_DIR)/run_tests
+
+.PHONY: all check clean
+
+all: $(TEST_BINARY)
+
+$(OUT_DIR):
+	mkdir -p $(OUT_DIR)
+
+# Generate test runner main
+$(TEST_RUNNER): | $(OUT_DIR)
+	@echo '#import <Foundation/Foundation.h>' > $@
+	@echo '#import <XCTest/GSXCTestRunner.h>' >> $@
+	@echo 'int main(int argc, const char *argv[]) {' >> $@
+	@echo '    @autoreleasepool {' >> $@
+	@echo '        return [[GSXCTestRunner sharedRunner] runAll] ? 0 : 1;' >> $@
+	@echo '    }' >> $@
+	@echo '}' >> $@
+
+# Compile source files
+$(OUT_DIR)/%.o: $(SRC_DIR)/%.m | $(OUT_DIR)
+	$(CLANG) $(OBJCFLAGS) -c $< -o $@
+
+$(OUT_DIR)/%.o: $(TEST_DIR)/%.m | $(OUT_DIR)
+	$(CLANG) $(OBJCFLAGS) -c $< -o $@
+
+$(OUT_DIR)/test_runner_main.o: $(TEST_RUNNER)
+	$(CLANG) $(OBJCFLAGS) -c $< -o $@
+
+# Link
+$(TEST_BINARY): $(ALL_OBJECTS) $(OUT_DIR)/test_runner_main.o
+	$(CLANG) $(LDFLAGS) $^ -o $@
+
+check: $(TEST_BINARY)
+	@echo ""
+	@echo "=== Running Calculator Tests on GNUstep ==="
+	@echo ""
+	LD_LIBRARY_PATH=/usr/local/lib:$(LD_LIBRARY_PATH) $(TEST_BINARY)
+
+clean:
+	rm -rf $(OUT_DIR)

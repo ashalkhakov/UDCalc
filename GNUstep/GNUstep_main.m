@@ -1,10 +1,11 @@
 /*
- * GNUstep_AppDelegate.m
+ * GNUstep_main.m
  *
  * GNUstep-specific AppDelegate that creates the calculator UI
  * programmatically (XIB files from Xcode are not compatible with GNUstep).
  *
- * This replaces AppDelegate.m for the GNUstep build.
+ * This replaces AppDelegate.m + UDCalcViewController.m + main.m
+ * for the GNUstep build.
  */
 
 #import <AppKit/AppKit.h>
@@ -16,31 +17,37 @@
 #import "UDConversionHistoryManager.h"
 #import "UDTape.h"
 
-/* Notification names (defined in the macOS UDCalcViewController.m) */
+/* Notification names (matching the macOS UDCalcViewController.m) */
 NSString * const UDCalcDidFinishCalculationNotification = @"org.underivable.calculator.DidFinishCalculation";
 NSString * const UDCalcFormulaKey = @"UDCalcFormulaKey";
 NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
 /* ============================================================
- * Minimal Calculator View Controller (GNUstep)
+ * GNUstep Calculator Controller
  *
- * Builds a basic calculator layout programmatically.
- * Supports Basic mode with the standard keypad.
+ * Builds a calculator layout programmatically with:
+ *   - Basic keypad (digits, +, -, *, /, =, C, AC, %, +/-)
+ *   - Scientific drawer (sin, cos, tan, sqrt, pow, ln, log, etc.)
+ *   - Memory operations (MC, MR, M+, M-)
+ *   - Parentheses
  * ============================================================ */
+
+static const CGFloat kPad   = 4.0;
+static const CGFloat kBtnW  = 54.0;
+static const CGFloat kBtnH  = 32.0;
 
 @interface GNUstepCalcController : NSObject <UDCalcDelegate>
 {
-    NSWindow *_window;
+    NSWindow    *_window;
     NSTextField *_displayField;
-    UDCalc *_calc;
-    UDTape *_tape;
+    NSTextField *_radLabel;
 }
 
 @property (strong) UDCalc *calc;
 @property (strong) UDTape *tape;
 
 - (void)buildUI;
-- (void)updateDisplay;
+- (NSMenu *)buildMainMenu;
 @end
 
 @implementation GNUstepCalcController
@@ -55,11 +62,36 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     return self;
 }
 
+/* --------------------------------------------------------
+ * Helper: create a button
+ * -------------------------------------------------------- */
+- (NSButton *)btnWithTitle:(NSString *)title
+                      tag:(NSInteger)tag
+                   action:(SEL)action
+                    frame:(NSRect)frame
+{
+    NSButton *btn = [[NSButton alloc] initWithFrame:frame];
+    [btn setTitle:title];
+    [btn setTag:tag];
+    [btn setTarget:self];
+    [btn setAction:action];
+    [btn setBezelStyle:NSRegularSquareBezelStyle];
+    return btn;
+}
+
+/* --------------------------------------------------------
+ * Build UI
+ * -------------------------------------------------------- */
 - (void)buildUI {
-    /* --------------------------------------------------------
-     * Window
-     * -------------------------------------------------------- */
-    NSRect winFrame = NSMakeRect(200, 200, 260, 400);
+    /* Column counts: 4 basic + 5 scientific = 9 cols (sci hidden initially) */
+    int basicCols = 4;
+    int sciCols   = 5;
+    int totalCols = basicCols + sciCols;
+
+    CGFloat winW = kPad + totalCols * (kBtnW + kPad);
+    CGFloat winH = kPad + 50 + kPad + 7 * (kBtnH + kPad) + kPad;
+
+    NSRect winFrame = NSMakeRect(200, 200, winW, winH);
     _window = [[NSWindow alloc]
         initWithContentRect:winFrame
                   styleMask:(NSWindowStyleMaskTitled |
@@ -70,72 +102,85 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     [_window setTitle:@"Calculator"];
 
     NSView *content = [_window contentView];
-    CGFloat pad = 4.0;
-    CGFloat btnW = 60.0;
-    CGFloat btnH = 40.0;
-    CGFloat x, y;
+    CGFloat curY = winH;
 
     /* --------------------------------------------------------
-     * Display Field (top)
+     * Display
      * -------------------------------------------------------- */
     CGFloat dispH = 50.0;
-    CGFloat dispY = winFrame.size.height - dispH - pad;
+    curY -= dispH + kPad;
     _displayField = [[NSTextField alloc]
-        initWithFrame:NSMakeRect(pad, dispY, winFrame.size.width - 2*pad, dispH)];
+        initWithFrame:NSMakeRect(kPad, curY, winW - 2*kPad, dispH)];
     [_displayField setStringValue:@"0"];
     [_displayField setEditable:NO];
     [_displayField setAlignment:NSTextAlignmentRight];
-    [_displayField setFont:[NSFont systemFontOfSize:28]];
+    [_displayField setFont:[NSFont userFixedPitchFontOfSize:26]];
     [_displayField setBezeled:YES];
     [_displayField setDrawsBackground:YES];
     [content addSubview:_displayField];
 
+    /* Rad/Deg indicator */
+    _radLabel = [[NSTextField alloc]
+        initWithFrame:NSMakeRect(kPad + 4, curY + 2, 40, 16)];
+    [_radLabel setStringValue:@"Rad"];
+    [_radLabel setFont:[NSFont systemFontOfSize:10]];
+    [_radLabel setBezeled:NO];
+    [_radLabel setDrawsBackground:NO];
+    [_radLabel setEditable:NO];
+    [_radLabel setSelectable:NO];
+    [content addSubview:_radLabel];
+
     /* --------------------------------------------------------
-     * Button Layout (5 rows x 4 columns, bottom-up)
-     *
-     * Row 0 (bottom): 0  .  =
-     * Row 1:  1  2  3  +
-     * Row 2:  4  5  6  -
-     * Row 3:  7  8  9  *
-     * Row 4 (top):  C  AC  %  /
+     * Row 0 (memory): MC  MR  M+  M-  |  (   )   x²  x³  xʸ
      * -------------------------------------------------------- */
+    typedef struct { const char *label; NSInteger tag; SEL act; } BD;
 
-    typedef struct { const char *label; NSInteger tag; } BtnDef;
+    #define OP(l,t)  { l, t, @selector(operationPressed:) }
+    #define DG(l,t)  { l, t, @selector(digitPressed:) }
+    #define DC       { ".", UDOpDecimal, @selector(decimalPressed:) }
+    #define RD       { "Rad", UDOpRad, @selector(operationPressed:) }
 
-    BtnDef rows[5][4] = {
-        { {"C",  UDOpClear},   {"+/-", UDOpNegate}, {"%",  UDOpPercent}, {"/",  UDOpDiv} },
-        { {"7",  7},           {"8",   8},          {"9",  9},           {"*",  UDOpMul} },
-        { {"4",  4},           {"5",   5},          {"6",  6},           {"-",  UDOpSub} },
-        { {"1",  1},           {"2",   2},          {"3",  3},           {"+",  UDOpAdd} },
-        { {"0",  0},           {".",   UDOpDecimal},{"=",  UDOpEq},      {"AC", UDOpClearAll} },
+    /* 7 rows x 9 columns */
+    BD layout[7][9] = {
+        /* row 0 – memory + sci top */
+        { OP("MC", UDOpMC), OP("MR", UDOpMR), OP("M+", UDOpMAdd), OP("M-", UDOpMSub),
+          OP("(", UDOpParenLeft), OP(")", UDOpParenRight), OP("x²", UDOpSquare), OP("x³", UDOpCube), OP("xʸ", UDOpPow) },
+        /* row 1 – clear row + sci */
+        { OP("C", UDOpClear), OP("+/-", UDOpNegate), OP("%", UDOpPercent), OP("/", UDOpDiv),
+          OP("1/x", UDOpInvert), OP("√x", UDOpSqrt), OP("∛x", UDOpCbrt), OP("ⁿ√x", UDOpYRoot), OP("x!", UDOpFactorial) },
+        /* row 2 */
+        { DG("7", 7), DG("8", 8), DG("9", 9), OP("×", UDOpMul),
+          OP("sin", UDOpSin), OP("cos", UDOpCos), OP("tan", UDOpTan), OP("eˣ", UDOpExp), OP("10ˣ", UDOpPow10) },
+        /* row 3 */
+        { DG("4", 4), DG("5", 5), DG("6", 6), OP("-", UDOpSub),
+          OP("sin⁻¹", UDOpSinInverse), OP("cos⁻¹", UDOpCosInverse), OP("tan⁻¹", UDOpTanInverse), OP("ln", UDOpLn), OP("log₁₀", UDOpLog10) },
+        /* row 4 */
+        { DG("1", 1), DG("2", 2), DG("3", 3), OP("+", UDOpAdd),
+          OP("sinh", UDOpSinh), OP("cosh", UDOpCosh), OP("tanh", UDOpTanh), OP("log₂", UDOpLog2), OP("logᵧ", UDOpLogY) },
+        /* row 5 */
+        { DG("0", 0), DC, OP("=", UDOpEq), OP("AC", UDOpClearAll),
+          OP("sinh⁻¹", UDOpSinhInverse), OP("cosh⁻¹", UDOpCoshInverse), OP("tanh⁻¹", UDOpTanhInverse), RD, OP("Rand", UDOpRand) },
+        /* row 6 – constants */
+        { {NULL,0,NULL}, {NULL,0,NULL}, {NULL,0,NULL}, {NULL,0,NULL},
+          OP("π", UDOpConstPi), OP("e", UDOpConstE), OP("EE", UDOpEE), {NULL,0,NULL}, {NULL,0,NULL} },
     };
 
-    CGFloat startY = dispY - pad - btnH;
+    #undef OP
+    #undef DG
+    #undef DC
+    #undef RD
 
-    for (int row = 0; row < 5; row++) {
-        y = startY - row * (btnH + pad);
-        for (int col = 0; col < 4; col++) {
-            x = pad + col * (btnW + pad);
-            BtnDef def = rows[row][col];
+    for (int row = 0; row < 7; row++) {
+        curY -= kBtnH + kPad;
+        for (int col = 0; col < totalCols; col++) {
+            BD def = layout[row][col];
+            if (def.label == NULL) continue;
 
-            NSButton *btn = [[NSButton alloc]
-                initWithFrame:NSMakeRect(x, y, btnW, btnH)];
-            [btn setTitle:[NSString stringWithUTF8String:def.label]];
-            [btn setTag:def.tag];
-
-            /* Route digits vs operations */
-            NSInteger t = def.tag;
-            if (t >= 0 && t <= 9) {
-                [btn setTarget:self];
-                [btn setAction:@selector(digitPressed:)];
-            } else if (t == UDOpDecimal) {
-                [btn setTarget:self];
-                [btn setAction:@selector(decimalPressed:)];
-            } else {
-                [btn setTarget:self];
-                [btn setAction:@selector(operationPressed:)];
-            }
-
+            CGFloat x = kPad + col * (kBtnW + kPad);
+            NSButton *btn = [self btnWithTitle:[NSString stringWithUTF8String:def.label]
+                                           tag:def.tag
+                                        action:def.act
+                                         frame:NSMakeRect(x, curY, kBtnW, kBtnH)];
             [content addSubview:btn];
         }
     }
@@ -148,8 +193,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
  * -------------------------------------------------------- */
 
 - (void)digitPressed:(id)sender {
-    NSInteger digit = [sender tag];
-    [self.calc inputDigit:digit];
+    [self.calc inputDigit:[sender tag]];
     [self updateDisplay];
 }
 
@@ -161,20 +205,37 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 - (void)operationPressed:(id)sender {
     UDOp op = (UDOp)[sender tag];
 
-    if (op == UDOpNegate) {
-        [self.calc performOperation:UDOpNegate];
+    /* Constants inject a number */
+    if (op == UDOpConstPi) {
+        [self.calc inputNumber:UDValueMakeDouble(M_PI)];
+    } else if (op == UDOpConstE) {
+        [self.calc inputNumber:UDValueMakeDouble(M_E)];
+    } else if (op == UDOpExp) {
+        /* e^x  =  e [pow] x */
+        UDValue cur = [self.calc currentInputValue];
+        [self.calc inputNumber:UDValueMakeDouble(M_E)];
+        [self.calc performOperation:UDOpPow];
+        [self.calc inputNumber:cur];
+        [self.calc performOperation:UDOpEq];
+    } else if (op == UDOpPow10) {
+        /* 10^x */
+        UDValue cur = [self.calc currentInputValue];
+        [self.calc inputNumber:UDValueMakeDouble(10.0)];
+        [self.calc performOperation:UDOpPow];
+        [self.calc inputNumber:cur];
+        [self.calc performOperation:UDOpEq];
     } else {
         [self.calc performOperation:op];
     }
+
+    /* Update Rad/Deg indicator */
+    [_radLabel setStringValue:self.calc.isRadians ? @"Rad" : @"Deg"];
+
     [self updateDisplay];
 }
 
 - (void)updateDisplay {
-    NSString *val = [self.calc currentDisplayValue];
-    [_displayField setStringValue:val];
-
-    /* Update C/AC label */
-    /* (simplified - we don't track the button reference here) */
+    [_displayField setStringValue:[self.calc currentDisplayValue]];
 }
 
 /* --------------------------------------------------------

@@ -1,0 +1,6 @@
+# GNUstep build artifacts
+obj/
+Calculator.app/
+*.o
+*.d
+stamp.make
