@@ -2,7 +2,8 @@
 #
 # Usage:
 #   . /usr/local/share/GNUstep/Makefiles/GNUstep.sh
-#   make
+#   make          # works everywhere (Makefile wrapper forwards to gmake)
+#   gmake         # or invoke GNU make directly (required on BSD)
 #
 # Requirements:
 #   - GNUstep with the modern Objective-C runtime (libobjc2)
