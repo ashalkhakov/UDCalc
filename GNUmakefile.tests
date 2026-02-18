@@ -24,7 +24,7 @@ OBJCFLAGS = -fobjc-arc -fobjc-runtime=gnustep-2.2 -fblocks -DGNUSTEP \
   -include $(GNUSTEP_COMPAT_DIR)/include/UDGNUstepCompat.h
 
 LDFLAGS = -fobjc-runtime=gnustep-2.2 -fobjc-arc \
-  -L/usr/local/lib -lgnustep-base -lXCTest -lobjc -lm \
+  -L/usr/local/lib -lgnustep-base -lXCTest -lobjc -ldispatch -lm \
   -Wl,-rpath,/usr/local/lib
 
 CORE_SOURCES = \

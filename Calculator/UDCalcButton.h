@@ -5,7 +5,7 @@
 //  Created by Artyom Shalkhakov on 21.01.2026.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 
 typedef NS_ENUM(NSInteger, CalcButtonType) {
     // We will use this to mean "Just draw the button title"

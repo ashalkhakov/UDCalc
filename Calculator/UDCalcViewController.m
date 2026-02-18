@@ -7,7 +7,9 @@
 
 
 #import "UDCalcViewController.h"
+#if __has_include(<QuartzCore/QuartzCore.h>)
 #import <QuartzCore/QuartzCore.h>
+#endif
 #import "UDCalcButton.h"
 #import "UDValueFormatter.h"
 #import "UDSettingsManager.h"

@@ -6,7 +6,9 @@
 //
 
 #import "AppDelegate.h"
+#if __has_include(<QuartzCore/QuartzCore.h>)
 #import <QuartzCore/QuartzCore.h>
+#endif
 #import "UDCalcButton.h"
 #import "UDSettingsManager.h"
 

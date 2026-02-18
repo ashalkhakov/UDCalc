@@ -5,7 +5,7 @@
 //  Created by Artyom Shalkhakov on 02.02.2026.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 
 @protocol UDBitDisplayDelegate <NSObject>
 - (void)bitDisplayDidToggleBit:(NSInteger)bitIndex toValue:(BOOL)newValue;

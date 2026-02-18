@@ -5,7 +5,7 @@
 //  Created by Artyom Shalkhakov on 18.01.2026.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 
 @interface UDTapeWindowController : NSWindowController <NSWindowDelegate>
 

@@ -5,7 +5,7 @@
 //  Created by Artyom Shalkhakov on 17.01.2026.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {

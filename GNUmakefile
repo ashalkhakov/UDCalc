@@ -42,7 +42,6 @@ Calculator_OBJCFLAGS = -fobjc-arc
 
 # Include paths:
 #   - Calculator/ for project headers
-#   - GNUstep/include/ for Cocoa.h and QuartzCore.h shims
 #   - GNUstep/include/ for UDGNUstepCompat.h
 #   - /usr/local/include/GNUstep for libobjc2 headers
 ADDITIONAL_OBJCFLAGS = \
@@ -53,6 +52,7 @@ ADDITIONAL_OBJCFLAGS = \
 
 ADDITIONAL_LDFLAGS = \
   -L/usr/local/lib \
+  -ldispatch \
   -Wl,-rpath,/usr/local/lib
 
 include $(GNUSTEP_MAKEFILES)/application.make

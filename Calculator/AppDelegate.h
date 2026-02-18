@@ -5,7 +5,7 @@
 //  Created by Artyom Shalkhakov on 17.01.2026.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 #import "UDCalcViewController.h"
 #import "UDUnitConverter.h"
 #import "UDConversionHistoryManager.h"
