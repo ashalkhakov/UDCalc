@@ -57,11 +57,23 @@
     }
     
     if (fromUnit && toUnit) {
+#ifdef GNUSTEP
+        // GNUstep's NSMeasurement.measurementByConvertingToUnit: is broken
+        // (calls -converter on NSUnit which only exists on NSDimension).
+        // Use NSDimension's converter directly instead.
+        if ([fromUnit isKindOfClass:[NSDimension class]] && [toUnit isKindOfClass:[NSDimension class]]) {
+            NSUnitConverter *fromConv = [(NSDimension *)fromUnit converter];
+            NSUnitConverter *toConv   = [(NSDimension *)toUnit converter];
+            double baseValue = [fromConv baseUnitValueFromValue:value];
+            return [toConv valueFromBaseUnitValue:baseValue];
+        }
+#else
         NSMeasurement *measurement = [[NSMeasurement alloc] initWithDoubleValue:value unit:fromUnit];
         if ([measurement canBeConvertedToUnit:toUnit]) {
             NSMeasurement *result = [measurement measurementByConvertingToUnit:toUnit];
             return result.doubleValue;
         }
+#endif
     }
     
     return value;

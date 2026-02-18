@@ -31,7 +31,7 @@ Calculator_OBJC_FILES = \
   $(SRC_DIR)/UDConversionHistoryManager.m \
   $(SRC_DIR)/UDSettingsManager.m \
   $(SRC_DIR)/UDTape.m \
-  GNUstep/UDUnitConverter_GNUstep.m \
+  $(SRC_DIR)/UDUnitConverter.m \
   $(SRC_DIR)/UDCalcButton.m \
   $(SRC_DIR)/UDBitDisplayView.m \
   GNUstep/UDGNUstepCompat.m \
