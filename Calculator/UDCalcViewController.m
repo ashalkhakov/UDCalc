@@ -483,7 +483,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     setBtn(self.sinhButton, CalcButtonTypeSinh, UDOpSinh, CalcButtonTypeSinhInverse, UDOpSinhInverse);
     setBtn(self.coshButton, CalcButtonTypeCosh, UDOpCosh, CalcButtonTypeCoshInverse, UDOpCoshInverse);
     setBtn(self.tanhButton, CalcButtonTypeTanh, UDOpTanh, CalcButtonTypeTanhInverse, UDOpTanhInverse);
-    
+
     self.radDegButton.title = self.calc.isRadians ? @"Deg" : @"Rad";
     [self.radDegButton setNeedsDisplay:YES];
 }
@@ -576,7 +576,6 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     UDCalcMode mode = self.calc.mode;
     NSTextField *radLabel = self.calc.isRPNMode ? self.radLabelRPN : self.radLabel;
     NSTextField *charLabel = self.calc.isRPNMode ? self.charLabelRPN : self.charLabel;
-    
     
     // ============================================================
     // 1. RADIAN INDICATOR (Scientific Mode)

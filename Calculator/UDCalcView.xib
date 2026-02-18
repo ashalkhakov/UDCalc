@@ -87,8 +87,8 @@
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uBC-6e-c6g">
-                                        <rect key="frame" x="-8" y="-6" width="33" height="16"/>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uBC-6e-c6g">
+                                        <rect key="frame" x="4" y="6" width="28" height="16"/>
                                         <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Char" id="GY9-Gw-9Wf">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -97,8 +97,8 @@
                                     </textField>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="uBC-6e-c6g" firstAttribute="bottom" secondItem="dJx-PN-gbn" secondAttribute="bottom" constant="6" id="95E-uQ-j8U"/>
-                                    <constraint firstItem="uBC-6e-c6g" firstAttribute="leading" secondItem="dJx-PN-gbn" secondAttribute="leading" constant="-6" id="HkC-fe-Wf7"/>
+                                    <constraint firstItem="uBC-6e-c6g" firstAttribute="bottom" secondItem="dJx-PN-gbn" secondAttribute="bottom" constant="-6" id="95E-uQ-j8U"/>
+                                    <constraint firstItem="uBC-6e-c6g" firstAttribute="leading" secondItem="dJx-PN-gbn" secondAttribute="leading" constant="6" id="HkC-fe-Wf7"/>
                                     <constraint firstItem="SMT-VF-0Db" firstAttribute="leading" secondItem="dJx-PN-gbn" secondAttribute="leading" constant="6" id="Mnc-VI-tA8"/>
                                     <constraint firstItem="dJx-PN-gbn" firstAttribute="top" secondItem="FPS-Kl-RQk" secondAttribute="top" id="U9U-9m-t8a"/>
                                     <constraint firstItem="SMT-VF-0Db" firstAttribute="bottom" secondItem="dJx-PN-gbn" secondAttribute="bottom" constant="-6" id="b4b-IY-4Pe"/>
@@ -471,7 +471,7 @@
                                 </gridCell>
                                 <gridCell row="5C6-84-KEb" column="uDK-Vs-eSe" id="gly-Dh-QLu">
                                     <button key="contentView" identifier="second" toolTip="Change some buttons to alternative functions" verticalHuggingPriority="750" tag="22" translatesAutoresizingMaskIntoConstraints="NO" id="p0F-jo-Sdn" customClass="UDCalcButton">
-                                        <rect key="frame" x="0.0" y="153" width="60" height="51"/>
+                                        <rect key="frame" x="0.0" y="154" width="60" height="50"/>
                                         <buttonCell key="cell" type="square" title="2nd" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" tag="83" imageScaling="proportionallyDown" inset="2" id="59E-WT-snW">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -483,7 +483,7 @@
                                 </gridCell>
                                 <gridCell row="5C6-84-KEb" column="VLN-cA-icp" id="qFS-Bs-Qi5">
                                     <button key="contentView" identifier="sqr" toolTip="Square the displayed value" verticalHuggingPriority="750" tag="31" translatesAutoresizingMaskIntoConstraints="NO" id="H5Q-0V-U2g" customClass="UDCalcButton">
-                                        <rect key="frame" x="61" y="153" width="60" height="51"/>
+                                        <rect key="frame" x="61" y="154" width="60" height="50"/>
                                         <buttonCell key="cell" type="square" title="x²" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="EBu-Y8-uLy">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -495,7 +495,7 @@
                                 </gridCell>
                                 <gridCell row="5C6-84-KEb" column="p4x-Hj-ZV9" id="BWU-hT-EAk">
                                     <button key="contentView" identifier="cube" toolTip="Cube the displayed value" verticalHuggingPriority="750" tag="32" translatesAutoresizingMaskIntoConstraints="NO" id="Ku9-kK-eWe" customClass="UDCalcButton">
-                                        <rect key="frame" x="122" y="153" width="60" height="51"/>
+                                        <rect key="frame" x="122" y="154" width="60" height="50"/>
                                         <buttonCell key="cell" type="square" title="x³" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="RCS-ya-cQ1">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -507,7 +507,7 @@
                                 </gridCell>
                                 <gridCell row="5C6-84-KEb" column="Oke-tY-dfN" id="qe2-0o-yY1">
                                     <button key="contentView" identifier="pow" toolTip="Raise the displayed value to the power of the next value entered" verticalHuggingPriority="750" tag="33" translatesAutoresizingMaskIntoConstraints="NO" id="6w6-Bf-JLU" customClass="UDCalcButton">
-                                        <rect key="frame" x="183" y="153" width="60" height="51"/>
+                                        <rect key="frame" x="183" y="154" width="60" height="50"/>
                                         <buttonCell key="cell" type="square" title="x^y" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="nAp-I0-0dg">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -524,7 +524,7 @@
                                 </gridCell>
                                 <gridCell row="5C6-84-KEb" column="BbZ-1T-Ayx" id="yPE-WV-fPD">
                                     <button key="contentView" identifier="e_pow_x" toolTip="Calculate e to the power of the displayed value" verticalHuggingPriority="750" tag="35" translatesAutoresizingMaskIntoConstraints="NO" id="xSX-QO-2eZ" customClass="UDCalcButton">
-                                        <rect key="frame" x="244" y="153" width="60" height="51"/>
+                                        <rect key="frame" x="244" y="154" width="60" height="50"/>
                                         <buttonCell key="cell" type="square" title="eˣ" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="u9c-HC-Dek">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -541,7 +541,7 @@
                                 </gridCell>
                                 <gridCell row="5C6-84-KEb" column="hbz-yz-2oS" id="sJr-y2-FMT">
                                     <button key="contentView" identifier="_10_pow_x" toolTip="Calculate 10 to the power of the displayed value" verticalHuggingPriority="750" tag="36" translatesAutoresizingMaskIntoConstraints="NO" id="du0-it-v0Z" customClass="UDCalcButton">
-                                        <rect key="frame" x="305" y="153" width="60" height="51"/>
+                                        <rect key="frame" x="305" y="154" width="60" height="50"/>
                                         <buttonCell key="cell" type="square" title="10ˣ" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="WIt-24-Aon">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -558,7 +558,7 @@
                                 </gridCell>
                                 <gridCell row="ZvJ-hM-qWa" column="uDK-Vs-eSe" id="ymH-sD-UKj">
                                     <button key="contentView" identifier="invert" toolTip="Calculate the Inverse of the displayed value" verticalHuggingPriority="750" tag="41" translatesAutoresizingMaskIntoConstraints="NO" id="pbI-N7-Sb8" customClass="UDCalcButton">
-                                        <rect key="frame" x="0.0" y="102" width="60" height="50"/>
+                                        <rect key="frame" x="0.0" y="102" width="60" height="51"/>
                                         <buttonCell key="cell" type="square" title="1/x" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1pp-Pm-MEL">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -575,7 +575,7 @@
                                 </gridCell>
                                 <gridCell row="ZvJ-hM-qWa" column="VLN-cA-icp" id="Zio-0r-XEN">
                                     <button key="contentView" identifier="sqrt" toolTip="Calculate the square root of the displayed value" verticalHuggingPriority="750" tag="42" translatesAutoresizingMaskIntoConstraints="NO" id="0XO-lu-DsU" customClass="UDCalcButton">
-                                        <rect key="frame" x="61" y="102" width="60" height="50"/>
+                                        <rect key="frame" x="61" y="102" width="60" height="51"/>
                                         <buttonCell key="cell" type="square" title="sqrt(x)" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="lNU-Ir-zcR">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -592,7 +592,7 @@
                                 </gridCell>
                                 <gridCell row="ZvJ-hM-qWa" column="p4x-Hj-ZV9" id="Fhu-X1-9iC">
                                     <button key="contentView" identifier="cbrt" toolTip="Calculate the cube root of the displayed value" verticalHuggingPriority="750" tag="43" translatesAutoresizingMaskIntoConstraints="NO" id="gbl-na-eO2" customClass="UDCalcButton">
-                                        <rect key="frame" x="122" y="102" width="60" height="50"/>
+                                        <rect key="frame" x="122" y="102" width="60" height="51"/>
                                         <buttonCell key="cell" type="square" title="cbrt(x)" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="UGY-Wk-Mbq">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -609,7 +609,7 @@
                                 </gridCell>
                                 <gridCell row="ZvJ-hM-qWa" column="Oke-tY-dfN" id="H5H-7i-5B9">
                                     <button key="contentView" identifier="yroot" toolTip="Compute the nth root of the displayed value, where n is the next value entered" verticalHuggingPriority="750" tag="44" translatesAutoresizingMaskIntoConstraints="NO" id="M32-ox-RFz" customClass="UDCalcButton">
-                                        <rect key="frame" x="183" y="102" width="60" height="50"/>
+                                        <rect key="frame" x="183" y="102" width="60" height="51"/>
                                         <buttonCell key="cell" type="square" title="yroot" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4At-aw-lHn">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -626,7 +626,7 @@
                                 </gridCell>
                                 <gridCell row="ZvJ-hM-qWa" column="BbZ-1T-Ayx" id="ywT-Eu-7KS">
                                     <button key="contentView" identifier="ln" toolTip="Calculate the natural logarithm of the displayed value" verticalHuggingPriority="750" tag="45" translatesAutoresizingMaskIntoConstraints="NO" id="5ur-nj-HL3" customClass="UDCalcButton">
-                                        <rect key="frame" x="244" y="102" width="60" height="50"/>
+                                        <rect key="frame" x="244" y="102" width="60" height="51"/>
                                         <buttonCell key="cell" type="square" title="ln" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="TUb-4F-cTv">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -638,7 +638,7 @@
                                 </gridCell>
                                 <gridCell row="ZvJ-hM-qWa" column="hbz-yz-2oS" id="tO5-SZ-OYb">
                                     <button key="contentView" identifier="log10" toolTip="Calculate the base 10 logarithm of the displayed value" verticalHuggingPriority="750" tag="46" translatesAutoresizingMaskIntoConstraints="NO" id="tbe-yY-gLY" customClass="UDCalcButton">
-                                        <rect key="frame" x="305" y="102" width="60" height="50"/>
+                                        <rect key="frame" x="305" y="102" width="60" height="51"/>
                                         <buttonCell key="cell" type="square" title="log10" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="fQC-IV-0JU">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>

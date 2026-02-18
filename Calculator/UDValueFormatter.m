@@ -45,18 +45,42 @@
 + (NSString *)stringForLong:(unsigned long long)val base:(UDBase)base showThousandsSeparators:(BOOL)showThousandsSeparators {
     switch (base) {
         case UDBaseDec: {
-            if (showThousandsSeparators) {
-                // Create a formatter for locale-aware grouping (e.g. 1,000,000)
-                NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-                formatter.numberStyle = NSNumberFormatterDecimalStyle;
-                formatter.usesGroupingSeparator = YES;
-                // Optional: Force a specific separator if you don't want Locale defaults
-                // formatter.groupingSeparator = @" ";
+            unsigned long long temp = val;
+            
+            // Fast-path for zero
+            if (temp == 0) return @"0";
+
+            // A 64-bit max unsigned integer is 18,446,744,073,709,551,615.
+            // That's 20 digits + 6 separators + 1 null terminator = 27 characters.
+            // A 32-byte buffer gives us plenty of room.
+            char buffer[32];
+            int index = 31;
+            buffer[index] = '\0'; // Null-terminate the end of the string
+            
+            // Figure out the local separator (default to comma)
+            NSString *sepStr = [[NSLocale currentLocale] objectForKey:NSLocaleGroupingSeparator];
+            char separator = (sepStr.length > 0) ? (char)[sepStr characterAtIndex:0] : ',';
+            int digitCount = 0;
+            
+            // Loop mathematically to extract digits right-to-left
+            while (temp > 0) {
+                // Add the separator every 3 digits
+                if (digitCount > 0 && digitCount % 3 == 0 && showThousandsSeparators) {
+                    index--;
+                    buffer[index] = separator;
+                }
                 
-                return [formatter stringFromNumber:@(val)];
-            } else {
-                return [NSString stringWithFormat:@"%llu", val];
+                // Extract lowest digit, convert to ASCII, and move to next
+                char digitChar = (char)(temp % 10) + '0';
+                index--;
+                buffer[index] = digitChar;
+                
+                temp /= 10;
+                digitCount++;
             }
+            
+            // Return an NSString starting from wherever our index ended up
+            return [NSString stringWithUTF8String:&buffer[index]];
         }
             
         case UDBaseHex:
