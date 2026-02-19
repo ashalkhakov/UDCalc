@@ -89,18 +89,15 @@
     _constant = constant;
 
     /* Find the view that owns this constraint and bounce it through
-       the solver by removing + re-adding. */
+       the solver by removing + re-adding.
+       Use performSelector: because GNUstep headers don't declare
+       removeConstraint:/addConstraint: on NSView. */
     id first = [self firstItem];
     if ([first isKindOfClass:[NSView class]]) {
         NSView *owner = [(NSView *)first superview];
-        if (owner) {
-            [owner removeConstraint:self];
-            [owner addConstraint:self];
-        } else {
-            /* Width/height constraint owned by the view itself. */
-            [(NSView *)first removeConstraint:self];
-            [(NSView *)first addConstraint:self];
-        }
+        id target = owner ? (id)owner : first;
+        [target performSelector:@selector(removeConstraint:) withObject:self];
+        [target performSelector:@selector(addConstraint:) withObject:self];
     }
 }
 
