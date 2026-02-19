@@ -400,6 +400,16 @@ static CGFloat _gs_wrapperH;
     [self rebuildProgrammerGrid];
     // Apply orange operator colors (XIB color runtime attributes not decoded)
     [self applyOperatorColorsInView:self.view];
+    // GNUstep may resolve catalog colors (controlTextColor, labelColor)
+    // to white in some themes, making text invisible on light backgrounds.
+    {
+        NSColor *dark = [NSColor blackColor];
+        [self.displayField setTextColor:dark];
+        [self.radLabel setTextColor:dark];
+        [self.charLabel setTextColor:dark];
+        [self.radLabelRPN setTextColor:dark];
+        [self.charLabelRPN setTextColor:dark];
+    }
 #else
     // mergeCellsInHorizontalRange:verticalRange: is not yet implemented
     // in GNUstep's NSGridView — skip on GNUstep (purely cosmetic).
@@ -968,10 +978,18 @@ static CGFloat _gs_wrapperH;
         
         if (isXRegister) {
             cell.textField.font = [NSFont boldSystemFontOfSize:22];
+#ifdef GNUSTEP
+            cell.textField.textColor = [NSColor blackColor];
+#else
             cell.textField.textColor = [NSColor labelColor];
+#endif
         } else {
             cell.textField.font = [NSFont systemFontOfSize:18];
+#ifdef GNUSTEP
+            cell.textField.textColor = [NSColor darkGrayColor];
+#else
             cell.textField.textColor = [NSColor secondaryLabelColor]; // Dim history
+#endif
         }
     }
 
