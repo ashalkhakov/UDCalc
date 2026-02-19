@@ -293,66 +293,21 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
         [g columnAtIndex:c].width = kGridButtonWidth;
 }
 
-/**
- * Replace an NSLayoutConstraint with a new one that has a different constant.
- * GNUstep's Auto Layout solver doesn't support changing constants on live
- * constraints; the only reliable way is to swap in a fresh constraint.
- * Returns the replacement (or the original if no change is needed).
+/*
+ * GNUstep's Cassowary solver hangs when constraints are removed/re-added
+ * at runtime, and doesn't pick up KVC changes to _constant either.
+ * Bypass Auto Layout for dynamic mode changes entirely: track the
+ * "logical" constraint constants in shadow variables, and rely on the
+ * window frame resize + view hiding that macOS also does.
+ *
+ * _gs_keypadH, _gs_scientificW, _gs_containerH, _gs_wrapperH
+ * are initialized from the XIB constraint constants in viewDidLoad and
+ * updated here whenever the macOS path would call setConstant:.
  */
-static NSLayoutConstraint *ud_replaceConstraint(NSLayoutConstraint *old, CGFloat newConstant) {
-    if (!old) return nil;
-    if (old.constant == newConstant) return old;
-
-    NSLayoutConstraint *replacement = [NSLayoutConstraint
-        constraintWithItem: old.firstItem
-                 attribute: old.firstAttribute
-                 relatedBy: old.relation
-                    toItem: old.secondItem
-                 attribute: old.secondAttribute
-                multiplier: old.multiplier
-                  constant: newConstant];
-    replacement.priority = old.priority;
-
-    /* Find the view that owns this constraint.  Height/width constraints
-       are typically owned by the view itself; inter-view constraints
-       by the nearest common ancestor. */
-    id first = old.firstItem;
-    id second = old.secondItem;
-    NSView *owner = nil;
-
-    /* GNUstep headers don't declare -constraints on NSView, so use
-       performSelector to call it dynamically at runtime. */
-    SEL constraintsSel = @selector(constraints);
-    if ([first isKindOfClass:[NSView class]]) {
-        NSView *v = (NSView *)first;
-        NSArray *vc = [v performSelector:constraintsSel];
-        if ([vc containsObject:old])
-            owner = v;
-        else if (v.superview) {
-            NSArray *sc = [v.superview performSelector:constraintsSel];
-            if ([sc containsObject:old])
-                owner = v.superview;
-        }
-    }
-    if (!owner && [second isKindOfClass:[NSView class]]) {
-        NSView *v = (NSView *)second;
-        NSArray *vc = [v performSelector:constraintsSel];
-        if ([vc containsObject:old])
-            owner = v;
-        else if (v.superview) {
-            NSArray *sc = [v.superview performSelector:constraintsSel];
-            if ([sc containsObject:old])
-                owner = v.superview;
-        }
-    }
-
-    if (owner) {
-        [owner performSelector:@selector(removeConstraint:) withObject:old];
-        [owner performSelector:@selector(addConstraint:) withObject:replacement];
-    }
-
-    return replacement;
-}
+static CGFloat _gs_keypadH;
+static CGFloat _gs_scientificW;
+static CGFloat _gs_containerH;
+static CGFloat _gs_wrapperH;
 
 #endif /* GNUSTEP */
 
@@ -371,6 +326,14 @@ static NSLayoutConstraint *ud_replaceConstraint(NSLayoutConstraint *old, CGFloat
     // fix up button layout
 
 #ifdef GNUSTEP
+    // Initialize shadow variables from the XIB constraint constants.
+    // These track the "logical" constraint values for delta calculations
+    // since we bypass the Auto Layout solver for dynamic changes.
+    _gs_keypadH    = self.keypadHeightConstraint.constant;
+    _gs_scientificW = self.scientificWidthConstraint.constant;
+    _gs_containerH = self.programmerInputHeightConstraint.constant;
+    _gs_wrapperH   = self.bitWrapperHeightConstraint.constant;
+
     // GNUstep's XIB parser may not connect NSGridCell contentViews from
     // Xcode XIBs.  Detect empty grids and rebuild them programmatically.
     [self rebuildBasicGrid];
@@ -441,9 +404,7 @@ static NSLayoutConstraint *ud_replaceConstraint(NSLayoutConstraint *old, CGFloat
     // Update Show Binary Button
     self.showBinaryViewButton.state = settings.showBinaryView ? NSControlStateValueOn : NSControlStateValueOff;
 #ifdef GNUSTEP
-    self.bitWrapperHeightConstraint = ud_replaceConstraint(
-        self.bitWrapperHeightConstraint,
-        settings.showBinaryView ? self.standardBitWrapperHeight : 0);
+    _gs_wrapperH = settings.showBinaryView ? self.standardBitWrapperHeight : 0;
 #else
     self.bitWrapperHeightConstraint.constant = settings.showBinaryView ? self.standardBitWrapperHeight : 0;
 #endif
@@ -554,9 +515,16 @@ static NSLayoutConstraint *ud_replaceConstraint(NSLayoutConstraint *old, CGFloat
     // 2. DETERMINE CURRENT STATE
     // ============================================================
 
+#ifdef GNUSTEP
+    // Read from shadow variables — GNUstep's solver doesn't track live changes
+    CGFloat currentKeypadH = _gs_keypadH;
+    CGFloat currentDrawerW = _gs_scientificW;
+    CGFloat currentContainerH = _gs_containerH;
+#else
     CGFloat currentKeypadH = self.keypadHeightConstraint.constant;
     CGFloat currentDrawerW = self.scientificWidthConstraint.constant;
     CGFloat currentContainerH = self.programmerInputHeightConstraint.constant;
+#endif
     
     // For width delta, use current grid fitting size
     NSView *currentGrid = (self.calc.mode == UDCalcModeProgrammer) ? self.programmerGridView : self.basicGridView;
@@ -613,12 +581,12 @@ static NSLayoutConstraint *ud_replaceConstraint(NSLayoutConstraint *old, CGFloat
     [window setFrame:newFrame display:YES];
 
 #ifdef GNUSTEP
-    // GNUstep's solver doesn't support live constant changes — replace
-    // constraints entirely with fresh ones that carry the new values.
-    self.keypadHeightConstraint = ud_replaceConstraint(self.keypadHeightConstraint, targetKeypadH);
-    self.scientificWidthConstraint = ud_replaceConstraint(self.scientificWidthConstraint, targetDrawerW);
-    self.programmerInputHeightConstraint = ud_replaceConstraint(self.programmerInputHeightConstraint, targetContainerH);
-    self.bitWrapperHeightConstraint = ud_replaceConstraint(self.bitWrapperHeightConstraint, targetWrapperH);
+    // Just update shadow variables — the window frame resize + view hiding
+    // handles the actual layout.  We never touch the Cassowary solver.
+    _gs_keypadH    = targetKeypadH;
+    _gs_scientificW = targetDrawerW;
+    _gs_containerH = targetContainerH;
+    _gs_wrapperH   = targetWrapperH;
 #else
     self.keypadHeightConstraint.constant = targetKeypadH;
     self.scientificWidthConstraint.constant = targetDrawerW;
@@ -744,7 +712,11 @@ static NSLayoutConstraint *ud_replaceConstraint(NSLayoutConstraint *old, CGFloat
     CGFloat targetWrapperHeight = isBitsVisible ? 0.0 : bitViewHeight;
     
     // 4. Calculate Window Delta (Target - Current)
+#ifdef GNUSTEP
+    CGFloat currentStackHeight = _gs_containerH;
+#else
     CGFloat currentStackHeight = self.programmerInputHeightConstraint.constant;
+#endif
     CGFloat deltaH = targetStackHeight - currentStackHeight;
 
     // 5. Animate
@@ -759,10 +731,8 @@ static NSLayoutConstraint *ud_replaceConstraint(NSLayoutConstraint *old, CGFloat
     // C. Resize Main Container (Outer Constraint)
     // This stops exactly at 'buttonsOnlyHeight', keeping buttons visible.
 #ifdef GNUSTEP
-    self.bitWrapperHeightConstraint = ud_replaceConstraint(
-        self.bitWrapperHeightConstraint, targetWrapperHeight);
-    self.programmerInputHeightConstraint = ud_replaceConstraint(
-        self.programmerInputHeightConstraint, targetStackHeight);
+    _gs_wrapperH   = targetWrapperHeight;
+    _gs_containerH = targetStackHeight;
 #else
     self.bitWrapperHeightConstraint.constant = targetWrapperHeight;
     self.programmerInputHeightConstraint.constant = targetStackHeight;
