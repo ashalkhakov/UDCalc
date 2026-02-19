@@ -351,8 +351,14 @@ static void enableAutoresizingRecursive(NSView *view) {
     if (displayH < kMinDisplayHeight) displayH = kMinDisplayHeight;
 
     // Display at top with 1px margins
+    CGFloat displayW = W - 2;
     [self.displayTabView setFrame:NSMakeRect(1, containerH + keypadH + 1,
-                                             W - 2, displayH)];
+                                             displayW, displayH)];
+
+    // GNUstep's NSTabView doesn't propagate frame changes to tab item
+    // content views.  Explicitly resize the display text field so
+    // right-aligned text isn't clipped at its XIB-designed width (607px).
+    [self.displayField setFrame:NSMakeRect(0, 0, displayW, displayH)];
 
     // Programmer input below display
     [self.programmerInputView setFrame:NSMakeRect(0, keypadH, W, containerH)];
