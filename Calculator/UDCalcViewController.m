@@ -314,17 +314,16 @@ static CGFloat _gs_containerH;
 static CGFloat _gs_wrapperH;
 
 /*
- * Enable autoresizing on a view and all descendants so that children
- * track their parent's size changes when we set frames manually.
+ * Enable frame-based positioning on a single view.
  * XIBs set translatesAutoresizingMaskIntoConstraints=NO, which
  * disables autoresizing; we reverse that here.
+ * Only applied to top-level containers — NOT recursively, since
+ * recursive autoresizing causes negative child widths when parents
+ * shrink below XIB-designed sizes.
  */
-static void enableAutoresizingRecursive(NSView *view) {
+static void enableAutoresizing(NSView *view) {
     [view setTranslatesAutoresizingMaskIntoConstraints:YES];
     [view setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
-    for (NSView *child in [view subviews]) {
-        enableAutoresizingRecursive(child);
-    }
 }
 
 /*
@@ -350,8 +349,13 @@ static void enableAutoresizingRecursive(NSView *view) {
     CGFloat displayH = H - containerH - keypadH - 2.0;
     if (displayH < kMinDisplayHeight) displayH = kMinDisplayHeight;
 
+    // Guard all dimensions against negative values (can happen during
+    // mode transitions before the window frame is updated).
+    CGFloat displayW = MAX(0, W - 2);
+    displayH = MAX(0, displayH);
+    CGFloat keypadW = MAX(0, W - drawerW - 1);
+
     // Display at top with 1px margins
-    CGFloat displayW = W - 2;
     [self.displayTabView setFrame:NSMakeRect(1, containerH + keypadH + 1,
                                              displayW, displayH)];
 
@@ -361,16 +365,13 @@ static void enableAutoresizingRecursive(NSView *view) {
     [self.displayField setFrame:NSMakeRect(0, 0, displayW, displayH)];
 
     // Programmer input below display
-    [self.programmerInputView setFrame:NSMakeRect(0, keypadH, W, containerH)];
+    [self.programmerInputView setFrame:NSMakeRect(0, keypadH, MAX(0, W), containerH)];
 
     // Scientific view at bottom-left
     [self.scientificView setFrame:NSMakeRect(0, 0, drawerW, keypadH)];
 
     // Keypad at bottom-right (1px right margin matches XIB)
-    CGFloat keypadX = drawerW;
-    CGFloat keypadW = W - drawerW;
-    if (keypadW > 1) keypadW -= 1;
-    [self.basicOrProgrammerTabView setFrame:NSMakeRect(keypadX, 0,
+    [self.basicOrProgrammerTabView setFrame:NSMakeRect(drawerW, 0,
                                                        keypadW, keypadH)];
 
     [self.view setNeedsDisplay:YES];
@@ -413,14 +414,15 @@ static void enableAutoresizingRecursive(NSView *view) {
         }
     }
 
-    // Enable autoresizing on all subviews so children track parent's
-    // size when we set frames manually in gnustepLayoutSubviews.
+    // Enable autoresizing on the four top-level containers only (not
+    // recursively) so gnustepLayoutSubviews can position them.
     // XIBs set translatesAutoresizingMaskIntoConstraints=NO which
-    // disables autoresizing; we reverse that here.
-    enableAutoresizingRecursive(self.displayTabView);
-    enableAutoresizingRecursive(self.programmerInputView);
-    enableAutoresizingRecursive(self.scientificView);
-    enableAutoresizingRecursive(self.basicOrProgrammerTabView);
+    // disables frame-based positioning; we reverse that here.
+    // Children keep their XIB-internal constraints/autoresizing.
+    enableAutoresizing(self.displayTabView);
+    enableAutoresizing(self.programmerInputView);
+    enableAutoresizing(self.scientificView);
+    enableAutoresizing(self.basicOrProgrammerTabView);
 
     // GNUstep's XIB parser may not connect NSGridCell contentViews from
     // Xcode XIBs.  Detect empty grids and rebuild them programmatically.
