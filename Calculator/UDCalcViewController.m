@@ -28,8 +28,9 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 // from Xcode XIBs.  These helpers detect empty grids and rebuild them
 // programmatically so the buttons actually appear.
 
-static const CGFloat kGridButtonWidth  = 60.0;
-static const CGFloat kGridButtonHeight = 50.0;
+static const CGFloat kGridButtonWidth    = 60.0;
+static const CGFloat kGridButtonHeight  = 50.0;
+static const CGFloat kMinDisplayHeight  = 20.0;
 
 static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
                                 id target, CalcButtonType sym, NSColor *btnColor)
@@ -294,20 +295,66 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
 }
 
 /*
- * GNUstep's Cassowary solver hangs when constraints are removed/re-added
- * at runtime, and doesn't pick up KVC changes to _constant either.
- * Bypass Auto Layout for dynamic mode changes entirely: track the
- * "logical" constraint constants in shadow variables, and rely on the
- * window frame resize + view hiding that macOS also does.
+ * GNUstep's Auto Layout solver loads constraints from XIBs but does NOT
+ * re-solve when constraint constants change or the window resizes.  Views
+ * stay at their XIB-designed positions regardless of window frame changes.
  *
- * _gs_keypadH, _gs_scientificW, _gs_containerH, _gs_wrapperH
- * are initialized from the XIB constraint constants in viewDidLoad and
- * updated here whenever the macOS path would call setConstant:.
+ * We work around this by:
+ * 1. Removing all inter-view constraints from self.view in viewDidLoad
+ * 2. Tracking "logical" constraint constants in shadow variables
+ * 3. Manually positioning the four main subviews (display, programmer
+ *    input, scientific drawer, keypad) after each mode change
+ *
+ * Internal constraints on each subview (grid layouts, stack views) are
+ * left intact — only the parent-to-child positioning is manual.
  */
 static CGFloat _gs_keypadH;
 static CGFloat _gs_scientificW;
 static CGFloat _gs_containerH;
 static CGFloat _gs_wrapperH;
+
+/*
+ * Position the four main subviews of self.view based on the current
+ * shadow variable values.  Called after window frame changes.
+ *
+ * Layout (AppKit coords, origin bottom-left):
+ *   Top:    displayTabView        (1px margins on top/left/right)
+ *   Middle: programmerInputView   (1px gap below display)
+ *   Bottom: scientificView (left) + keypadTabView (right)
+ */
+- (void)gnustepLayoutSubviews {
+    NSRect bounds = self.view.bounds;
+    CGFloat W = bounds.size.width;
+    CGFloat H = bounds.size.height;
+
+    CGFloat keypadH    = _gs_keypadH;
+    CGFloat containerH = _gs_containerH;
+    CGFloat drawerW    = _gs_scientificW;
+
+    // Display height: fill remaining space above programmer + keypad
+    // Constraint chain: 1(top) + displayH + 1(gap) + containerH + keypadH = H
+    CGFloat displayH = H - containerH - keypadH - 2.0;
+    if (displayH < kMinDisplayHeight) displayH = kMinDisplayHeight;
+
+    // Display at top with 1px margins
+    [self.displayTabView setFrame:NSMakeRect(1, containerH + keypadH + 1,
+                                             W - 2, displayH)];
+
+    // Programmer input below display
+    [self.programmerInputView setFrame:NSMakeRect(0, keypadH, W, containerH)];
+
+    // Scientific view at bottom-left
+    [self.scientificView setFrame:NSMakeRect(0, 0, drawerW, keypadH)];
+
+    // Keypad at bottom-right (1px right margin matches XIB)
+    CGFloat keypadX = drawerW;
+    CGFloat keypadW = W - drawerW;
+    if (keypadW > 1) keypadW -= 1;
+    [self.basicOrProgrammerTabView setFrame:NSMakeRect(keypadX, 0,
+                                                       keypadW, keypadH)];
+
+    [self.view setNeedsDisplay:YES];
+}
 
 #endif /* GNUSTEP */
 
@@ -327,12 +374,24 @@ static CGFloat _gs_wrapperH;
 
 #ifdef GNUSTEP
     // Initialize shadow variables from the XIB constraint constants.
-    // These track the "logical" constraint values for delta calculations
-    // since we bypass the Auto Layout solver for dynamic changes.
     _gs_keypadH    = self.keypadHeightConstraint.constant;
     _gs_scientificW = self.scientificWidthConstraint.constant;
     _gs_containerH = self.programmerInputHeightConstraint.constant;
     _gs_wrapperH   = self.bitWrapperHeightConstraint.constant;
+
+    // Remove inter-view constraints from self.view so we can position
+    // subviews manually.  GNUstep's solver loads constraints from XIBs
+    // but doesn't re-solve when the window resizes or constants change.
+    // Internal constraints on each subview (grids, stacks) stay intact.
+    // Note: performSelector: is used because GNUstep headers don't declare
+    // -constraints or -removeConstraints: on NSView (they exist at runtime).
+    {
+        NSArray *constraints = [self.view performSelector:@selector(constraints)];
+        if ([constraints count] > 0) {
+            [self.view performSelector:@selector(removeConstraints:)
+                            withObject:constraints];
+        }
+    }
 
     // GNUstep's XIB parser may not connect NSGridCell contentViews from
     // Xcode XIBs.  Detect empty grids and rebuild them programmatically.
@@ -581,12 +640,12 @@ static CGFloat _gs_wrapperH;
     [window setFrame:newFrame display:YES];
 
 #ifdef GNUSTEP
-    // Just update shadow variables — the window frame resize + view hiding
-    // handles the actual layout.  We never touch the Cassowary solver.
+    // Update shadow variables and manually position subviews.
     _gs_keypadH    = targetKeypadH;
     _gs_scientificW = targetDrawerW;
     _gs_containerH = targetContainerH;
     _gs_wrapperH   = targetWrapperH;
+    [self gnustepLayoutSubviews];
 #else
     self.keypadHeightConstraint.constant = targetKeypadH;
     self.scientificWidthConstraint.constant = targetDrawerW;
@@ -594,9 +653,9 @@ static CGFloat _gs_wrapperH;
     // 3. Animate Programmer Constraints (Both Inner and Outer)
     self.programmerInputHeightConstraint.constant = targetContainerH;
     self.bitWrapperHeightConstraint.constant = targetWrapperH;
-#endif
 
     [self.view.superview layoutSubtreeIfNeeded];
+#endif
 
     self.calc.mode = mode;
     [self updateScientificButtons];
@@ -733,6 +792,7 @@ static CGFloat _gs_wrapperH;
 #ifdef GNUSTEP
     _gs_wrapperH   = targetWrapperHeight;
     _gs_containerH = targetStackHeight;
+    [self gnustepLayoutSubviews];
 #else
     self.bitWrapperHeightConstraint.constant = targetWrapperHeight;
     self.programmerInputHeightConstraint.constant = targetStackHeight;
