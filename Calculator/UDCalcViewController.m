@@ -314,6 +314,20 @@ static CGFloat _gs_containerH;
 static CGFloat _gs_wrapperH;
 
 /*
+ * Enable autoresizing on a view and all descendants so that children
+ * track their parent's size changes when we set frames manually.
+ * XIBs set translatesAutoresizingMaskIntoConstraints=NO, which
+ * disables autoresizing; we reverse that here.
+ */
+static void enableAutoresizingRecursive(NSView *view) {
+    [view setTranslatesAutoresizingMaskIntoConstraints:YES];
+    [view setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+    for (NSView *child in [view subviews]) {
+        enableAutoresizingRecursive(child);
+    }
+}
+
+/*
  * Position the four main subviews of self.view based on the current
  * shadow variable values.  Called after window frame changes.
  *
@@ -392,6 +406,15 @@ static CGFloat _gs_wrapperH;
                             withObject:constraints];
         }
     }
+
+    // Enable autoresizing on all subviews so children track parent's
+    // size when we set frames manually in gnustepLayoutSubviews.
+    // XIBs set translatesAutoresizingMaskIntoConstraints=NO which
+    // disables autoresizing; we reverse that here.
+    enableAutoresizingRecursive(self.displayTabView);
+    enableAutoresizingRecursive(self.programmerInputView);
+    enableAutoresizingRecursive(self.scientificView);
+    enableAutoresizingRecursive(self.basicOrProgrammerTabView);
 
     // GNUstep's XIB parser may not connect NSGridCell contentViews from
     // Xcode XIBs.  Detect empty grids and rebuild them programmatically.
