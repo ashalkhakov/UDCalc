@@ -73,15 +73,15 @@
                                 <subviews>
                                     <textField identifier="display" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dJx-PN-gbn">
                                         <rect key="frame" x="0.0" y="0.0" width="607" height="61"/>
-                                        <textFieldCell key="cell" controlSize="large" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" drawsBackground="YES" usesSingleLineMode="YES" id="DIk-ym-U6A">
-                                            <font key="font" metaFont="systemLight" size="52"/>
+                                        <textFieldCell key="cell" controlSize="regular" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" drawsBackground="YES" usesSingleLineMode="YES" id="DIk-ym-U6A">
+                                            <font key="font" metaFont="system" size="52"/>
                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SMT-VF-0Db">
                                         <rect key="frame" x="4" y="6" width="28" height="16"/>
-                                        <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Rad" id="g1e-kR-e2q">
+                                        <textFieldCell key="cell" controlSize="regular" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Rad" id="g1e-kR-e2q">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -89,7 +89,7 @@
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uBC-6e-c6g">
                                         <rect key="frame" x="4" y="6" width="28" height="16"/>
-                                        <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Char" id="GY9-Gw-9Wf">
+                                        <textFieldCell key="cell" controlSize="regular" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Char" id="GY9-Gw-9Wf">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -181,7 +181,7 @@
                                     </scrollView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="z5b-h6-iaY">
                                         <rect key="frame" x="4" y="6" width="28" height="16"/>
-                                        <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Rad" id="jfR-qh-i6s">
+                                        <textFieldCell key="cell" controlSize="regular" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Rad" id="jfR-qh-i6s">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -189,7 +189,7 @@
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Eqi-fi-emF">
                                         <rect key="frame" x="4" y="6" width="33" height="16"/>
-                                        <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Char" id="tTI-gO-jFw">
+                                        <textFieldCell key="cell" controlSize="regular" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Char" id="tTI-gO-jFw">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -868,9 +868,9 @@
                                             <gridCell row="eT9-dM-IOZ" column="9z0-VX-R72" xPlacement="fill" yPlacement="fill" id="27f-1e-1uI">
                                                 <button key="contentView" identifier="clear" toolTip="Clear" verticalHuggingPriority="750" tag="26" translatesAutoresizingMaskIntoConstraints="NO" id="Fcd-8F-P1e" customClass="UDCalcButton">
                                                     <rect key="frame" x="0.0" y="204" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="AC" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" tag="26" imageScaling="proportionallyDown" inset="2" id="S2X-9H-kLG">
+                                                    <buttonCell key="cell" type="square" title="AC" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" tag="26" imageScaling="proportionallyDown" inset="2" id="S2X-9H-kLG">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent" base64-UTF8="YES">
 Gw
 </string>
@@ -888,9 +888,9 @@ Gw
                                             <gridCell row="eT9-dM-IOZ" column="B4E-zv-9Qi" xPlacement="fill" yPlacement="fill" id="MAf-al-9Ol">
                                                 <button key="contentView" identifier="negate" toolTip="Negate the displayed value" tag="28" translatesAutoresizingMaskIntoConstraints="NO" id="kNF-Yt-SfB" customClass="UDCalcButton">
                                                     <rect key="frame" x="61" y="204" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="±" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iDC-QA-iYn">
+                                                    <buttonCell key="cell" type="square" title="±" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iDC-QA-iYn">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">-</string>
                                                         <modifierMask key="keyEquivalentModifierMask" option="YES"/>
                                                     </buttonCell>
@@ -907,9 +907,9 @@ Gw
                                             <gridCell row="eT9-dM-IOZ" column="6xh-vT-FmR" xPlacement="fill" yPlacement="fill" id="j4p-OI-6Jv">
                                                 <button key="contentView" identifier="percent" toolTip="Per cent" verticalHuggingPriority="750" tag="27" translatesAutoresizingMaskIntoConstraints="NO" id="dvj-7z-Lqm" customClass="UDCalcButton">
                                                     <rect key="frame" x="122" y="204" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="%" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1Fr-8B-y9v">
+                                                    <buttonCell key="cell" type="square" title="%" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1Fr-8B-y9v">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">5</string>
                                                         <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
                                                     </buttonCell>
@@ -926,9 +926,9 @@ Gw
                                             <gridCell row="eT9-dM-IOZ" column="Ply-5H-Ij9" xPlacement="fill" yPlacement="fill" id="g9P-Bk-DNU">
                                                 <button key="contentView" identifier="div" verticalHuggingPriority="750" tag="24" translatesAutoresizingMaskIntoConstraints="NO" id="HWJ-7B-Xmg" customClass="UDCalcButton">
                                                     <rect key="frame" x="183" y="204" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="÷" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" identifier="divide" imageScaling="proportionallyDown" inset="2" id="Krj-RS-yJI">
+                                                    <buttonCell key="cell" type="square" title="÷" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" identifier="divide" imageScaling="proportionallyDown" inset="2" id="Krj-RS-yJI">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">/</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -951,9 +951,9 @@ Gw
                                             <gridCell row="yMb-4d-j8b" column="9z0-VX-R72" xPlacement="fill" id="wed-mN-5Bf">
                                                 <button key="contentView" identifier="b7" verticalHuggingPriority="750" tag="7" translatesAutoresizingMaskIntoConstraints="NO" id="P6b-D0-Qu3" customClass="UDCalcButton">
                                                     <rect key="frame" x="0.0" y="153" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="7" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="WaJ-RH-g7g">
+                                                    <buttonCell key="cell" type="square" title="7" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="WaJ-RH-g7g">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">7</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -969,9 +969,9 @@ Gw
                                             <gridCell row="yMb-4d-j8b" column="B4E-zv-9Qi" xPlacement="fill" id="Mn7-Xf-7Y8">
                                                 <button key="contentView" identifier="b8" verticalHuggingPriority="750" tag="8" translatesAutoresizingMaskIntoConstraints="NO" id="Yzw-5p-Od2" customClass="UDCalcButton">
                                                     <rect key="frame" x="61" y="153" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="8" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vq2-mc-aMx">
+                                                    <buttonCell key="cell" type="square" title="8" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vq2-mc-aMx">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">8</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -987,9 +987,9 @@ Gw
                                             <gridCell row="yMb-4d-j8b" column="6xh-vT-FmR" xPlacement="fill" yPlacement="fill" id="nIc-lV-yaH">
                                                 <button key="contentView" identifier="b9" verticalHuggingPriority="750" tag="9" translatesAutoresizingMaskIntoConstraints="NO" id="GQz-9w-Enx" customClass="UDCalcButton">
                                                     <rect key="frame" x="122" y="153" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="9" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="y81-0V-lqK">
+                                                    <buttonCell key="cell" type="square" title="9" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="y81-0V-lqK">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">9</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1005,9 +1005,9 @@ Gw
                                             <gridCell row="yMb-4d-j8b" column="Ply-5H-Ij9" xPlacement="fill" yPlacement="fill" id="mAg-dE-PfV">
                                                 <button key="contentView" identifier="mul" verticalHuggingPriority="750" tag="23" translatesAutoresizingMaskIntoConstraints="NO" id="AGi-pP-6YW" customClass="UDCalcButton">
                                                     <rect key="frame" x="183" y="153" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="×" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="DTM-Wa-30Z">
+                                                    <buttonCell key="cell" type="square" title="×" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="DTM-Wa-30Z">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">8</string>
                                                         <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
                                                     </buttonCell>
@@ -1031,9 +1031,9 @@ Gw
                                             <gridCell row="7YE-P2-NOH" column="9z0-VX-R72" xPlacement="fill" yPlacement="fill" id="JXe-Z4-nOI">
                                                 <button key="contentView" identifier="b4" verticalHuggingPriority="750" tag="4" translatesAutoresizingMaskIntoConstraints="NO" id="cQx-Ne-AlY" customClass="UDCalcButton">
                                                     <rect key="frame" x="0.0" y="102" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="4" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="84P-qr-NlF">
+                                                    <buttonCell key="cell" type="square" title="4" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="84P-qr-NlF">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">4</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1049,9 +1049,9 @@ Gw
                                             <gridCell row="7YE-P2-NOH" column="B4E-zv-9Qi" xPlacement="fill" yPlacement="fill" id="qOl-Bk-nUs">
                                                 <button key="contentView" identifier="b5" verticalHuggingPriority="750" tag="5" translatesAutoresizingMaskIntoConstraints="NO" id="ce5-e5-h0h" customClass="UDCalcButton">
                                                     <rect key="frame" x="61" y="102" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="5" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="66Y-Uv-UMI">
+                                                    <buttonCell key="cell" type="square" title="5" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="66Y-Uv-UMI">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">5</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1067,9 +1067,9 @@ Gw
                                             <gridCell row="7YE-P2-NOH" column="6xh-vT-FmR" xPlacement="fill" yPlacement="fill" id="1zC-pc-1vU">
                                                 <button key="contentView" identifier="b6" verticalHuggingPriority="750" tag="6" translatesAutoresizingMaskIntoConstraints="NO" id="yWD-uJ-nCT" customClass="UDCalcButton">
                                                     <rect key="frame" x="122" y="102" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="6" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" identifier="b6" imageScaling="proportionallyDown" inset="2" id="dyO-VP-tZq">
+                                                    <buttonCell key="cell" type="square" title="6" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" identifier="b6" imageScaling="proportionallyDown" inset="2" id="dyO-VP-tZq">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">6</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1085,9 +1085,9 @@ Gw
                                             <gridCell row="7YE-P2-NOH" column="Ply-5H-Ij9" xPlacement="fill" yPlacement="fill" id="ZSW-cD-rJx">
                                                 <button key="contentView" identifier="sub" verticalHuggingPriority="750" tag="22" translatesAutoresizingMaskIntoConstraints="NO" id="wkr-eW-Jkx" customClass="UDCalcButton">
                                                     <rect key="frame" x="183" y="102" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="−" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="hSM-vW-A6c">
+                                                    <buttonCell key="cell" type="square" title="−" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="hSM-vW-A6c">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">-</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1110,9 +1110,9 @@ Gw
                                             <gridCell row="t9I-OR-qET" column="9z0-VX-R72" xPlacement="fill" yPlacement="fill" id="q36-np-qiX">
                                                 <button key="contentView" identifier="b1" verticalHuggingPriority="750" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="GYv-Y1-Ojk" customClass="UDCalcButton">
                                                     <rect key="frame" x="0.0" y="51" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="1" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="8de-mb-Yhc">
+                                                    <buttonCell key="cell" type="square" title="1" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="8de-mb-Yhc">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">1</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1128,9 +1128,9 @@ Gw
                                             <gridCell row="t9I-OR-qET" column="B4E-zv-9Qi" xPlacement="fill" yPlacement="fill" id="mHJ-ls-P0R">
                                                 <button key="contentView" identifier="b2" verticalHuggingPriority="750" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="ah1-7o-ySc" customClass="UDCalcButton">
                                                     <rect key="frame" x="61" y="51" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="2" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Tup-la-PGT">
+                                                    <buttonCell key="cell" type="square" title="2" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Tup-la-PGT">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">2</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1146,9 +1146,9 @@ Gw
                                             <gridCell row="t9I-OR-qET" column="6xh-vT-FmR" xPlacement="fill" yPlacement="fill" id="XLN-IG-FSF">
                                                 <button key="contentView" identifier="b3" verticalHuggingPriority="750" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="25d-bL-2G0" customClass="UDCalcButton">
                                                     <rect key="frame" x="122" y="51" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="3" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="d7a-PB-cUP">
+                                                    <buttonCell key="cell" type="square" title="3" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="d7a-PB-cUP">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">3</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1164,9 +1164,9 @@ Gw
                                             <gridCell row="t9I-OR-qET" column="Ply-5H-Ij9" xPlacement="fill" yPlacement="fill" id="waT-G9-mIO">
                                                 <button key="contentView" identifier="add" verticalHuggingPriority="750" tag="21" translatesAutoresizingMaskIntoConstraints="NO" id="Yje-EN-Dxm" customClass="UDCalcButton">
                                                     <rect key="frame" x="183" y="51" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="+" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6mq-wu-XJV">
+                                                    <buttonCell key="cell" type="square" title="+" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6mq-wu-XJV">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">=</string>
                                                         <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
                                                     </buttonCell>
@@ -1190,9 +1190,9 @@ Gw
                                             <gridCell row="t1c-fm-H5e" column="9z0-VX-R72" xPlacement="fill" yPlacement="fill" id="JdX-Td-VSD">
                                                 <button key="contentView" identifier="b0" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GbZ-UY-1Ru" customClass="UDCalcButton">
                                                     <rect key="frame" x="0.0" y="0.0" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="0" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1c5-GF-r3K">
+                                                    <buttonCell key="cell" type="square" title="0" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1c5-GF-r3K">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">0</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1209,9 +1209,9 @@ Gw
                                             <gridCell row="t1c-fm-H5e" column="6xh-vT-FmR" xPlacement="fill" yPlacement="fill" id="kpd-15-wey">
                                                 <button key="contentView" identifier="comma" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="44Q-Tg-Djr" customClass="UDCalcButton">
                                                     <rect key="frame" x="122" y="0.0" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="," bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" tag="29" imageScaling="proportionallyDown" inset="2" id="Pg0-7y-455">
+                                                    <buttonCell key="cell" type="square" title="," bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" tag="29" imageScaling="proportionallyDown" inset="2" id="Pg0-7y-455">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">.</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1227,9 +1227,9 @@ Gw
                                             <gridCell row="t1c-fm-H5e" column="Ply-5H-Ij9" xPlacement="fill" yPlacement="fill" id="hq6-8a-TlD">
                                                 <button key="contentView" identifier="equals" toolTip="Equal" verticalHuggingPriority="750" tag="25" translatesAutoresizingMaskIntoConstraints="NO" id="ZsI-G8-7Lm" customClass="UDCalcButton">
                                                     <rect key="frame" x="183" y="0.0" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="=" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="jBk-o3-xfT">
+                                                    <buttonCell key="cell" type="square" title="=" bezelStyle="shadowlessSquare" alignment="center" controlSize="regular" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="jBk-o3-xfT">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent" base64-UTF8="YES">
 DQ
 </string>
