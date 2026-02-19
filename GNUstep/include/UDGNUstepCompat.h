@@ -14,7 +14,9 @@
 
 #ifdef GNUSTEP
 
+#if __has_include(<dispatch/dispatch.h>)
 #include <dispatch/dispatch.h>
+#endif
 
 /* ============================================================
  * IBInspectable (Interface Builder attribute, no-op on GNUstep)
@@ -59,15 +61,6 @@
 
 @interface NSView (UDGNUstepCompat)
 - (NSSize)fittingSize;
-@end
-
-/* ============================================================
- * NSLayoutConstraint setConstant (not available in GNUstep)
- * ============================================================ */
-#import <AppKit/NSLayoutConstraint.h>
-
-@interface NSLayoutConstraint (UDGNUstepCompat)
-- (void)setConstant:(CGFloat)constant;
 @end
 
 /* ============================================================

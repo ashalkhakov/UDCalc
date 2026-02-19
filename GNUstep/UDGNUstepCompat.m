@@ -76,34 +76,6 @@
 @end
 
 /* ============================================================
- * NSLayoutConstraint setConstant compatibility
- *
- * GNUstep's NSLayoutConstraint lacks a public setter for constant.
- * Simply writing to the ivar is not enough: the Cassowary solver
- * still holds the old value.  Remove and re-add the constraint so
- * the solver picks up the new constant.
- * ============================================================ */
-@implementation NSLayoutConstraint (UDGNUstepCompat)
-
-- (void)setConstant:(CGFloat)constant {
-    _constant = constant;
-
-    /* Find the view that owns this constraint and bounce it through
-       the solver by removing + re-adding.
-       Use performSelector: because GNUstep headers don't declare
-       removeConstraint:/addConstraint: on NSView. */
-    id first = [self firstItem];
-    if ([first isKindOfClass:[NSView class]]) {
-        NSView *owner = [(NSView *)first superview];
-        id target = owner ? (id)owner : first;
-        [target performSelector:@selector(removeConstraint:) withObject:self];
-        [target performSelector:@selector(addConstraint:) withObject:self];
-    }
-}
-
-@end
-
-/* ============================================================
  * NSPasteboard clearContents compatibility
  * ============================================================ */
 @implementation NSPasteboard (UDGNUstepClearCompat)

@@ -292,6 +292,57 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
     for (NSInteger c = 0; c < g.numberOfColumns; c++)
         [g columnAtIndex:c].width = kGridButtonWidth;
 }
+
+/**
+ * Replace an NSLayoutConstraint with a new one that has a different constant.
+ * GNUstep's Auto Layout solver doesn't support changing constants on live
+ * constraints; the only reliable way is to swap in a fresh constraint.
+ * Returns the replacement (or the original if no change is needed).
+ */
+static NSLayoutConstraint *ud_replaceConstraint(NSLayoutConstraint *old, CGFloat newConstant) {
+    if (!old) return nil;
+    if (old.constant == newConstant) return old;
+
+    NSLayoutConstraint *replacement = [NSLayoutConstraint
+        constraintWithItem: old.firstItem
+                 attribute: old.firstAttribute
+                 relatedBy: old.relation
+                    toItem: old.secondItem
+                 attribute: old.secondAttribute
+                multiplier: old.multiplier
+                  constant: newConstant];
+    replacement.priority = old.priority;
+
+    /* Find the view that owns this constraint.  Height/width constraints
+       are typically owned by the view itself; inter-view constraints
+       by the nearest common ancestor. */
+    id first = old.firstItem;
+    id second = old.secondItem;
+    NSView *owner = nil;
+
+    if ([first isKindOfClass:[NSView class]]) {
+        NSView *v = (NSView *)first;
+        if ([[v constraints] containsObject:old])
+            owner = v;
+        else if (v.superview && [[v.superview constraints] containsObject:old])
+            owner = v.superview;
+    }
+    if (!owner && [second isKindOfClass:[NSView class]]) {
+        NSView *v = (NSView *)second;
+        if ([[v constraints] containsObject:old])
+            owner = v;
+        else if (v.superview && [[v.superview constraints] containsObject:old])
+            owner = v.superview;
+    }
+
+    if (owner) {
+        [owner performSelector:@selector(removeConstraint:) withObject:old];
+        [owner performSelector:@selector(addConstraint:) withObject:replacement];
+    }
+
+    return replacement;
+}
+
 #endif /* GNUSTEP */
 
 - (void)viewDidLoad {
@@ -378,7 +429,13 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
     
     // Update Show Binary Button
     self.showBinaryViewButton.state = settings.showBinaryView ? NSControlStateValueOn : NSControlStateValueOff;
+#ifdef GNUSTEP
+    self.bitWrapperHeightConstraint = ud_replaceConstraint(
+        self.bitWrapperHeightConstraint,
+        settings.showBinaryView ? self.standardBitWrapperHeight : 0);
+#else
     self.bitWrapperHeightConstraint.constant = settings.showBinaryView ? self.standardBitWrapperHeight : 0;
+#endif
 
     [self setCalculatorMode:settings.calcMode animate:NO];
     if (self.calc.mode == UDCalcModeProgrammer) {
@@ -544,18 +601,20 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
 
     [window setFrame:newFrame display:YES];
 
+#ifdef GNUSTEP
+    // GNUstep's solver doesn't support live constant changes — replace
+    // constraints entirely with fresh ones that carry the new values.
+    self.keypadHeightConstraint = ud_replaceConstraint(self.keypadHeightConstraint, targetKeypadH);
+    self.scientificWidthConstraint = ud_replaceConstraint(self.scientificWidthConstraint, targetDrawerW);
+    self.programmerInputHeightConstraint = ud_replaceConstraint(self.programmerInputHeightConstraint, targetContainerH);
+    self.bitWrapperHeightConstraint = ud_replaceConstraint(self.bitWrapperHeightConstraint, targetWrapperH);
+#else
     self.keypadHeightConstraint.constant = targetKeypadH;
     self.scientificWidthConstraint.constant = targetDrawerW;
 
     // 3. Animate Programmer Constraints (Both Inner and Outer)
     self.programmerInputHeightConstraint.constant = targetContainerH;
     self.bitWrapperHeightConstraint.constant = targetWrapperH;
-
-#ifdef GNUSTEP
-    // After the improved setConstant: (which removes/re-adds constraints
-    // in the solver), force a full layout pass so the views reposition.
-    [self.view setNeedsLayout:YES];
-    [self.view layoutSubtreeIfNeeded];
 #endif
 
     [self.view.superview layoutSubtreeIfNeeded];
@@ -686,20 +745,16 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
     [self.view.window setFrame:winFrame display:YES];
     
     // B. Resize Wrapper (Inner Constraint)
-    self.bitWrapperHeightConstraint.constant = targetWrapperHeight;
-    
     // C. Resize Main Container (Outer Constraint)
     // This stops exactly at 'buttonsOnlyHeight', keeping buttons visible.
-    self.programmerInputHeightConstraint.constant = targetStackHeight;
-
 #ifdef GNUSTEP
-    // GNUstep's Auto Layout doesn't collapse views on constraint change;
-    // force the wrapper frame to match.
-    if (targetWrapperHeight == 0.0) {
-        NSRect bitDisplayFrame = self.bitDisplayWrapperView.frame;
-        bitDisplayFrame.size.height = 0;
-        [self.bitDisplayWrapperView setFrame:bitDisplayFrame];
-    }
+    self.bitWrapperHeightConstraint = ud_replaceConstraint(
+        self.bitWrapperHeightConstraint, targetWrapperHeight);
+    self.programmerInputHeightConstraint = ud_replaceConstraint(
+        self.programmerInputHeightConstraint, targetStackHeight);
+#else
+    self.bitWrapperHeightConstraint.constant = targetWrapperHeight;
+    self.programmerInputHeightConstraint.constant = targetStackHeight;
 #endif
 }
 
