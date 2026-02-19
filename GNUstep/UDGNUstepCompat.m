@@ -77,11 +77,31 @@
 
 /* ============================================================
  * NSLayoutConstraint setConstant compatibility
+ *
+ * GNUstep's NSLayoutConstraint lacks a public setter for constant.
+ * Simply writing to the ivar is not enough: the Cassowary solver
+ * still holds the old value.  Remove and re-add the constraint so
+ * the solver picks up the new constant.
  * ============================================================ */
 @implementation NSLayoutConstraint (UDGNUstepCompat)
 
 - (void)setConstant:(CGFloat)constant {
     _constant = constant;
+
+    /* Find the view that owns this constraint and bounce it through
+       the solver by removing + re-adding. */
+    id first = [self firstItem];
+    if ([first isKindOfClass:[NSView class]]) {
+        NSView *owner = [(NSView *)first superview];
+        if (owner) {
+            [owner removeConstraint:self];
+            [owner addConstraint:self];
+        } else {
+            /* Width/height constraint owned by the view itself. */
+            [(NSView *)first removeConstraint:self];
+            [(NSView *)first addConstraint:self];
+        }
+    }
 }
 
 @end

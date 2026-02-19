@@ -46,6 +46,24 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
     return b;
 }
 
+// GNUstep's XIB parser can't decode color-type userDefinedRuntimeAttributes,
+// so buttonColor is never set from the XIB.  Apply orange to operator buttons
+// (tags 21–25: +, −, ×, ÷, =) programmatically after loading.
+- (void)applyOperatorColorsInView:(NSView *)root {
+    NSColor *orange = [NSColor orangeColor];
+    NSColor *orangeHL = [NSColor colorWithCalibratedRed:1.0 green:0.72 blue:0.28 alpha:1.0];
+    for (NSView *v in root.subviews) {
+        if ([v isKindOfClass:[UDCalcButton class]]) {
+            UDCalcButton *btn = (UDCalcButton *)v;
+            if (btn.tag >= 21 && btn.tag <= 25) {
+                btn.buttonColor = orange;
+                btn.highlightColor = orangeHL;
+            }
+        }
+        [self applyOperatorColorsInView:v];
+    }
+}
+
 - (BOOL)gridNeedsRebuild:(NSGridView *)grid {
     if (!grid) return NO;
     if (grid.numberOfRows == 0 || grid.numberOfColumns == 0) return YES;
@@ -296,6 +314,8 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
     [self rebuildBasicGrid];
     [self rebuildScientificGrid];
     [self rebuildProgrammerGrid];
+    // Apply orange operator colors (XIB color runtime attributes not decoded)
+    [self applyOperatorColorsInView:self.view];
 #else
     // mergeCellsInHorizontalRange:verticalRange: is not yet implemented
     // in GNUstep's NSGridView — skip on GNUstep (purely cosmetic).
@@ -532,22 +552,10 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
     self.bitWrapperHeightConstraint.constant = targetWrapperH;
 
 #ifdef GNUSTEP
-    // GNUstep's Auto Layout engine doesn't properly collapse views when
-    // constraint constants are set to 0.  Force zero-size frames on hidden
-    // views so they don't occupy space in the layout.
-    if (!isProgrammer) {
-        NSRect programmerFrame = self.programmerInputView.frame;
-        programmerFrame.size.height = 0;
-        [self.programmerInputView setFrame:programmerFrame];
-        NSRect bitDisplayFrame = self.bitDisplayWrapperView.frame;
-        bitDisplayFrame.size.height = 0;
-        [self.bitDisplayWrapperView setFrame:bitDisplayFrame];
-    }
-    if (!isScientific) {
-        NSRect scientificFrame = self.scientificView.frame;
-        scientificFrame.size.width = 0;
-        [self.scientificView setFrame:scientificFrame];
-    }
+    // After the improved setConstant: (which removes/re-adds constraints
+    // in the solver), force a full layout pass so the views reposition.
+    [self.view setNeedsLayout:YES];
+    [self.view layoutSubtreeIfNeeded];
 #endif
 
     [self.view.superview layoutSubtreeIfNeeded];
