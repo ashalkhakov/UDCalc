@@ -21,6 +21,261 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
 @implementation UDCalcViewController
 
+#ifdef GNUSTEP
+#pragma mark - GNUstep Grid Rebuild Helpers
+
+// GNUstep's XIB parser may not properly connect gridCell contentViews
+// from Xcode XIBs.  These helpers detect empty grids and rebuild them
+// programmatically so the buttons actually appear.
+
+static const CGFloat kGridButtonWidth  = 60.0;
+static const CGFloat kGridButtonHeight = 50.0;
+
+static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
+                                id target, CalcButtonType sym, NSColor *btnColor)
+{
+    UDCalcButton *b = [[UDCalcButton alloc] initWithFrame:
+                        NSMakeRect(0, 0, kGridButtonWidth, kGridButtonHeight)];
+    b.title = title;
+    b.tag = tag;
+    b.target = target;
+    b.action = action;
+    b.symbolType = sym;
+    if (btnColor) b.buttonColor = btnColor;
+    b.translatesAutoresizingMaskIntoConstraints = NO;
+    return b;
+}
+
+- (BOOL)gridNeedsRebuild:(NSGridView *)grid {
+    if (!grid) return NO;
+    if (grid.numberOfRows == 0 || grid.numberOfColumns == 0) return YES;
+    NSGridCell *cell = [grid cellAtColumnIndex:0 rowIndex:0];
+    return (cell.contentView == nil);
+}
+
+- (void)clearGrid:(NSGridView *)grid {
+    while (grid.numberOfRows > 0)
+        [grid removeRowAtIndex:0];
+}
+
+// ---------- Basic Grid (4 cols × 5 rows) ----------
+- (void)rebuildBasicGrid {
+    NSGridView *g = self.basicGridView;
+    if (![self gridNeedsRebuild:g]) return;
+    [self clearGrid:g];
+
+    SEL opAct  = @selector(operationPressed:);
+    SEL digAct = @selector(digitPressed:);
+    SEL decAct = @selector(decimalPressed:);
+    NSColor *orange = [NSColor orangeColor];
+
+    UDCalcButton *ac  = makeButton(@"AC", UDOpClear,   opAct,  self, 0, nil);
+    UDCalcButton *neg = makeButton(@"±",  UDOpNegate,  opAct,  self, 0, nil);
+    UDCalcButton *pct = makeButton(@"%",  UDOpPercent, opAct,  self, 0, nil);
+    UDCalcButton *div = makeButton(@"÷",  UDOpDiv,     opAct,  self, 0, orange);
+    [g addRowWithViews:@[ac, neg, pct, div]];
+    self.acButton = ac;
+
+    UDCalcButton *b7  = makeButton(@"7", 7, digAct, self, 0, nil);
+    UDCalcButton *b8  = makeButton(@"8", 8, digAct, self, 0, nil);
+    UDCalcButton *b9  = makeButton(@"9", 9, digAct, self, 0, nil);
+    UDCalcButton *mul = makeButton(@"×", UDOpMul, opAct, self, 0, orange);
+    [g addRowWithViews:@[b7, b8, b9, mul]];
+
+    UDCalcButton *b4  = makeButton(@"4", 4, digAct, self, 0, nil);
+    UDCalcButton *b5  = makeButton(@"5", 5, digAct, self, 0, nil);
+    UDCalcButton *b6  = makeButton(@"6", 6, digAct, self, 0, nil);
+    UDCalcButton *sub = makeButton(@"−", UDOpSub, opAct, self, 0, orange);
+    [g addRowWithViews:@[b4, b5, b6, sub]];
+
+    UDCalcButton *b1  = makeButton(@"1", 1, digAct, self, 0, nil);
+    UDCalcButton *b2  = makeButton(@"2", 2, digAct, self, 0, nil);
+    UDCalcButton *b3  = makeButton(@"3", 3, digAct, self, 0, nil);
+    UDCalcButton *add = makeButton(@"+", UDOpAdd, opAct, self, 0, orange);
+    [g addRowWithViews:@[b1, b2, b3, add]];
+
+    UDCalcButton *b0  = makeButton(@"0", 0,      digAct, self, 0, nil);
+    UDCalcButton *dot = makeButton(@".", 0,      decAct, self, 0, nil);
+    UDCalcButton *eq  = makeButton(@"=", UDOpEq, opAct,  self, 0, orange);
+    // "0" normally spans 2 columns, but mergeCells not supported — use placeholder
+    NSView *placeholder = [[NSView alloc] initWithFrame:NSZeroRect];
+    [g addRowWithViews:@[b0, placeholder, dot, eq]];
+    self.equalsButton = eq;
+
+    // Set consistent row height / col width
+    for (NSInteger r = 0; r < g.numberOfRows; r++)
+        [g rowAtIndex:r].height = kGridButtonHeight;
+    for (NSInteger c = 0; c < g.numberOfColumns; c++)
+        [g columnAtIndex:c].width = kGridButtonWidth;
+}
+
+// ---------- Scientific Grid (6 cols × 5 rows) ----------
+- (void)rebuildScientificGrid {
+    // The scientific grid is a subview of self.scientificView
+    NSGridView *g = nil;
+    for (NSView *sub in self.scientificView.subviews) {
+        if ([sub isKindOfClass:[NSGridView class]]) {
+            g = (NSGridView *)sub;
+            break;
+        }
+    }
+    if (!g || ![self gridNeedsRebuild:g]) return;
+    [self clearGrid:g];
+
+    SEL opAct  = @selector(operationPressed:);
+    SEL secAct = @selector(secondFunctionPressed:);
+
+    // Row 0: ( ) mc m+ m- mr
+    UDCalcButton *lp = makeButton(@"(",  UDOpParenLeft,  opAct, self, 0, nil);
+    UDCalcButton *rp = makeButton(@")",  UDOpParenRight, opAct, self, 0, nil);
+    UDCalcButton *mc = makeButton(@"mc", UDOpMC,   opAct, self, 0, nil);
+    UDCalcButton *mp = makeButton(@"m+", UDOpMAdd, opAct, self, 0, nil);
+    UDCalcButton *mm = makeButton(@"m-", UDOpMSub, opAct, self, 0, nil);
+    UDCalcButton *mr = makeButton(@"mr", UDOpMR,   opAct, self, 0, nil);
+    [g addRowWithViews:@[lp, rp, mc, mp, mm, mr]];
+    self.parenLeftButton = lp;
+    self.parenRightButton = rp;
+
+    // Row 1: 2nd x² x³ x^y e^x 10^x
+    UDCalcButton *sec  = makeButton(@"2nd", UDOpSecondFunc, secAct, self, CalcButtonType2nd, nil);
+    UDCalcButton *sqr  = makeButton(@"x²",  UDOpSquare, opAct, self, CalcButtonTypeSquare, nil);
+    UDCalcButton *cube = makeButton(@"x³",  UDOpCube,   opAct, self, CalcButtonTypeCube, nil);
+    UDCalcButton *pw   = makeButton(@"x^y", UDOpPow,    opAct, self, CalcButtonTypePower, nil);
+    UDCalcButton *ex   = makeButton(@"e^x", UDOpExp,    opAct, self, CalcButtonTypeExp, nil);
+    UDCalcButton *t10  = makeButton(@"10^x",UDOpPow10,  opAct, self, CalcButtonTypeTenPower, nil);
+    [g addRowWithViews:@[sec, sqr, cube, pw, ex, t10]];
+    self.expButton = ex;
+    self.xthPowerOf10Button = t10;
+
+    // Row 2: 1/x √x ³√x ʸ√x ln log₁₀
+    UDCalcButton *inv  = makeButton(@"1/x", UDOpInvert, opAct, self, CalcButtonTypeInverse, nil);
+    UDCalcButton *sq   = makeButton(@"√x",  UDOpSqrt,   opAct, self, CalcButtonTypeSqrt, nil);
+    UDCalcButton *cb   = makeButton(@"³√x", UDOpCbrt,   opAct, self, CalcButtonTypeCubeRoot, nil);
+    UDCalcButton *yr   = makeButton(@"ʸ√x", UDOpYRoot,  opAct, self, CalcButtonTypeYRoot, nil);
+    UDCalcButton *ln   = makeButton(@"ln",  UDOpLn,     opAct, self, 0, nil);
+    UDCalcButton *lg10 = makeButton(@"log₁₀",UDOpLog10, opAct, self, CalcButtonTypeLog10, nil);
+    [g addRowWithViews:@[inv, sq, cb, yr, ln, lg10]];
+    self.lnButton = ln;
+    self.log10Button = lg10;
+
+    // Row 3: x! sin cos tan e EE
+    UDCalcButton *fact = makeButton(@"x!",  UDOpFactorial, opAct, self, 0, nil);
+    UDCalcButton *sin  = makeButton(@"sin", UDOpSin,  opAct, self, CalcButtonTypeSin, nil);
+    UDCalcButton *cos  = makeButton(@"cos", UDOpCos,  opAct, self, CalcButtonTypeCos, nil);
+    UDCalcButton *tan  = makeButton(@"tan", UDOpTan,  opAct, self, CalcButtonTypeTan, nil);
+    UDCalcButton *ce   = makeButton(@"e",   UDOpConstE, opAct, self, 0, nil);
+    UDCalcButton *ee   = makeButton(@"EE",  UDOpEE,  opAct, self, 0, nil);
+    [g addRowWithViews:@[fact, sin, cos, tan, ce, ee]];
+    self.sinButton = sin;
+    self.cosButton = cos;
+    self.tanButton = tan;
+
+    // Row 4: Rad sinh cosh tanh π Rand
+    UDCalcButton *rd   = makeButton(@"Rad", UDOpRad,     opAct, self, 0, nil);
+    UDCalcButton *sinh = makeButton(@"sinh",UDOpSinh,    opAct, self, CalcButtonTypeSinh, nil);
+    UDCalcButton *cosh = makeButton(@"cosh",UDOpCosh,    opAct, self, CalcButtonTypeCosh, nil);
+    UDCalcButton *tanh = makeButton(@"tanh",UDOpTanh,    opAct, self, CalcButtonTypeTanh, nil);
+    UDCalcButton *pi   = makeButton(@"π",   UDOpConstPi, opAct, self, CalcButtonTypePi, nil);
+    UDCalcButton *rnd  = makeButton(@"Rand",UDOpRand,    opAct, self, 0, nil);
+    [g addRowWithViews:@[rd, sinh, cosh, tanh, pi, rnd]];
+    self.radDegButton = rd;
+    self.sinhButton = sinh;
+    self.coshButton = cosh;
+    self.tanhButton = tanh;
+
+    for (NSInteger r = 0; r < g.numberOfRows; r++)
+        [g rowAtIndex:r].height = kGridButtonHeight;
+    for (NSInteger c = 0; c < g.numberOfColumns; c++)
+        [g columnAtIndex:c].width = kGridButtonWidth;
+}
+
+// ---------- Programmer Grid (7 cols × 6 rows) ----------
+- (void)rebuildProgrammerGrid {
+    NSGridView *g = self.programmerGridView;
+    if (![self gridNeedsRebuild:g]) return;
+    [self clearGrid:g];
+
+    SEL opAct  = @selector(operationPressed:);
+    SEL digAct = @selector(digitPressed:);
+    NSColor *orange = [NSColor orangeColor];
+
+    // Row 0: AND OR D E F AC C
+    UDCalcButton *band = makeButton(@"AND",UDOpBitwiseAnd,opAct,self,0,nil);
+    UDCalcButton *bor  = makeButton(@"OR", UDOpBitwiseOr, opAct,self,0,nil);
+    // Hex digits D–F: UDOpDigitA (10) + offset
+    UDCalcButton *bD   = makeButton(@"D",  UDOpDigitA+3,  digAct,self,0,nil);
+    UDCalcButton *bE   = makeButton(@"E",  UDOpDigitA+4,  digAct,self,0,nil);
+    UDCalcButton *bF   = makeButton(@"F",  UDOpDigitA+5,  digAct,self,0,nil);
+    UDCalcButton *pac  = makeButton(@"AC", UDOpClearAll,   opAct,self,0,nil);
+    UDCalcButton *pc   = makeButton(@"C",  UDOpClear,      opAct,self,0,nil);
+    [g addRowWithViews:@[band, bor, bD, bE, bF, pac, pc]];
+    self.pDButton = bD;
+    self.pEButton = bE;
+    self.pFButton = bF;
+
+    // Row 1: NOR XOR A B C RoL RoR
+    UDCalcButton *bnor = makeButton(@"NOR",UDOpBitwiseNor,opAct,self,0,nil);
+    UDCalcButton *bxor = makeButton(@"XOR",UDOpBitwiseXor,opAct,self,0,nil);
+    UDCalcButton *bA   = makeButton(@"A",  UDOpDigitA,    digAct,self,0,nil);
+    UDCalcButton *bB   = makeButton(@"B",  UDOpDigitA+1,  digAct,self,0,nil);
+    UDCalcButton *bC   = makeButton(@"C",  UDOpDigitA+2,  digAct,self,0,nil);
+    UDCalcButton *rol  = makeButton(@"RoL",UDOpRotateLeft, opAct,self,0,nil);
+    UDCalcButton *ror  = makeButton(@"RoR",UDOpRotateRight,opAct,self,0,nil);
+    [g addRowWithViews:@[bnor, bxor, bA, bB, bC, rol, ror]];
+    self.pAButton = bA;
+    self.pBButton = bB;
+    self.pCButton = bC;
+
+    // Row 2: << >> 7 8 9 2's 1's
+    UDCalcButton *sl1  = makeButton(@"<<", UDOpShift1Left,  opAct,self,0,nil);
+    UDCalcButton *sr1  = makeButton(@">>", UDOpShift1Right, opAct,self,0,nil);
+    UDCalcButton *p7   = makeButton(@"7",  7,  digAct,self,0,nil);
+    UDCalcButton *p8   = makeButton(@"8",  8,  digAct,self,0,nil);
+    UDCalcButton *p9   = makeButton(@"9",  9,  digAct,self,0,nil);
+    UDCalcButton *c2s  = makeButton(@"2's",UDOpComp2, opAct,self,0,nil);
+    UDCalcButton *c1s  = makeButton(@"1's",UDOpComp1, opAct,self,0,nil);
+    [g addRowWithViews:@[sl1, sr1, p7, p8, p9, c2s, c1s]];
+    self.p8Button = p8;
+    self.p9Button = p9;
+
+    // Row 3: X<<Y X>>Y 4 5 6 ÷ −
+    UDCalcButton *sly  = makeButton(@"X<<Y",UDOpShiftLeft,  opAct,self,0,nil);
+    UDCalcButton *sry  = makeButton(@"X>>Y",UDOpShiftRight, opAct,self,0,nil);
+    UDCalcButton *p4   = makeButton(@"4",   4,  digAct,self,0,nil);
+    UDCalcButton *p5   = makeButton(@"5",   5,  digAct,self,0,nil);
+    UDCalcButton *p6   = makeButton(@"6",   6,  digAct,self,0,nil);
+    UDCalcButton *pdiv = makeButton(@"÷",   UDOpDiv, opAct,self,0,orange);
+    UDCalcButton *psub = makeButton(@"−",   UDOpSub, opAct,self,0,orange);
+    [g addRowWithViews:@[sly, sry, p4, p5, p6, pdiv, psub]];
+
+    // Row 4: byte-flip [placeholder] 1 2 3 × +
+    UDCalcButton *bf   = makeButton(@"byte flip",UDOpByteFlip, opAct,self,0,nil);
+    NSView *ph4        = [[NSView alloc] initWithFrame:NSZeroRect];
+    UDCalcButton *p1   = makeButton(@"1",  1,  digAct,self,0,nil);
+    UDCalcButton *p2   = makeButton(@"2",  2,  digAct,self,0,nil);
+    UDCalcButton *p3   = makeButton(@"3",  3,  digAct,self,0,nil);
+    UDCalcButton *pmul = makeButton(@"×",  UDOpMul, opAct,self,0,orange);
+    UDCalcButton *padd = makeButton(@"+",  UDOpAdd, opAct,self,0,orange);
+    [g addRowWithViews:@[bf, ph4, p1, p2, p3, pmul, padd]];
+
+    // Row 5: word-flip [placeholder] FF 0 00 = [placeholder]
+    UDCalcButton *wf   = makeButton(@"word flip",UDOpWordFlip, opAct,self,0,nil);
+    NSView *ph5a       = [[NSView alloc] initWithFrame:NSZeroRect];
+    UDCalcButton *ff   = makeButton(@"FF", UDOpDigitFF, digAct,self,0,nil);
+    UDCalcButton *p0   = makeButton(@"0",  0,  digAct,self,0,nil);
+    UDCalcButton *d00  = makeButton(@"00", UDOpDigit00, digAct,self,0,nil);
+    UDCalcButton *peq  = makeButton(@"=",  UDOpEq, opAct,self,0,orange);
+    NSView *ph5b       = [[NSView alloc] initWithFrame:NSZeroRect];
+    [g addRowWithViews:@[wf, ph5a, ff, p0, d00, peq, ph5b]];
+    self.pFFButton = ff;
+
+    for (NSInteger r = 0; r < g.numberOfRows; r++)
+        [g rowAtIndex:r].height = kGridButtonHeight;
+    for (NSInteger c = 0; c < g.numberOfColumns; c++)
+        [g columnAtIndex:c].width = kGridButtonWidth;
+}
+#endif /* GNUSTEP */
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -35,7 +290,13 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
     // fix up button layout
 
-#ifndef GNUSTEP
+#ifdef GNUSTEP
+    // GNUstep's XIB parser may not connect NSGridCell contentViews from
+    // Xcode XIBs.  Detect empty grids and rebuild them programmatically.
+    [self rebuildBasicGrid];
+    [self rebuildScientificGrid];
+    [self rebuildProgrammerGrid];
+#else
     // mergeCellsInHorizontalRange:verticalRange: is not yet implemented
     // in GNUstep's NSGridView — skip on GNUstep (purely cosmetic).
 

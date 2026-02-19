@@ -61,6 +61,13 @@
     [self.calcViewController restoreApplicationState];
 
     // 3. Make the Next Responder chain work (Keyboard shortcuts)
+#ifdef GNUSTEP
+    // GNUstep doesn't automatically insert NSViewController into the
+    // responder chain (macOS 10.10+ does this).  Wire it manually:
+    //   view → viewController → window
+    [calcView setNextResponder:self.calcViewController];
+    [self.calcViewController setNextResponder:self.window];
+#endif
     [self.window makeFirstResponder:self.calcViewController];
 
     [self updateRecentMenu];
