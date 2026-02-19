@@ -374,6 +374,23 @@ static void enableAutoresizing(NSView *view) {
     [self.basicOrProgrammerTabView setFrame:NSMakeRect(drawerW, 0,
                                                        keypadW, keypadH)];
 
+    // GNUstep's NSTabView doesn't propagate frame changes to content
+    // views.  Resize the active grid so it fills the tab item area.
+    BOOL isProgrammer = (self.calc.mode == UDCalcModeProgrammer);
+    NSGridView *activeGrid = isProgrammer ? self.programmerGridView
+                                          : self.basicGridView;
+    [activeGrid setFrame:NSMakeRect(0, 0, keypadW, keypadH)];
+
+    // Similarly, resize programmer input internals: the bit display
+    // wrapper and its child UDBitDisplayView need explicit sizing.
+    if (containerH > 0) {
+        CGFloat wrapperH = _gs_wrapperH;
+        [self.bitDisplayWrapperView setFrame:NSMakeRect(0, 0,
+                                                        MAX(0, W), wrapperH)];
+        [self.bitDisplayView setFrame:NSMakeRect(0, 0,
+                                                 MAX(0, W), wrapperH)];
+    }
+
     [self.view setNeedsDisplay:YES];
 }
 
