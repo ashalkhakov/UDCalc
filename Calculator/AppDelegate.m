@@ -67,6 +67,31 @@
     //   view → viewController → window
     [calcView setNextResponder:self.calcViewController];
     [self.calcViewController setNextResponder:self.window];
+
+    // 4. Explicitly wire menu targets.
+    // GNUstep's First Responder (target=-1) resolution doesn't
+    // reliably find action methods on view controllers.  Set the
+    // targets directly so menu items are always enabled.
+    {
+        NSMenu *mainMenu = [NSApp mainMenu];
+        for (NSInteger i = 0; i < [mainMenu numberOfItems]; i++) {
+            NSMenu *sub = [[mainMenu itemAtIndex:i] submenu];
+            if (!sub) continue;
+            for (NSInteger j = 0; j < [sub numberOfItems]; j++) {
+                NSMenuItem *mi = [sub itemAtIndex:j];
+                SEL act = [mi action];
+                if (!act) continue;
+                if (act == @selector(changeMode:) ||
+                    act == @selector(changeRPNMode:)) {
+                    [mi setTarget:self.calcViewController];
+                } else if (act == @selector(showTape:) ||
+                           act == @selector(conversionMenuClicked:) ||
+                           act == @selector(openConverter:)) {
+                    [mi setTarget:self];
+                }
+            }
+        }
+    }
 #endif
     [self.window makeFirstResponder:self.calcViewController];
 
