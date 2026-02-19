@@ -320,19 +320,30 @@ static NSLayoutConstraint *ud_replaceConstraint(NSLayoutConstraint *old, CGFloat
     id second = old.secondItem;
     NSView *owner = nil;
 
+    /* GNUstep headers don't declare -constraints on NSView, so use
+       performSelector to call it dynamically at runtime. */
+    SEL constraintsSel = @selector(constraints);
     if ([first isKindOfClass:[NSView class]]) {
         NSView *v = (NSView *)first;
-        if ([[v constraints] containsObject:old])
+        NSArray *vc = [v performSelector:constraintsSel];
+        if ([vc containsObject:old])
             owner = v;
-        else if (v.superview && [[v.superview constraints] containsObject:old])
-            owner = v.superview;
+        else if (v.superview) {
+            NSArray *sc = [v.superview performSelector:constraintsSel];
+            if ([sc containsObject:old])
+                owner = v.superview;
+        }
     }
     if (!owner && [second isKindOfClass:[NSView class]]) {
         NSView *v = (NSView *)second;
-        if ([[v constraints] containsObject:old])
+        NSArray *vc = [v performSelector:constraintsSel];
+        if ([vc containsObject:old])
             owner = v;
-        else if (v.superview && [[v.superview constraints] containsObject:old])
-            owner = v.superview;
+        else if (v.superview) {
+            NSArray *sc = [v.superview performSelector:constraintsSel];
+            if ([sc containsObject:old])
+                owner = v.superview;
+        }
     }
 
     if (owner) {
