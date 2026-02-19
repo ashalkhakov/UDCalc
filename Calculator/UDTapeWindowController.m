@@ -62,7 +62,7 @@
     // Create attributes dictionary with Font and Color
     NSDictionary *attrs = @{
         NSFontAttributeName: [NSFont monospacedDigitSystemFontOfSize:14.0 weight:NSFontWeightRegular],
-        NSForegroundColorAttributeName: [NSColor labelColor] // <--- Forces adaptive color
+        NSForegroundColorAttributeName: [NSColor controlTextColor]
     };
     
     NSAttributedString *attrStr = [[NSAttributedString alloc] initWithString:logLine attributes:attrs];

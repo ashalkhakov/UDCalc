@@ -934,13 +934,13 @@ Gw
                                                     <userDefinedRuntimeAttributes>
                                                         <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
@@ -1014,13 +1014,13 @@ Gw
                                                     <userDefinedRuntimeAttributes>
                                                         <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
@@ -1093,13 +1093,13 @@ Gw
                                                     <userDefinedRuntimeAttributes>
                                                         <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
@@ -1173,13 +1173,13 @@ Gw
                                                     <userDefinedRuntimeAttributes>
                                                         <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
@@ -1237,13 +1237,13 @@ DQ
                                                     <userDefinedRuntimeAttributes>
                                                         <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
@@ -1756,7 +1756,7 @@ DQ
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
@@ -1776,7 +1776,7 @@ DQ
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
@@ -1868,7 +1868,7 @@ DQ
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
@@ -1888,7 +1888,7 @@ DQ
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
@@ -1977,7 +1977,7 @@ DQ
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
                                                         </userDefinedRuntimeAttribute>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>

@@ -531,6 +531,25 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
     self.programmerInputHeightConstraint.constant = targetContainerH;
     self.bitWrapperHeightConstraint.constant = targetWrapperH;
 
+#ifdef GNUSTEP
+    // GNUstep's Auto Layout engine doesn't properly collapse views when
+    // constraint constants are set to 0.  Force zero-size frames on hidden
+    // views so they don't occupy space in the layout.
+    if (!isProgrammer) {
+        NSRect programmerFrame = self.programmerInputView.frame;
+        programmerFrame.size.height = 0;
+        [self.programmerInputView setFrame:programmerFrame];
+        NSRect bitDisplayFrame = self.bitDisplayWrapperView.frame;
+        bitDisplayFrame.size.height = 0;
+        [self.bitDisplayWrapperView setFrame:bitDisplayFrame];
+    }
+    if (!isScientific) {
+        NSRect scientificFrame = self.scientificView.frame;
+        scientificFrame.size.width = 0;
+        [self.scientificView setFrame:scientificFrame];
+    }
+#endif
+
     [self.view.superview layoutSubtreeIfNeeded];
 
     self.calc.mode = mode;
@@ -664,6 +683,16 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
     // C. Resize Main Container (Outer Constraint)
     // This stops exactly at 'buttonsOnlyHeight', keeping buttons visible.
     self.programmerInputHeightConstraint.constant = targetStackHeight;
+
+#ifdef GNUSTEP
+    // GNUstep's Auto Layout doesn't collapse views on constraint change;
+    // force the wrapper frame to match.
+    if (targetWrapperHeight == 0.0) {
+        NSRect bitDisplayFrame = self.bitDisplayWrapperView.frame;
+        bitDisplayFrame.size.height = 0;
+        [self.bitDisplayWrapperView setFrame:bitDisplayFrame];
+    }
+#endif
 }
 
 - (IBAction)baseSelected:(NSSegmentedControl *)sender {
