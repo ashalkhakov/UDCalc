@@ -70,6 +70,12 @@
 @implementation NSView (UDGNUstepCompat)
 
 - (NSSize)fittingSize {
+    /* NSGridView exposes -_prototypeFrame which computes the intrinsic
+       content size from row/column dimensions.  Use it when available. */
+    if ([self respondsToSelector:@selector(_prototypeFrame)]) {
+        NSRect proto = [(id)self _prototypeFrame];
+        return proto.size;
+    }
     return [self frame].size;
 }
 

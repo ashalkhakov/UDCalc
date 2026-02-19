@@ -586,16 +586,9 @@ static void enableAutoresizing(NSView *view) {
     
     // A. Keypad (Grid) Size
     NSGridView *targetGrid = isProgrammer ? self.programmerGridView : self.basicGridView;
-#ifdef GNUSTEP
-    // GNUstep's fittingSize returns the stale frame.size, not intrinsic
-    // content size.  Compute directly from grid dimensions.
-    CGFloat targetKeypadH = targetGrid.numberOfRows * kGridButtonHeight;
-    CGFloat targetKeypadW = targetGrid.numberOfColumns * kGridButtonWidth;
-#else
     NSSize targetGridFit = [targetGrid fittingSize];
     CGFloat targetKeypadH = targetGridFit.height;
     CGFloat targetKeypadW = targetGridFit.width;
-#endif
 
     // B. Scientific Drawer Width
     CGFloat targetDrawerW = isScientific ? self.standardScientificWidth : 0.0;
@@ -635,11 +628,7 @@ static void enableAutoresizing(NSView *view) {
     
     // For width delta, use current grid fitting size
     NSGridView *currentGrid = (self.calc.mode == UDCalcModeProgrammer) ? self.programmerGridView : self.basicGridView;
-#ifdef GNUSTEP
-    CGFloat currentKeypadW = currentGrid.numberOfColumns * kGridButtonWidth;
-#else
     CGFloat currentKeypadW = [currentGrid fittingSize].width;
-#endif
 
     // ============================================================
     // 3. CALCULATE DELTAS
