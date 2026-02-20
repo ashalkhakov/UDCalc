@@ -58,12 +58,6 @@
     [self.window setContentSize:calcView.frame.size];
     [self.window setContentView:calcView];
 
-#ifdef GNUSTEP
-    // Disable user-resizing: we manage window size programmatically
-    // during mode switches (Basic/Scientific/Programmer).
-    self.window.styleMask &= ~NSWindowStyleMaskResizable;
-#endif
-
     [self.calcViewController restoreApplicationState];
 
     // 3. Make the Next Responder chain work (Keyboard shortcuts)
