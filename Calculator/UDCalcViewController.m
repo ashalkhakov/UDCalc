@@ -392,14 +392,28 @@ static void enableAutoresizing(NSView *view) {
                                           : self.basicGridView;
     [activeGrid setFrame:NSMakeRect(0, 0, keypadW, keypadH)];
 
-    // Similarly, resize programmer input internals: the bit display
-    // wrapper and its child UDBitDisplayView need explicit sizing.
+    // Similarly, resize programmer input internals.  GNUstep's
+    // NSStackView doesn't re-arrange children when frames change.
+    // Layout (AppKit coords, origin bottom-left within containerH):
+    //   Bottom: bitDisplayWrapperView  (height = wrapperH)
+    //   Top:    button row             (height = kProgButtonRowH)
     if (containerH > 0) {
+        static const CGFloat kProgButtonRowH = 30.0;
         CGFloat wrapperH = _gs_wrapperH;
+
+        // Bit display wrapper at the bottom of the container
         [self.bitDisplayWrapperView setFrame:NSMakeRect(0, 0,
                                                         MAX(0, W), wrapperH)];
         [self.bitDisplayView setFrame:NSMakeRect(0, 0,
                                                  MAX(0, W), wrapperH)];
+
+        // Button row (encoding, show-binary, base) at the top.
+        // Found via baseSegmentedControl's superview (no IBOutlet).
+        NSView *buttonRow = [self.baseSegmentedControl superview];
+        if (buttonRow) {
+            CGFloat rowY = containerH - kProgButtonRowH;
+            [buttonRow setFrame:NSMakeRect(0, rowY, MAX(0, W), kProgButtonRowH)];
+        }
     }
 
     [self.view setNeedsDisplay:YES];
