@@ -47,7 +47,7 @@
     
     if (!self.isEnabled) {
 #ifdef GNUSTEP
-        bg = [NSColor controlColor];
+        bg = [NSColor colorWithCalibratedWhite:0.85 alpha:1.0]; // light gray for disabled
 #else
         // DISABLED: Use a flat, dark gray to indicate inactivity
         bg = [NSColor colorWithCalibratedWhite:0.15 alpha:1.0];
@@ -63,7 +63,16 @@
     }
     
     [bg setFill];
-    [[NSBezierPath bezierPathWithRoundedRect:self.bounds xRadius:0 yRadius:0] fill];
+    NSRect bounds = self.bounds;
+    NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:bounds xRadius:4 yRadius:4];
+    [path fill];
+
+#ifdef GNUSTEP
+    // Draw a subtle border for visual depth on light themes
+    [[NSColor colorWithCalibratedWhite:0.7 alpha:1.0] setStroke];
+    NSRect inset = NSInsetRect(bounds, 0.5, 0.5);
+    [[NSBezierPath bezierPathWithRoundedRect:inset xRadius:4 yRadius:4] stroke];
+#endif
 
     // 2. Draw Symbol
     // Note: The drawing helpers below now check [self isEnabled] to dim the text automatically.

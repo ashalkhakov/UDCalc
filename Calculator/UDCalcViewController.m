@@ -50,18 +50,33 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
 // GNUstep's XIB parser can't decode color-type userDefinedRuntimeAttributes,
 // so buttonColor is never set from the XIB.  Apply orange to operator buttons
 // (tags 21–25: +, −, ×, ÷, =) programmatically after loading.
+// Also traverses NSGridView cells (grid cell content views aren't in subviews).
+static void applyOrangeIfOperator(UDCalcButton *btn) {
+    // Tags 21-25 are operator buttons (+, −, ×, ÷, =)
+    // BUT exclude the "2nd" button whose XIB button tag=22 conflicts with UDOpSub
+    if (btn.tag >= 21 && btn.tag <= 25 && btn.symbolType != CalcButtonType2nd) {
+        btn.buttonColor = [NSColor orangeColor];
+        btn.highlightColor = [NSColor colorWithCalibratedRed:1.0 green:0.72 blue:0.28 alpha:1.0];
+        btn.textColor = [NSColor whiteColor];
+    }
+}
+
 - (void)applyOperatorColorsInView:(NSView *)root {
-    NSColor *orange = [NSColor orangeColor];
-    NSColor *orangeHL = [NSColor colorWithCalibratedRed:1.0 green:0.72 blue:0.28 alpha:1.0];
-    for (NSView *v in root.subviews) {
-        if ([v isKindOfClass:[UDCalcButton class]]) {
-            UDCalcButton *btn = (UDCalcButton *)v;
-            if (btn.tag >= 21 && btn.tag <= 25) {
-                btn.buttonColor = orange;
-                btn.highlightColor = orangeHL;
-                btn.textColor = [NSColor whiteColor];
+    // Traverse NSGridView cells directly (content views aren't in subviews)
+    if ([root isKindOfClass:[NSGridView class]]) {
+        NSGridView *grid = (NSGridView *)root;
+        for (NSInteger r = 0; r < grid.numberOfRows; r++) {
+            for (NSInteger c = 0; c < grid.numberOfColumns; c++) {
+                NSView *cv = [grid cellAtColumnIndex:c rowIndex:r].contentView;
+                if ([cv isKindOfClass:[UDCalcButton class]])
+                    applyOrangeIfOperator((UDCalcButton *)cv);
             }
         }
+        return;
+    }
+    for (NSView *v in root.subviews) {
+        if ([v isKindOfClass:[UDCalcButton class]])
+            applyOrangeIfOperator((UDCalcButton *)v);
         [self applyOperatorColorsInView:v];
     }
 }
