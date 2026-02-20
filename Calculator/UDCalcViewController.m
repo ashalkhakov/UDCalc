@@ -149,6 +149,52 @@ static const CGFloat kStandardProgrammerInputHeight = 98.0;
 static const CGFloat kStandardBitWrapperHeight      = 60.0;
 static const CGFloat kStandardKeypadHeight          = 255.0;
 
+#ifdef GNUSTEP
+/* Recursively walk all subviews and set target=self on any NSButton
+ * whose action is one of the view controller's IBActions.
+ * GNUstep's XIB parser may not resolve File's Owner (target=-2)
+ * for controls inside NSGridView cells or non-visible NSTabView tabs. */
+static void rewireButton(NSButton *btn, id target) {
+    SEL act = [btn action];
+    if (act == @selector(digitPressed:) ||
+        act == @selector(operationPressed:) ||
+        act == @selector(decimalPressed:) ||
+        act == @selector(secondFunctionPressed:) ||
+        act == @selector(showBinaryPressed:) ||
+        act == @selector(baseSelected:) ||
+        act == @selector(encodingSelected:)) {
+        [btn setTarget:target];
+    }
+}
+
+- (void)rewireButtonTargetsInView:(NSView *)root {
+    for (NSView *v in [root subviews]) {
+        if ([v isKindOfClass:[NSButton class]])
+            rewireButton((NSButton *)v, self);
+        [self rewireButtonTargetsInView:v];
+    }
+
+    /* NSGridView cells may not be in the subview hierarchy.
+     * Access them via the cell API if available. */
+    if ([root isKindOfClass:[NSGridView class]]) {
+        NSGridView *grid = (NSGridView *)root;
+        NSInteger nRows = [grid numberOfRows];
+        NSInteger nCols = [grid numberOfColumns];
+        for (NSInteger r = 0; r < nRows; r++) {
+            for (NSInteger c = 0; c < nCols; c++) {
+                @try {
+                    NSView *cv = [[grid cellAtColumnIndex:c rowIndex:r] contentView];
+                    if (cv && [cv isKindOfClass:[NSButton class]])
+                        rewireButton((NSButton *)cv, self);
+                } @catch (NSException *e) {
+                    /* cellAtColumnIndex may throw on merged cells */
+                }
+            }
+        }
+    }
+}
+#endif
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -174,6 +220,14 @@ static const CGFloat kStandardKeypadHeight          = 255.0;
         [self.radLabelRPN setTextColor:dark];
         [self.charLabelRPN setTextColor:dark];
     }
+
+    /* GNUstep's XIB parser may not resolve File's Owner (target=-2)
+     * for buttons deep inside NSGridView cells / NSTabView tabs.
+     * Walk all subviews and explicitly rewire targets to self. */
+    [self rewireButtonTargetsInView:self.view];
+    [self.encodingSegmentedControl setTarget:self];
+    [self.baseSegmentedControl setTarget:self];
+    [self.showBinaryViewButton setTarget:self];
 #endif
 
 #ifndef GNUSTEP
