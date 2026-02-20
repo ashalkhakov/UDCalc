@@ -25,18 +25,33 @@
 
 - (void)setupDefaults {
     self.bordered = NO; // Handle our own drawing
-    
+    [self applyAccentedStyle];
+}
+
+- (void)setIsAccented:(BOOL)isAccented {
+    _isAccented = isAccented;
+    [self applyAccentedStyle];
+}
+
+- (void)applyAccentedStyle {
+    if (_isAccented) {
+        // Orange "operator" style
+        self.buttonColor = [NSColor orangeColor];
+        self.highlightColor = [NSColor colorWithCalibratedRed:1.0 green:0.72 blue:0.28 alpha:1.0];
+        self.textColor = [NSColor whiteColor];
+    } else {
 #ifdef GNUSTEP
-    // Use theme-aware colors on GNUstep
-    self.textColor = [NSColor controlTextColor];
-    self.buttonColor = [NSColor controlColor];
-    self.highlightColor = [NSColor selectedControlColor];
+        // Use theme-aware colors on GNUstep
+        self.textColor = [NSColor controlTextColor];
+        self.buttonColor = [NSColor controlColor];
+        self.highlightColor = [NSColor selectedControlColor];
 #else
-    // Default "Dark Mode" Calculator Colors
-    self.textColor = [NSColor whiteColor];
-    self.buttonColor = [NSColor colorWithCalibratedWhite:0.2 alpha:1.0];      // Dark Grey
-    self.highlightColor = [NSColor colorWithCalibratedWhite:0.4 alpha:1.0];   // Lighter Grey
+        // Default "Dark Mode" Calculator Colors
+        self.textColor = [NSColor whiteColor];
+        self.buttonColor = [NSColor colorWithCalibratedWhite:0.2 alpha:1.0];      // Dark Grey
+        self.highlightColor = [NSColor colorWithCalibratedWhite:0.4 alpha:1.0];   // Lighter Grey
 #endif
+    }
 }
 
 #pragma mark - Main Draw Loop

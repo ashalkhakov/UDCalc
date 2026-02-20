@@ -863,16 +863,10 @@ Gw
                                                         <string key="keyEquivalent">/</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
+<userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="u3P-Zn-9eL"/>
@@ -943,16 +937,10 @@ Gw
                                                         <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
+<userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="k55-9s-AOQ"/>
@@ -1022,16 +1010,10 @@ Gw
                                                         <string key="keyEquivalent">-</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
+<userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="fIY-P3-Ch9"/>
@@ -1102,16 +1084,10 @@ Gw
                                                         <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
+<userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="jht-Wm-LzQ"/>
@@ -1166,16 +1142,10 @@ DQ
 </string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
+<userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="Y83-7R-431"/>
@@ -1677,9 +1647,7 @@ DQ
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="5Ff-w0-OrH"/>
@@ -1697,9 +1665,7 @@ DQ
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="hLw-pL-p7j"/>
@@ -1789,9 +1755,7 @@ DQ
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="QWr-Ie-z0K"/>
@@ -1809,9 +1773,7 @@ DQ
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="Bp3-zt-qpZ"/>
@@ -1898,9 +1860,7 @@ DQ
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" red="1" green="0.584" blue="0" alpha="1" colorSpace="calibratedRGB"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="hvG-8I-46T"/>

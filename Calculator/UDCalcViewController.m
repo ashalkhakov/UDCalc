@@ -20,15 +20,15 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
 #pragma mark - Grid Rebuild Helpers
 
-// Programmatic grid rebuild ensures buttons have correct targets/actions
-// and orange operator colors.  Works on both macOS and GNUstep.
+// Programmatic grid rebuild (fallback when XIB cells are empty).
+// Operator buttons use isAccented=YES for orange coloring.
 
 static const CGFloat kGridButtonWidth    = 60.0;
 static const CGFloat kGridButtonHeight  = 50.0;
 static const CGFloat kMinDisplayHeight  = 20.0;
 
 static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
-                                id target, CalcButtonType sym, NSColor *btnColor)
+                                id target, CalcButtonType sym, BOOL accented)
 {
     UDCalcButton *b = [[UDCalcButton alloc] initWithFrame:
                         NSMakeRect(0, 0, kGridButtonWidth, kGridButtonHeight)];
@@ -37,26 +37,8 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
     b.target = target;
     b.action = action;
     b.symbolType = sym;
-    if (btnColor) b.buttonColor = btnColor;
+    b.isAccented = accented;
     return b;
-}
-
-static void applyOrangeIfOperator(UDCalcButton *btn) {
-    // Tags 21-25 are operator buttons (+, −, ×, ÷, =)
-    // Exclude "2nd" button whose tag=22 conflicts with UDOpSub
-    if (btn.tag >= 21 && btn.tag <= 25 && btn.symbolType != CalcButtonType2nd) {
-        btn.buttonColor = [NSColor orangeColor];
-        btn.highlightColor = [NSColor colorWithCalibratedRed:1.0 green:0.72 blue:0.28 alpha:1.0];
-        btn.textColor = [NSColor whiteColor];
-    }
-}
-
-- (void)applyOperatorColorsInView:(NSView *)root {
-    for (NSView *v in root.subviews) {
-        if ([v isKindOfClass:[UDCalcButton class]])
-            applyOrangeIfOperator((UDCalcButton *)v);
-        [self applyOperatorColorsInView:v];
-    }
 }
 
 - (BOOL)gridNeedsRebuild:(NSGridView *)grid {
@@ -81,36 +63,35 @@ static void applyOrangeIfOperator(UDCalcButton *btn) {
     SEL opAct  = @selector(operationPressed:);
     SEL digAct = @selector(digitPressed:);
     SEL decAct = @selector(decimalPressed:);
-    NSColor *orange = [NSColor orangeColor];
 
-    UDCalcButton *ac  = makeButton(@"AC", UDOpClear,   opAct,  self, 0, nil);
-    UDCalcButton *neg = makeButton(@"±",  UDOpNegate,  opAct,  self, 0, nil);
-    UDCalcButton *pct = makeButton(@"%",  UDOpPercent, opAct,  self, 0, nil);
-    UDCalcButton *div = makeButton(@"÷",  UDOpDiv,     opAct,  self, 0, orange);
+    UDCalcButton *ac  = makeButton(@"AC", UDOpClear,   opAct,  self, 0, NO);
+    UDCalcButton *neg = makeButton(@"±",  UDOpNegate,  opAct,  self, 0, NO);
+    UDCalcButton *pct = makeButton(@"%",  UDOpPercent, opAct,  self, 0, NO);
+    UDCalcButton *div = makeButton(@"÷",  UDOpDiv,     opAct,  self, 0, YES);
     [g addRowWithViews:@[ac, neg, pct, div]];
     self.acButton = ac;
 
-    UDCalcButton *b7  = makeButton(@"7", 7, digAct, self, 0, nil);
-    UDCalcButton *b8  = makeButton(@"8", 8, digAct, self, 0, nil);
-    UDCalcButton *b9  = makeButton(@"9", 9, digAct, self, 0, nil);
-    UDCalcButton *mul = makeButton(@"×", UDOpMul, opAct, self, 0, orange);
+    UDCalcButton *b7  = makeButton(@"7", 7, digAct, self, 0, NO);
+    UDCalcButton *b8  = makeButton(@"8", 8, digAct, self, 0, NO);
+    UDCalcButton *b9  = makeButton(@"9", 9, digAct, self, 0, NO);
+    UDCalcButton *mul = makeButton(@"×", UDOpMul, opAct, self, 0, YES);
     [g addRowWithViews:@[b7, b8, b9, mul]];
 
-    UDCalcButton *b4  = makeButton(@"4", 4, digAct, self, 0, nil);
-    UDCalcButton *b5  = makeButton(@"5", 5, digAct, self, 0, nil);
-    UDCalcButton *b6  = makeButton(@"6", 6, digAct, self, 0, nil);
-    UDCalcButton *sub = makeButton(@"−", UDOpSub, opAct, self, 0, orange);
+    UDCalcButton *b4  = makeButton(@"4", 4, digAct, self, 0, NO);
+    UDCalcButton *b5  = makeButton(@"5", 5, digAct, self, 0, NO);
+    UDCalcButton *b6  = makeButton(@"6", 6, digAct, self, 0, NO);
+    UDCalcButton *sub = makeButton(@"−", UDOpSub, opAct, self, 0, YES);
     [g addRowWithViews:@[b4, b5, b6, sub]];
 
-    UDCalcButton *b1  = makeButton(@"1", 1, digAct, self, 0, nil);
-    UDCalcButton *b2  = makeButton(@"2", 2, digAct, self, 0, nil);
-    UDCalcButton *b3  = makeButton(@"3", 3, digAct, self, 0, nil);
-    UDCalcButton *add = makeButton(@"+", UDOpAdd, opAct, self, 0, orange);
+    UDCalcButton *b1  = makeButton(@"1", 1, digAct, self, 0, NO);
+    UDCalcButton *b2  = makeButton(@"2", 2, digAct, self, 0, NO);
+    UDCalcButton *b3  = makeButton(@"3", 3, digAct, self, 0, NO);
+    UDCalcButton *add = makeButton(@"+", UDOpAdd, opAct, self, 0, YES);
     [g addRowWithViews:@[b1, b2, b3, add]];
 
-    UDCalcButton *b0  = makeButton(@"0", 0,      digAct, self, 0, nil);
-    UDCalcButton *dot = makeButton(@".", 0,      decAct, self, 0, nil);
-    UDCalcButton *eq  = makeButton(@"=", UDOpEq, opAct,  self, 0, orange);
+    UDCalcButton *b0  = makeButton(@"0", 0,      digAct, self, 0, NO);
+    UDCalcButton *dot = makeButton(@".", 0,      decAct, self, 0, NO);
+    UDCalcButton *eq  = makeButton(@"=", UDOpEq, opAct,  self, 0, YES);
     // "0" normally spans 2 columns, but mergeCells not supported — use placeholder
     NSView *placeholder = [[NSView alloc] initWithFrame:NSZeroRect];
     [g addRowWithViews:@[b0, placeholder, dot, eq]];
@@ -141,57 +122,57 @@ static void applyOrangeIfOperator(UDCalcButton *btn) {
     SEL secAct = @selector(secondFunctionPressed:);
 
     // Row 0: ( ) mc m+ m- mr
-    UDCalcButton *lp = makeButton(@"(",  UDOpParenLeft,  opAct, self, 0, nil);
-    UDCalcButton *rp = makeButton(@")",  UDOpParenRight, opAct, self, 0, nil);
-    UDCalcButton *mc = makeButton(@"mc", UDOpMC,   opAct, self, 0, nil);
-    UDCalcButton *mp = makeButton(@"m+", UDOpMAdd, opAct, self, 0, nil);
-    UDCalcButton *mm = makeButton(@"m-", UDOpMSub, opAct, self, 0, nil);
-    UDCalcButton *mr = makeButton(@"mr", UDOpMR,   opAct, self, 0, nil);
+    UDCalcButton *lp = makeButton(@"(",  UDOpParenLeft,  opAct, self, 0, NO);
+    UDCalcButton *rp = makeButton(@")",  UDOpParenRight, opAct, self, 0, NO);
+    UDCalcButton *mc = makeButton(@"mc", UDOpMC,   opAct, self, 0, NO);
+    UDCalcButton *mp = makeButton(@"m+", UDOpMAdd, opAct, self, 0, NO);
+    UDCalcButton *mm = makeButton(@"m-", UDOpMSub, opAct, self, 0, NO);
+    UDCalcButton *mr = makeButton(@"mr", UDOpMR,   opAct, self, 0, NO);
     [g addRowWithViews:@[lp, rp, mc, mp, mm, mr]];
     self.parenLeftButton = lp;
     self.parenRightButton = rp;
 
     // Row 1: 2nd x² x³ x^y e^x 10^x
-    UDCalcButton *sec  = makeButton(@"2nd", UDOpSecondFunc, secAct, self, CalcButtonType2nd, nil);
-    UDCalcButton *sqr  = makeButton(@"x²",  UDOpSquare, opAct, self, CalcButtonTypeSquare, nil);
-    UDCalcButton *cube = makeButton(@"x³",  UDOpCube,   opAct, self, CalcButtonTypeCube, nil);
-    UDCalcButton *pw   = makeButton(@"x^y", UDOpPow,    opAct, self, CalcButtonTypePower, nil);
-    UDCalcButton *ex   = makeButton(@"e^x", UDOpExp,    opAct, self, CalcButtonTypeExp, nil);
-    UDCalcButton *t10  = makeButton(@"10^x",UDOpPow10,  opAct, self, CalcButtonTypeTenPower, nil);
+    UDCalcButton *sec  = makeButton(@"2nd", UDOpSecondFunc, secAct, self, CalcButtonType2nd, NO);
+    UDCalcButton *sqr  = makeButton(@"x²",  UDOpSquare, opAct, self, CalcButtonTypeSquare, NO);
+    UDCalcButton *cube = makeButton(@"x³",  UDOpCube,   opAct, self, CalcButtonTypeCube, NO);
+    UDCalcButton *pw   = makeButton(@"x^y", UDOpPow,    opAct, self, CalcButtonTypePower, NO);
+    UDCalcButton *ex   = makeButton(@"e^x", UDOpExp,    opAct, self, CalcButtonTypeExp, NO);
+    UDCalcButton *t10  = makeButton(@"10^x",UDOpPow10,  opAct, self, CalcButtonTypeTenPower, NO);
     [g addRowWithViews:@[sec, sqr, cube, pw, ex, t10]];
     self.expButton = ex;
     self.xthPowerOf10Button = t10;
 
     // Row 2: 1/x √x ³√x ʸ√x ln log₁₀
-    UDCalcButton *inv  = makeButton(@"1/x", UDOpInvert, opAct, self, CalcButtonTypeInverse, nil);
-    UDCalcButton *sq   = makeButton(@"√x",  UDOpSqrt,   opAct, self, CalcButtonTypeSqrt, nil);
-    UDCalcButton *cb   = makeButton(@"³√x", UDOpCbrt,   opAct, self, CalcButtonTypeCubeRoot, nil);
-    UDCalcButton *yr   = makeButton(@"ʸ√x", UDOpYRoot,  opAct, self, CalcButtonTypeYRoot, nil);
-    UDCalcButton *ln   = makeButton(@"ln",  UDOpLn,     opAct, self, 0, nil);
-    UDCalcButton *lg10 = makeButton(@"log₁₀",UDOpLog10, opAct, self, CalcButtonTypeLog10, nil);
+    UDCalcButton *inv  = makeButton(@"1/x", UDOpInvert, opAct, self, CalcButtonTypeInverse, NO);
+    UDCalcButton *sq   = makeButton(@"√x",  UDOpSqrt,   opAct, self, CalcButtonTypeSqrt, NO);
+    UDCalcButton *cb   = makeButton(@"³√x", UDOpCbrt,   opAct, self, CalcButtonTypeCubeRoot, NO);
+    UDCalcButton *yr   = makeButton(@"ʸ√x", UDOpYRoot,  opAct, self, CalcButtonTypeYRoot, NO);
+    UDCalcButton *ln   = makeButton(@"ln",  UDOpLn,     opAct, self, 0, NO);
+    UDCalcButton *lg10 = makeButton(@"log₁₀",UDOpLog10, opAct, self, CalcButtonTypeLog10, NO);
     [g addRowWithViews:@[inv, sq, cb, yr, ln, lg10]];
     self.lnButton = ln;
     self.log10Button = lg10;
 
     // Row 3: x! sin cos tan e EE
-    UDCalcButton *fact = makeButton(@"x!",  UDOpFactorial, opAct, self, 0, nil);
-    UDCalcButton *sin  = makeButton(@"sin", UDOpSin,  opAct, self, CalcButtonTypeSin, nil);
-    UDCalcButton *cos  = makeButton(@"cos", UDOpCos,  opAct, self, CalcButtonTypeCos, nil);
-    UDCalcButton *tan  = makeButton(@"tan", UDOpTan,  opAct, self, CalcButtonTypeTan, nil);
-    UDCalcButton *ce   = makeButton(@"e",   UDOpConstE, opAct, self, 0, nil);
-    UDCalcButton *ee   = makeButton(@"EE",  UDOpEE,  opAct, self, 0, nil);
+    UDCalcButton *fact = makeButton(@"x!",  UDOpFactorial, opAct, self, 0, NO);
+    UDCalcButton *sin  = makeButton(@"sin", UDOpSin,  opAct, self, CalcButtonTypeSin, NO);
+    UDCalcButton *cos  = makeButton(@"cos", UDOpCos,  opAct, self, CalcButtonTypeCos, NO);
+    UDCalcButton *tan  = makeButton(@"tan", UDOpTan,  opAct, self, CalcButtonTypeTan, NO);
+    UDCalcButton *ce   = makeButton(@"e",   UDOpConstE, opAct, self, 0, NO);
+    UDCalcButton *ee   = makeButton(@"EE",  UDOpEE,  opAct, self, 0, NO);
     [g addRowWithViews:@[fact, sin, cos, tan, ce, ee]];
     self.sinButton = sin;
     self.cosButton = cos;
     self.tanButton = tan;
 
     // Row 4: Rad sinh cosh tanh π Rand
-    UDCalcButton *rd   = makeButton(@"Rad", UDOpRad,     opAct, self, 0, nil);
-    UDCalcButton *sinh = makeButton(@"sinh",UDOpSinh,    opAct, self, CalcButtonTypeSinh, nil);
-    UDCalcButton *cosh = makeButton(@"cosh",UDOpCosh,    opAct, self, CalcButtonTypeCosh, nil);
-    UDCalcButton *tanh = makeButton(@"tanh",UDOpTanh,    opAct, self, CalcButtonTypeTanh, nil);
-    UDCalcButton *pi   = makeButton(@"π",   UDOpConstPi, opAct, self, CalcButtonTypePi, nil);
-    UDCalcButton *rnd  = makeButton(@"Rand",UDOpRand,    opAct, self, 0, nil);
+    UDCalcButton *rd   = makeButton(@"Rad", UDOpRad,     opAct, self, 0, NO);
+    UDCalcButton *sinh = makeButton(@"sinh",UDOpSinh,    opAct, self, CalcButtonTypeSinh, NO);
+    UDCalcButton *cosh = makeButton(@"cosh",UDOpCosh,    opAct, self, CalcButtonTypeCosh, NO);
+    UDCalcButton *tanh = makeButton(@"tanh",UDOpTanh,    opAct, self, CalcButtonTypeTanh, NO);
+    UDCalcButton *pi   = makeButton(@"π",   UDOpConstPi, opAct, self, CalcButtonTypePi, NO);
+    UDCalcButton *rnd  = makeButton(@"Rand",UDOpRand,    opAct, self, 0, NO);
     [g addRowWithViews:@[rd, sinh, cosh, tanh, pi, rnd]];
     self.radDegButton = rd;
     self.sinhButton = sinh;
@@ -213,74 +194,73 @@ static void applyOrangeIfOperator(UDCalcButton *btn) {
 
     SEL opAct  = @selector(operationPressed:);
     SEL digAct = @selector(digitPressed:);
-    NSColor *orange = [NSColor orangeColor];
 
     // Row 0: AND OR D E F AC C
-    UDCalcButton *band = makeButton(@"AND",UDOpBitwiseAnd,opAct,self,0,nil);
-    UDCalcButton *bor  = makeButton(@"OR", UDOpBitwiseOr, opAct,self,0,nil);
+    UDCalcButton *band = makeButton(@"AND",UDOpBitwiseAnd,opAct,self,0,NO);
+    UDCalcButton *bor  = makeButton(@"OR", UDOpBitwiseOr, opAct,self,0,NO);
     // Hex digits D–F: UDOpDigitA (10) + offset
-    UDCalcButton *bD   = makeButton(@"D",  UDOpDigitA+3,  digAct,self,0,nil);
-    UDCalcButton *bE   = makeButton(@"E",  UDOpDigitA+4,  digAct,self,0,nil);
-    UDCalcButton *bF   = makeButton(@"F",  UDOpDigitA+5,  digAct,self,0,nil);
-    UDCalcButton *pac  = makeButton(@"AC", UDOpClearAll,   opAct,self,0,nil);
-    UDCalcButton *pc   = makeButton(@"C",  UDOpClear,      opAct,self,0,nil);
+    UDCalcButton *bD   = makeButton(@"D",  UDOpDigitA+3,  digAct,self,0,NO);
+    UDCalcButton *bE   = makeButton(@"E",  UDOpDigitA+4,  digAct,self,0,NO);
+    UDCalcButton *bF   = makeButton(@"F",  UDOpDigitA+5,  digAct,self,0,NO);
+    UDCalcButton *pac  = makeButton(@"AC", UDOpClearAll,   opAct,self,0,NO);
+    UDCalcButton *pc   = makeButton(@"C",  UDOpClear,      opAct,self,0,NO);
     [g addRowWithViews:@[band, bor, bD, bE, bF, pac, pc]];
     self.pDButton = bD;
     self.pEButton = bE;
     self.pFButton = bF;
 
     // Row 1: NOR XOR A B C RoL RoR
-    UDCalcButton *bnor = makeButton(@"NOR",UDOpBitwiseNor,opAct,self,0,nil);
-    UDCalcButton *bxor = makeButton(@"XOR",UDOpBitwiseXor,opAct,self,0,nil);
-    UDCalcButton *bA   = makeButton(@"A",  UDOpDigitA,    digAct,self,0,nil);
-    UDCalcButton *bB   = makeButton(@"B",  UDOpDigitA+1,  digAct,self,0,nil);
-    UDCalcButton *bC   = makeButton(@"C",  UDOpDigitA+2,  digAct,self,0,nil);
-    UDCalcButton *rol  = makeButton(@"RoL",UDOpRotateLeft, opAct,self,0,nil);
-    UDCalcButton *ror  = makeButton(@"RoR",UDOpRotateRight,opAct,self,0,nil);
+    UDCalcButton *bnor = makeButton(@"NOR",UDOpBitwiseNor,opAct,self,0,NO);
+    UDCalcButton *bxor = makeButton(@"XOR",UDOpBitwiseXor,opAct,self,0,NO);
+    UDCalcButton *bA   = makeButton(@"A",  UDOpDigitA,    digAct,self,0,NO);
+    UDCalcButton *bB   = makeButton(@"B",  UDOpDigitA+1,  digAct,self,0,NO);
+    UDCalcButton *bC   = makeButton(@"C",  UDOpDigitA+2,  digAct,self,0,NO);
+    UDCalcButton *rol  = makeButton(@"RoL",UDOpRotateLeft, opAct,self,0,NO);
+    UDCalcButton *ror  = makeButton(@"RoR",UDOpRotateRight,opAct,self,0,NO);
     [g addRowWithViews:@[bnor, bxor, bA, bB, bC, rol, ror]];
     self.pAButton = bA;
     self.pBButton = bB;
     self.pCButton = bC;
 
     // Row 2: << >> 7 8 9 2's 1's
-    UDCalcButton *sl1  = makeButton(@"<<", UDOpShift1Left,  opAct,self,0,nil);
-    UDCalcButton *sr1  = makeButton(@">>", UDOpShift1Right, opAct,self,0,nil);
-    UDCalcButton *p7   = makeButton(@"7",  7,  digAct,self,0,nil);
-    UDCalcButton *p8   = makeButton(@"8",  8,  digAct,self,0,nil);
-    UDCalcButton *p9   = makeButton(@"9",  9,  digAct,self,0,nil);
-    UDCalcButton *c2s  = makeButton(@"2's",UDOpComp2, opAct,self,0,nil);
-    UDCalcButton *c1s  = makeButton(@"1's",UDOpComp1, opAct,self,0,nil);
+    UDCalcButton *sl1  = makeButton(@"<<", UDOpShift1Left,  opAct,self,0,NO);
+    UDCalcButton *sr1  = makeButton(@">>", UDOpShift1Right, opAct,self,0,NO);
+    UDCalcButton *p7   = makeButton(@"7",  7,  digAct,self,0,NO);
+    UDCalcButton *p8   = makeButton(@"8",  8,  digAct,self,0,NO);
+    UDCalcButton *p9   = makeButton(@"9",  9,  digAct,self,0,NO);
+    UDCalcButton *c2s  = makeButton(@"2's",UDOpComp2, opAct,self,0,NO);
+    UDCalcButton *c1s  = makeButton(@"1's",UDOpComp1, opAct,self,0,NO);
     [g addRowWithViews:@[sl1, sr1, p7, p8, p9, c2s, c1s]];
     self.p8Button = p8;
     self.p9Button = p9;
 
     // Row 3: X<<Y X>>Y 4 5 6 ÷ −
-    UDCalcButton *sly  = makeButton(@"X<<Y",UDOpShiftLeft,  opAct,self,0,nil);
-    UDCalcButton *sry  = makeButton(@"X>>Y",UDOpShiftRight, opAct,self,0,nil);
-    UDCalcButton *p4   = makeButton(@"4",   4,  digAct,self,0,nil);
-    UDCalcButton *p5   = makeButton(@"5",   5,  digAct,self,0,nil);
-    UDCalcButton *p6   = makeButton(@"6",   6,  digAct,self,0,nil);
-    UDCalcButton *pdiv = makeButton(@"÷",   UDOpDiv, opAct,self,0,orange);
-    UDCalcButton *psub = makeButton(@"−",   UDOpSub, opAct,self,0,orange);
+    UDCalcButton *sly  = makeButton(@"X<<Y",UDOpShiftLeft,  opAct,self,0,NO);
+    UDCalcButton *sry  = makeButton(@"X>>Y",UDOpShiftRight, opAct,self,0,NO);
+    UDCalcButton *p4   = makeButton(@"4",   4,  digAct,self,0,NO);
+    UDCalcButton *p5   = makeButton(@"5",   5,  digAct,self,0,NO);
+    UDCalcButton *p6   = makeButton(@"6",   6,  digAct,self,0,NO);
+    UDCalcButton *pdiv = makeButton(@"÷",   UDOpDiv, opAct,self,0,YES);
+    UDCalcButton *psub = makeButton(@"−",   UDOpSub, opAct,self,0,YES);
     [g addRowWithViews:@[sly, sry, p4, p5, p6, pdiv, psub]];
 
     // Row 4: byte-flip [placeholder] 1 2 3 × +
-    UDCalcButton *bf   = makeButton(@"byte flip",UDOpByteFlip, opAct,self,0,nil);
+    UDCalcButton *bf   = makeButton(@"byte flip",UDOpByteFlip, opAct,self,0,NO);
     NSView *ph4        = [[NSView alloc] initWithFrame:NSZeroRect];
-    UDCalcButton *p1   = makeButton(@"1",  1,  digAct,self,0,nil);
-    UDCalcButton *p2   = makeButton(@"2",  2,  digAct,self,0,nil);
-    UDCalcButton *p3   = makeButton(@"3",  3,  digAct,self,0,nil);
-    UDCalcButton *pmul = makeButton(@"×",  UDOpMul, opAct,self,0,orange);
-    UDCalcButton *padd = makeButton(@"+",  UDOpAdd, opAct,self,0,orange);
+    UDCalcButton *p1   = makeButton(@"1",  1,  digAct,self,0,NO);
+    UDCalcButton *p2   = makeButton(@"2",  2,  digAct,self,0,NO);
+    UDCalcButton *p3   = makeButton(@"3",  3,  digAct,self,0,NO);
+    UDCalcButton *pmul = makeButton(@"×",  UDOpMul, opAct,self,0,YES);
+    UDCalcButton *padd = makeButton(@"+",  UDOpAdd, opAct,self,0,YES);
     [g addRowWithViews:@[bf, ph4, p1, p2, p3, pmul, padd]];
 
     // Row 5: word-flip [placeholder] FF 0 00 = [placeholder]
-    UDCalcButton *wf   = makeButton(@"word flip",UDOpWordFlip, opAct,self,0,nil);
+    UDCalcButton *wf   = makeButton(@"word flip",UDOpWordFlip, opAct,self,0,NO);
     NSView *ph5a       = [[NSView alloc] initWithFrame:NSZeroRect];
-    UDCalcButton *ff   = makeButton(@"FF", UDOpDigitFF, digAct,self,0,nil);
-    UDCalcButton *p0   = makeButton(@"0",  0,  digAct,self,0,nil);
-    UDCalcButton *d00  = makeButton(@"00", UDOpDigit00, digAct,self,0,nil);
-    UDCalcButton *peq  = makeButton(@"=",  UDOpEq, opAct,self,0,orange);
+    UDCalcButton *ff   = makeButton(@"FF", UDOpDigitFF, digAct,self,0,NO);
+    UDCalcButton *p0   = makeButton(@"0",  0,  digAct,self,0,NO);
+    UDCalcButton *d00  = makeButton(@"00", UDOpDigit00, digAct,self,0,NO);
+    UDCalcButton *peq  = makeButton(@"=",  UDOpEq, opAct,self,0,YES);
     NSView *ph5b       = [[NSView alloc] initWithFrame:NSZeroRect];
     [g addRowWithViews:@[wf, ph5a, ff, p0, d00, peq, ph5b]];
     self.pFFButton = ff;
@@ -435,7 +415,6 @@ static const CGFloat kStandardKeypadHeight          = 255.0;
     [self rebuildBasicGrid];
     [self rebuildScientificGrid];
     [self rebuildProgrammerGrid];
-    [self applyOperatorColorsInView:self.view];
 
 #ifdef GNUSTEP
     {
