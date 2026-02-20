@@ -62,18 +62,6 @@ static void applyOrangeIfOperator(UDCalcButton *btn) {
 }
 
 - (void)applyOperatorColorsInView:(NSView *)root {
-    // Traverse NSGridView cells directly (content views aren't in subviews)
-    if ([root isKindOfClass:[NSGridView class]]) {
-        NSGridView *grid = (NSGridView *)root;
-        for (NSInteger r = 0; r < grid.numberOfRows; r++) {
-            for (NSInteger c = 0; c < grid.numberOfColumns; c++) {
-                NSView *cv = [grid cellAtColumnIndex:c rowIndex:r].contentView;
-                if ([cv isKindOfClass:[UDCalcButton class]])
-                    applyOrangeIfOperator((UDCalcButton *)cv);
-            }
-        }
-        return;
-    }
     for (NSView *v in root.subviews) {
         if ([v isKindOfClass:[UDCalcButton class]])
             applyOrangeIfOperator((UDCalcButton *)v);
@@ -83,9 +71,17 @@ static void applyOrangeIfOperator(UDCalcButton *btn) {
 
 - (BOOL)gridNeedsRebuild:(NSGridView *)grid {
     if (!grid) return NO;
+#ifdef GNUSTEP
+    // Always rebuild on GNUstep: XIB-loaded buttons use First Responder
+    // targets that GNUstep can't resolve, and cellAtColumnIndex: access
+    // may corrupt grid state. Rebuilding ensures correct targets/actions
+    // and orange operator colors from creation.
+    return YES;
+#else
     if (grid.numberOfRows == 0 || grid.numberOfColumns == 0) return YES;
     NSGridCell *cell = [grid cellAtColumnIndex:0 rowIndex:0];
     return (cell.contentView == nil);
+#endif
 }
 
 - (void)clearGrid:(NSGridView *)grid {
