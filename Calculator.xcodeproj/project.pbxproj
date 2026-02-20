@@ -11,8 +11,6 @@
 		9A20771D2F291BFE00A28E88 /* UDCalcRPNTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A20771C2F291BFE00A28E88 /* UDCalcRPNTests.m */; };
 		9A22A84B2F2BBCA40087F296 /* UDCalcViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A22A84A2F2BBCA40087F296 /* UDCalcViewController.m */; };
 		9A22A84C2F2BBCA40087F296 /* UDCalcViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A22A84A2F2BBCA40087F296 /* UDCalcViewController.m */; };
-		9A22A84E2F2BBE130087F296 /* UDCalcView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A22A84D2F2BBE130087F296 /* UDCalcView.xib */; };
-		9A22A84F2F2BBE130087F296 /* UDCalcView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A22A84D2F2BBE130087F296 /* UDCalcView.xib */; };
 		9A3E0DFB2F438C6900EFEFD9 /* UDASTTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3E0DFA2F438C6900EFEFD9 /* UDASTTests.m */; };
 		9A4496B52F2143980024B55F /* UDCalcButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4496B42F2143980024B55F /* UDCalcButton.m */; };
 		9A5589862F1FFDA500159E7B /* UDFrontendContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5589852F1FFDA500159E7B /* UDFrontendContext.m */; };
@@ -20,15 +18,12 @@
 		9A5E28C02F2E76FB001A7618 /* UDValueFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5E28BE2F2E76F2001A7618 /* UDValueFormatter.m */; };
 		9A717CA52F1D1D9F005A27B7 /* UDTape.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CA42F1D1D9F005A27B7 /* UDTape.m */; };
 		9A717CAB2F1D2085005A27B7 /* UDTapeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CAA2F1D2085005A27B7 /* UDTapeWindowController.m */; };
-		9A717CAD2F1D20C8005A27B7 /* UDTapeWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A717CAC2F1D20C8005A27B7 /* UDTapeWindow.xib */; };
 		9A717CAF2F1D493A005A27B7 /* UDFrontend.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CAE2F1D493A005A27B7 /* UDFrontend.m */; };
 		9A7B94EE2F1BB18600ED7306 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B94ED2F1BB18600ED7306 /* AppDelegate.m */; };
 		9A7B94F02F1BB18800ED7306 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A7B94EF2F1BB18800ED7306 /* Assets.xcassets */; };
-		9A7B94F32F1BB18800ED7306 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A7B94F12F1BB18800ED7306 /* MainMenu.xib */; };
 		9A7B94F52F1BB18800ED7306 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B94F42F1BB18800ED7306 /* main.m */; };
 		9A7B94FD2F1BE4FF00ED7306 /* UDCalc.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B94FC2F1BE4FF00ED7306 /* UDCalc.m */; };
 		9A7B95002F1BF69500ED7306 /* UDConversionWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B94FF2F1BF69500ED7306 /* UDConversionWindowController.m */; };
-		9A7B95032F1BF7CE00ED7306 /* ConversionWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A7B95022F1BF7CE00ED7306 /* ConversionWindow.xib */; };
 		9A7B95052F1C08E500ED7306 /* UDUnitConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B95042F1C08E500ED7306 /* UDUnitConverter.m */; };
 		9A7B95082F1C0E0700ED7306 /* UDConversionHistoryManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B95072F1C0E0700ED7306 /* UDConversionHistoryManager.m */; };
 		9A7D1A282F30E47A00CC974D /* UDBitDisplayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7D1A272F30E47A00CC974D /* UDBitDisplayView.m */; };
@@ -53,6 +48,10 @@
 		9AC4C6192F27CAA900CD3AD4 /* UDCalcButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4496B42F2143980024B55F /* UDCalcButton.m */; };
 		9AC4C61A2F27CAAB00CD3AD4 /* UDInputBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0D01C12F234AD000FE2946 /* UDInputBuffer.m */; };
 		9ADBE6FE2F3DC62400B1F907 /* UDSettingsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ADBE6FD2F3DC62400B1F907 /* UDSettingsManager.m */; };
+		9ADD9A152F487B1B00C2C65E /* ConversionWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9ADD9A112F487B1B00C2C65E /* ConversionWindow.xib */; };
+		9ADD9A162F487B1B00C2C65E /* UDCalcView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9ADD9A122F487B1B00C2C65E /* UDCalcView.xib */; };
+		9ADD9A172F487B1B00C2C65E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9ADD9A132F487B1B00C2C65E /* MainMenu.xib */; };
+		9ADD9A182F487B1B00C2C65E /* UDTapeWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9ADD9A142F487B1B00C2C65E /* UDTapeWindow.xib */; };
 		9AE3F67D2F1EA14800E1CFCF /* UDAST.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F67C2F1EA14800E1CFCF /* UDAST.m */; };
 		9AE3F6802F1EA9AA00E1CFCF /* UDInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F67F2F1EA9AA00E1CFCF /* UDInstruction.m */; };
 		9AE3F6832F1EA9F300E1CFCF /* UDCompiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE3F6822F1EA9F300E1CFCF /* UDCompiler.m */; };
@@ -75,7 +74,6 @@
 		9A20771C2F291BFE00A28E88 /* UDCalcRPNTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCalcRPNTests.m; sourceTree = "<group>"; };
 		9A22A8492F2BBC790087F296 /* UDCalcViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDCalcViewController.h; sourceTree = "<group>"; };
 		9A22A84A2F2BBCA40087F296 /* UDCalcViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCalcViewController.m; sourceTree = "<group>"; };
-		9A22A84D2F2BBE130087F296 /* UDCalcView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UDCalcView.xib; sourceTree = "<group>"; };
 		9A3E0DFA2F438C6900EFEFD9 /* UDASTTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDASTTests.m; sourceTree = "<group>"; };
 		9A4496B32F2143790024B55F /* UDCalcButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDCalcButton.h; sourceTree = "<group>"; };
 		9A4496B42F2143980024B55F /* UDCalcButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCalcButton.m; sourceTree = "<group>"; };
@@ -88,21 +86,18 @@
 		9A717CA42F1D1D9F005A27B7 /* UDTape.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDTape.m; sourceTree = "<group>"; };
 		9A717CA92F1D2062005A27B7 /* UDTapeWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDTapeWindowController.h; sourceTree = "<group>"; };
 		9A717CAA2F1D2085005A27B7 /* UDTapeWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDTapeWindowController.m; sourceTree = "<group>"; };
-		9A717CAC2F1D20C8005A27B7 /* UDTapeWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UDTapeWindow.xib; sourceTree = "<group>"; };
 		9A717CAE2F1D493A005A27B7 /* UDFrontend.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDFrontend.m; sourceTree = "<group>"; };
 		9A717CB02F1D4954005A27B7 /* UDFrontend.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDFrontend.h; sourceTree = "<group>"; };
 		9A7B94E92F1BB18600ED7306 /* Calculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Calculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A7B94EC2F1BB18600ED7306 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		9A7B94ED2F1BB18600ED7306 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		9A7B94EF2F1BB18800ED7306 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		9A7B94F22F1BB18800ED7306 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		9A7B94F42F1BB18800ED7306 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9A7B94F62F1BB18800ED7306 /* Calculator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Calculator.entitlements; sourceTree = "<group>"; };
 		9A7B94FC2F1BE4FF00ED7306 /* UDCalc.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCalc.m; sourceTree = "<group>"; };
 		9A7B94FE2F1BE51100ED7306 /* UDCalc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDCalc.h; sourceTree = "<group>"; };
 		9A7B94FF2F1BF69500ED7306 /* UDConversionWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDConversionWindowController.m; sourceTree = "<group>"; };
 		9A7B95012F1BF6A700ED7306 /* UDConversionWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDConversionWindowController.h; sourceTree = "<group>"; };
-		9A7B95022F1BF7CE00ED7306 /* ConversionWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ConversionWindow.xib; sourceTree = "<group>"; };
 		9A7B95042F1C08E500ED7306 /* UDUnitConverter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDUnitConverter.m; sourceTree = "<group>"; };
 		9A7B95062F1C091D00ED7306 /* UDUnitConverter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDUnitConverter.h; sourceTree = "<group>"; };
 		9A7B95072F1C0E0700ED7306 /* UDConversionHistoryManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDConversionHistoryManager.m; sourceTree = "<group>"; };
@@ -117,6 +112,10 @@
 		9AC4C6042F27CA3000CD3AD4 /* UDCalcTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCalcTests.m; sourceTree = "<group>"; };
 		9ADBE6FC2F3DC5E000B1F907 /* UDSettingsManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDSettingsManager.h; sourceTree = "<group>"; };
 		9ADBE6FD2F3DC62400B1F907 /* UDSettingsManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDSettingsManager.m; sourceTree = "<group>"; };
+		9ADD9A112F487B1B00C2C65E /* ConversionWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ConversionWindow.xib; path = Resources/ConversionWindow.xib; sourceTree = "<group>"; };
+		9ADD9A122F487B1B00C2C65E /* UDCalcView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = UDCalcView.xib; path = Resources/UDCalcView.xib; sourceTree = "<group>"; };
+		9ADD9A132F487B1B00C2C65E /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = Resources/MainMenu.xib; sourceTree = "<group>"; };
+		9ADD9A142F487B1B00C2C65E /* UDTapeWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = UDTapeWindow.xib; path = Resources/UDTapeWindow.xib; sourceTree = "<group>"; };
 		9AE3F67B2F1EA12D00E1CFCF /* UDAST.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDAST.h; sourceTree = "<group>"; };
 		9AE3F67C2F1EA14800E1CFCF /* UDAST.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDAST.m; sourceTree = "<group>"; };
 		9AE3F67E2F1EA99300E1CFCF /* UDInstruction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDInstruction.h; sourceTree = "<group>"; };
@@ -166,17 +165,19 @@
 		9A7B94EB2F1BB18600ED7306 /* Calculator */ = {
 			isa = PBXGroup;
 			children = (
+				9ADD9A112F487B1B00C2C65E /* ConversionWindow.xib */,
+				9ADD9A132F487B1B00C2C65E /* MainMenu.xib */,
+				9ADD9A122F487B1B00C2C65E /* UDCalcView.xib */,
+				9ADD9A142F487B1B00C2C65E /* UDTapeWindow.xib */,
 				9A7B94EC2F1BB18600ED7306 /* AppDelegate.h */,
 				9A7B94ED2F1BB18600ED7306 /* AppDelegate.m */,
 				9A7B94EF2F1BB18800ED7306 /* Assets.xcassets */,
-				9A7B94F12F1BB18800ED7306 /* MainMenu.xib */,
 				9A7B94F42F1BB18800ED7306 /* main.m */,
 				9A7B94F62F1BB18800ED7306 /* Calculator.entitlements */,
 				9A7B94FC2F1BE4FF00ED7306 /* UDCalc.m */,
 				9A7B94FE2F1BE51100ED7306 /* UDCalc.h */,
 				9A7B94FF2F1BF69500ED7306 /* UDConversionWindowController.m */,
 				9A7B95012F1BF6A700ED7306 /* UDConversionWindowController.h */,
-				9A7B95022F1BF7CE00ED7306 /* ConversionWindow.xib */,
 				9A7B95042F1C08E500ED7306 /* UDUnitConverter.m */,
 				9A7B95062F1C091D00ED7306 /* UDUnitConverter.h */,
 				9A7B95072F1C0E0700ED7306 /* UDConversionHistoryManager.m */,
@@ -185,7 +186,6 @@
 				9A717CA42F1D1D9F005A27B7 /* UDTape.m */,
 				9A717CA92F1D2062005A27B7 /* UDTapeWindowController.h */,
 				9A717CAA2F1D2085005A27B7 /* UDTapeWindowController.m */,
-				9A717CAC2F1D20C8005A27B7 /* UDTapeWindow.xib */,
 				9A717CAE2F1D493A005A27B7 /* UDFrontend.m */,
 				9A717CB02F1D4954005A27B7 /* UDFrontend.h */,
 				9AE3F67B2F1EA12D00E1CFCF /* UDAST.h */,
@@ -204,7 +204,6 @@
 				9A0D01C12F234AD000FE2946 /* UDInputBuffer.m */,
 				9A22A8492F2BBC790087F296 /* UDCalcViewController.h */,
 				9A22A84A2F2BBCA40087F296 /* UDCalcViewController.m */,
-				9A22A84D2F2BBE130087F296 /* UDCalcView.xib */,
 				9A5E28BC2F2E0481001A7618 /* UDValue.h */,
 				9A5E28BD2F2E76CE001A7618 /* UDValueFormatter.h */,
 				9A5E28BE2F2E76F2001A7618 /* UDValueFormatter.m */,
@@ -310,11 +309,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A717CAD2F1D20C8005A27B7 /* UDTapeWindow.xib in Resources */,
-				9A22A84E2F2BBE130087F296 /* UDCalcView.xib in Resources */,
+				9ADD9A182F487B1B00C2C65E /* UDTapeWindow.xib in Resources */,
 				9A7B94F02F1BB18800ED7306 /* Assets.xcassets in Resources */,
-				9A7B94F32F1BB18800ED7306 /* MainMenu.xib in Resources */,
-				9A7B95032F1BF7CE00ED7306 /* ConversionWindow.xib in Resources */,
+				9ADD9A162F487B1B00C2C65E /* UDCalcView.xib in Resources */,
+				9ADD9A152F487B1B00C2C65E /* ConversionWindow.xib in Resources */,
+				9ADD9A172F487B1B00C2C65E /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -322,7 +321,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A22A84F2F2BBE130087F296 /* UDCalcView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -396,17 +394,6 @@
 			targetProxy = 9AC4C6062F27CA3000CD3AD4 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		9A7B94F12F1BB18800ED7306 /* MainMenu.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9A7B94F22F1BB18800ED7306 /* Base */,
-			);
-			name = MainMenu.xib;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		9A7B94F72F1BB18800ED7306 /* Debug */ = {
