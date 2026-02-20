@@ -9,7 +9,7 @@
  * and aim to replicate the essential behavior of the macOS originals without
  * depending on any private GNUstep internals.
  *
- * The entire file is wrapped in an GNUSTEP preprocessor guard so that it
+ * The entire file is wrapped in a GNUSTEP preprocessor guard so that it
  * compiles to nothing when building on macOS with Xcode.
  */
 
