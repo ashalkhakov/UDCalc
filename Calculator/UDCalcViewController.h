@@ -38,13 +38,10 @@ extern NSString * const UDCalcResultKey;  // double
 @property (nonatomic, weak) IBOutlet NSTabView *displayTabView;
 @property (weak) IBOutlet NSTextField *radLabel;
 @property (weak) IBOutlet NSTextField *charLabel;
-@property (nonatomic, weak) IBOutlet NSLayoutConstraint *scientificWidthConstraint;
 @property (nonatomic, weak) IBOutlet NSView *scientificView;
 @property (nonatomic, assign) CGFloat standardScientificWidth; // To remember the size
 
-@property (nonatomic, weak) IBOutlet NSLayoutConstraint *programmerInputHeightConstraint;
 @property (nonatomic, assign) CGFloat standardProgrammerInputHeight; // To remember the size
-@property (nonatomic, weak) IBOutlet NSLayoutConstraint *bitWrapperHeightConstraint; // The wrapper's height
 @property (nonatomic, assign) CGFloat standardBitWrapperHeight;
 @property (nonatomic, weak) IBOutlet NSStackView *programmerInputView;
 @property (nonatomic, weak) IBOutlet NSSegmentedControl *baseSegmentedControl;
@@ -56,7 +53,6 @@ extern NSString * const UDCalcResultKey;  // double
 @property (nonatomic, weak) IBOutlet NSTabView *basicOrProgrammerTabView;
 @property (nonatomic, weak) IBOutlet NSGridView *basicGridView;
 @property (nonatomic, weak) IBOutlet NSGridView *programmerGridView;
-@property (nonatomic, weak) IBOutlet NSLayoutConstraint *keypadHeightConstraint;
 
 @property (weak) IBOutlet NSTextField *radLabelRPN;
 @property (weak) IBOutlet NSTextField *charLabelRPN;

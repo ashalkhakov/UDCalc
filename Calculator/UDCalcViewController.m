@@ -479,7 +479,14 @@ static const CGFloat kStandardKeypadHeight          = 255.0;
 
     // Update Segment Control UI to match loaded state
     if (settings.encodingMode == UDCalcEncodingModeNone) {
+#ifdef GNUSTEP
+        // GNUstep doesn't support selectedSegment = -1 (deselect all)
+        for (NSInteger i = 0; i < self.encodingSegmentedControl.segmentCount; i++) {
+            [self.encodingSegmentedControl setSelected:NO forSegment:i];
+        }
+#else
         self.encodingSegmentedControl.selectedSegment = -1;
+#endif
     } else {
         self.encodingSegmentedControl.selectedSegment = settings.encodingMode == UDCalcEncodingModeASCII ? 0 : 1;
     }
@@ -963,10 +970,18 @@ static const CGFloat kStandardKeypadHeight          = 255.0;
         
         if (isXRegister) {
             cell.textField.font = [NSFont boldSystemFontOfSize:22];
+#ifdef GNUSTEP
+            cell.textField.textColor = [NSColor blackColor];
+#else
             cell.textField.textColor = [NSColor labelColor];
+#endif
         } else {
             cell.textField.font = [NSFont systemFontOfSize:18];
+#ifdef GNUSTEP
+            cell.textField.textColor = [NSColor darkGrayColor];
+#else
             cell.textField.textColor = [NSColor secondaryLabelColor];
+#endif
         }
     }
 
