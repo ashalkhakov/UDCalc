@@ -59,6 +59,7 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
             if (btn.tag >= 21 && btn.tag <= 25) {
                 btn.buttonColor = orange;
                 btn.highlightColor = orangeHL;
+                btn.textColor = [NSColor whiteColor];
             }
         }
         [self applyOperatorColorsInView:v];

@@ -26,10 +26,17 @@
 - (void)setupDefaults {
     self.bordered = NO; // Handle our own drawing
     
+#ifdef GNUSTEP
+    // Use theme-aware colors on GNUstep
+    self.textColor = [NSColor controlTextColor];
+    self.buttonColor = [NSColor controlColor];
+    self.highlightColor = [NSColor selectedControlColor];
+#else
     // Default "Dark Mode" Calculator Colors
     self.textColor = [NSColor whiteColor];
     self.buttonColor = [NSColor colorWithCalibratedWhite:0.2 alpha:1.0];      // Dark Grey
     self.highlightColor = [NSColor colorWithCalibratedWhite:0.4 alpha:1.0];   // Lighter Grey
+#endif
 }
 
 #pragma mark - Main Draw Loop
@@ -39,8 +46,12 @@
     NSColor *bg;
     
     if (!self.isEnabled) {
+#ifdef GNUSTEP
+        bg = [NSColor controlColor];
+#else
         // DISABLED: Use a flat, dark gray to indicate inactivity
         bg = [NSColor colorWithCalibratedWhite:0.15 alpha:1.0];
+#endif
     }
     else if ([self.cell isHighlighted]) {
         // HIGHLIGHTED: Use the specified highlight color
