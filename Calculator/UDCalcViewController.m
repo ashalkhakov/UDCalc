@@ -21,12 +21,10 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
 @implementation UDCalcViewController
 
-#ifdef GNUSTEP
-#pragma mark - GNUstep Grid Rebuild Helpers
+#pragma mark - Grid Rebuild Helpers
 
-// GNUstep's XIB parser may not properly connect gridCell contentViews
-// from Xcode XIBs.  These helpers detect empty grids and rebuild them
-// programmatically so the buttons actually appear.
+// Programmatic grid rebuild ensures buttons have correct targets/actions
+// and orange operator colors.  Works on both macOS and GNUstep.
 
 static const CGFloat kGridButtonWidth    = 60.0;
 static const CGFloat kGridButtonHeight  = 50.0;
@@ -43,17 +41,12 @@ static UDCalcButton *makeButton(NSString *title, NSInteger tag, SEL action,
     b.action = action;
     b.symbolType = sym;
     if (btnColor) b.buttonColor = btnColor;
-    b.translatesAutoresizingMaskIntoConstraints = NO;
     return b;
 }
 
-// GNUstep's XIB parser can't decode color-type userDefinedRuntimeAttributes,
-// so buttonColor is never set from the XIB.  Apply orange to operator buttons
-// (tags 21–25: +, −, ×, ÷, =) programmatically after loading.
-// Also traverses NSGridView cells (grid cell content views aren't in subviews).
 static void applyOrangeIfOperator(UDCalcButton *btn) {
     // Tags 21-25 are operator buttons (+, −, ×, ÷, =)
-    // BUT exclude the "2nd" button whose XIB button tag=22 conflicts with UDOpSub
+    // Exclude "2nd" button whose tag=22 conflicts with UDOpSub
     if (btn.tag >= 21 && btn.tag <= 25 && btn.symbolType != CalcButtonType2nd) {
         btn.buttonColor = [NSColor orangeColor];
         btn.highlightColor = [NSColor colorWithCalibratedRed:1.0 green:0.72 blue:0.28 alpha:1.0];
@@ -71,17 +64,9 @@ static void applyOrangeIfOperator(UDCalcButton *btn) {
 
 - (BOOL)gridNeedsRebuild:(NSGridView *)grid {
     if (!grid) return NO;
-#ifdef GNUSTEP
-    // Always rebuild on GNUstep: XIB-loaded buttons use First Responder
-    // targets that GNUstep can't resolve, and cellAtColumnIndex: access
-    // may corrupt grid state. Rebuilding ensures correct targets/actions
-    // and orange operator colors from creation.
-    return YES;
-#else
     if (grid.numberOfRows == 0 || grid.numberOfColumns == 0) return YES;
     NSGridCell *cell = [grid cellAtColumnIndex:0 rowIndex:0];
     return (cell.contentView == nil);
-#endif
 }
 
 - (void)clearGrid:(NSGridView *)grid {
@@ -307,37 +292,20 @@ static void applyOrangeIfOperator(UDCalcButton *btn) {
 }
 
 /*
- * GNUstep's Auto Layout solver loads constraints from XIBs but does NOT
- * re-solve when constraint constants change or the window resizes.  Views
- * stay at their XIB-designed positions regardless of window frame changes.
- *
- * We work around this by:
- * 1. Removing all inter-view constraints from self.view in viewDidLoad
- * 2. Tracking "logical" constraint constants in shadow variables
- * 3. Manually positioning the four main subviews (display, programmer
- *    input, scientific drawer, keypad) after each mode change
- *
- * Internal constraints on each subview (grid layouts, stack views) are
- * left intact — only the parent-to-child positioning is manual.
+ * Frame-based layout state.  Since all constraints have been removed from
+ * the XIB, these variables track the "logical" sizes of each panel.
+ * They are initialised from hard-coded constants that match the XIB
+ * frame design and updated when the calculator mode changes.
  */
-static CGFloat _gs_keypadH;
-static CGFloat _gs_scientificW;
-static CGFloat _gs_containerH;
-static CGFloat _gs_wrapperH;
+static CGFloat _layoutKeypadH;
+static CGFloat _layoutScientificW;
+static CGFloat _layoutContainerH;
+static CGFloat _layoutWrapperH;
 
-/*
- * Enable frame-based positioning on a single view.
- * XIBs set translatesAutoresizingMaskIntoConstraints=NO, which
- * disables autoresizing; we reverse that here.
- * Only applied to top-level containers — NOT recursively, since
- * recursive autoresizing causes negative child widths when parents
- * shrink below XIB-designed sizes.
- */
 /* Compute the fitting width for an NSSegmentedControl by measuring
- * each segment's label text.  GNUstep's sizeToFit is broken for
- * NSSegmentedControl (returns ~0 width).                            */
+ * each segment's label text. */
 static CGFloat ud_segmentedControlFittingWidth(NSSegmentedControl *sc) {
-    static const CGFloat kSegPad = 16.0; // per-segment padding
+    static const CGFloat kSegPad = 16.0;
     NSDictionary *attrs = @{NSFontAttributeName: [sc font] ?: [NSFont systemFontOfSize:0]};
     CGFloat total = 0;
     NSInteger count = [sc segmentCount];
@@ -349,64 +317,45 @@ static CGFloat ud_segmentedControlFittingWidth(NSSegmentedControl *sc) {
     return total;
 }
 
-static void enableAutoresizing(NSView *view) {
-    [view setTranslatesAutoresizingMaskIntoConstraints:YES];
-    [view setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
-}
-
 /*
  * Position the four main subviews of self.view based on the current
- * shadow variable values.  Called after window frame changes.
+ * layout state.  Called after window frame changes.
  *
  * Layout (AppKit coords, origin bottom-left):
  *   Top:    displayTabView        (1px margins on top/left/right)
- *   Middle: programmerInputView   (1px gap below display)
+ *   Middle: programmerInputView   (visible in programmer mode only)
  *   Bottom: scientificView (left) + keypadTabView (right)
  */
-- (void)gnustepLayoutSubviews {
+- (void)layoutMainSubviews {
     NSRect bounds = self.view.bounds;
     CGFloat W = bounds.size.width;
     CGFloat H = bounds.size.height;
 
-    CGFloat keypadH    = _gs_keypadH;
-    CGFloat containerH = _gs_containerH;
-    CGFloat drawerW    = _gs_scientificW;
+    CGFloat keypadH    = _layoutKeypadH;
+    CGFloat containerH = _layoutContainerH;
+    CGFloat drawerW    = _layoutScientificW;
 
-    // Display height: fill remaining space above programmer + keypad
-    // Constraint chain: 1(top) + displayH + 1(gap) + containerH + keypadH = H
     CGFloat displayH = H - containerH - keypadH - 2.0;
     if (displayH < kMinDisplayHeight) displayH = kMinDisplayHeight;
 
-    // Guard all dimensions against negative values (can happen during
-    // mode transitions before the window frame is updated).
     CGFloat displayW = MAX(0, W - 2);
     displayH = MAX(0, displayH);
     CGFloat keypadW = MAX(0, W - drawerW - 1);
 
-    // Display at top with 1px margins
     [self.displayTabView setFrame:NSMakeRect(1, containerH + keypadH + 1,
                                              displayW, displayH)];
 
-    // GNUstep's NSTabView doesn't propagate frame changes to tab item
-    // content views.  Explicitly resize the content views and the display
-    // text field so right-aligned text isn't clipped at its XIB width.
     {
         NSRect dRect = [self.displayTabView contentRect];
-        for (NSTabViewItem *item in [self.displayTabView tabViewItems]) {
-            [[item view] setFrame:NSMakeRect(0, 0,
-                                             dRect.size.width, dRect.size.height)];
-        }
+        for (NSTabViewItem *item in [self.displayTabView tabViewItems])
+            [[item view] setFrame:NSMakeRect(0, 0, dRect.size.width, dRect.size.height)];
         [self.displayField setFrame:NSMakeRect(0, 0, dRect.size.width, dRect.size.height)];
     }
 
-    // Programmer input below display
     [self.programmerInputView setFrame:NSMakeRect(0, keypadH, MAX(0, W), containerH)];
 
-    // Scientific view at bottom-left
     [self.scientificView setFrame:NSMakeRect(0, 0, drawerW, keypadH)];
 
-    // Resize the scientific grid to fill its parent (GNUstep doesn't
-    // propagate frame changes to children of plain NSView containers)
     if (drawerW > 0) {
         for (NSView *sub in self.scientificView.subviews) {
             if ([sub isKindOfClass:[NSGridView class]]) {
@@ -416,80 +365,56 @@ static void enableAutoresizing(NSView *view) {
         }
     }
 
-    // Keypad at bottom-right (1px right margin matches XIB)
-    [self.basicOrProgrammerTabView setFrame:NSMakeRect(drawerW, 0,
-                                                       keypadW, keypadH)];
+    [self.basicOrProgrammerTabView setFrame:NSMakeRect(drawerW, 0, keypadW, keypadH)];
 
-    // GNUstep's NSTabView doesn't propagate frame changes to content
-    // views.  Resize both tab item content views and their grids so
-    // whichever tab is active fills the tab area.  Without resizing the
-    // content views, mouse events are clipped to the old XIB-designed
-    // bounds, making buttons unresponsive.
     {
         NSRect contentRect = [self.basicOrProgrammerTabView contentRect];
         CGFloat cw = contentRect.size.width;
         CGFloat ch = contentRect.size.height;
-        for (NSTabViewItem *item in [self.basicOrProgrammerTabView tabViewItems]) {
+        for (NSTabViewItem *item in [self.basicOrProgrammerTabView tabViewItems])
             [[item view] setFrame:NSMakeRect(0, 0, cw, ch)];
-        }
         [self.basicGridView setFrame:NSMakeRect(0, 0, cw, ch)];
         [self.programmerGridView setFrame:NSMakeRect(0, 0, cw, ch)];
     }
 
-    // Similarly, resize programmer input internals.  GNUstep's
-    // NSStackView doesn't re-arrange children when frames change.
-    // Layout (AppKit coords, origin bottom-left within containerH):
-    //   Bottom: bitDisplayWrapperView  (height = wrapperH)
-    //   Top:    button row             (height = kProgButtonRowH)
     if (containerH > 0) {
         static const CGFloat kProgButtonRowH = 30.0;
-        CGFloat wrapperH = _gs_wrapperH;
+        CGFloat wrapperH = _layoutWrapperH;
 
-        // Bit display wrapper at the bottom of the container
-        [self.bitDisplayWrapperView setFrame:NSMakeRect(0, 0,
-                                                        MAX(0, W), wrapperH)];
-        [self.bitDisplayView setFrame:NSMakeRect(0, 0,
-                                                 MAX(0, W), wrapperH)];
+        [self.bitDisplayWrapperView setFrame:NSMakeRect(0, 0, MAX(0, W), wrapperH)];
+        [self.bitDisplayView setFrame:NSMakeRect(0, 0, MAX(0, W), wrapperH)];
 
-        // Button row (encoding, show-binary, base) at the top.
-        // Found via baseSegmentedControl's superview (no IBOutlet).
         NSView *buttonRow = [self.baseSegmentedControl superview];
         if (buttonRow) {
             CGFloat rowY = containerH - kProgButtonRowH;
             [buttonRow setFrame:NSMakeRect(0, rowY, MAX(0, W), kProgButtonRowH)];
 
-            // GNUstep's horizontal NSStackView doesn't re-arrange
-            // children.  Position the three controls explicitly:
-            //   [encoding|left] [show-binary|center] [base|right]
             static const CGFloat kPad = 8.0;
             CGFloat ctrlH = kProgButtonRowH - 4;
             CGFloat ctrlY = 2.0;
             CGFloat rowW = MAX(0, W) - 2 * kPad;
 
-            // GNUstep's sizeToFit is broken for NSSegmentedControl
-            // (returns ~0 width).  Compute width from segment labels.
-            CGFloat encW = ud_segmentedControlFittingWidth(
-                               self.encodingSegmentedControl);
-            [self.encodingSegmentedControl setFrame:
-                NSMakeRect(kPad, ctrlY, encW, ctrlH)];
+            CGFloat encW = ud_segmentedControlFittingWidth(self.encodingSegmentedControl);
+            [self.encodingSegmentedControl setFrame:NSMakeRect(kPad, ctrlY, encW, ctrlH)];
 
             [self.showBinaryViewButton sizeToFit];
             NSSize btnSz = [self.showBinaryViewButton frame].size;
             CGFloat btnX = kPad + (rowW - btnSz.width) / 2.0;
-            [self.showBinaryViewButton setFrame:
-                NSMakeRect(btnX, ctrlY, btnSz.width, ctrlH)];
+            [self.showBinaryViewButton setFrame:NSMakeRect(btnX, ctrlY, btnSz.width, ctrlH)];
 
-            CGFloat baseW = ud_segmentedControlFittingWidth(
-                                self.baseSegmentedControl);
-            [self.baseSegmentedControl setFrame:
-                NSMakeRect(kPad + rowW - baseW, ctrlY, baseW, ctrlH)];
+            CGFloat baseW = ud_segmentedControlFittingWidth(self.baseSegmentedControl);
+            [self.baseSegmentedControl setFrame:NSMakeRect(kPad + rowW - baseW, ctrlY, baseW, ctrlH)];
         }
     }
 
     [self.view setNeedsDisplay:YES];
 }
 
-#endif /* GNUSTEP */
+// XIB-designed standard sizes (matching the frame rects in UDCalcView.xib)
+static const CGFloat kStandardScientificWidth       = 365.0;
+static const CGFloat kStandardProgrammerInputHeight = 98.0;
+static const CGFloat kStandardBitWrapperHeight      = 60.0;
+static const CGFloat kStandardKeypadHeight          = 255.0;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -498,53 +423,21 @@ static void enableAutoresizing(NSView *view) {
     self.calc.delegate = self;
     self.bitDisplayView.delegate = self;
 
-    // Store the designed width of the scientific pane
-    self.standardScientificWidth = self.scientificWidthConstraint.constant;
-    self.standardProgrammerInputHeight = self.programmerInputHeightConstraint.constant;
-    self.standardBitWrapperHeight = self.bitWrapperHeightConstraint.constant;
+    self.standardScientificWidth       = kStandardScientificWidth;
+    self.standardProgrammerInputHeight = kStandardProgrammerInputHeight;
+    self.standardBitWrapperHeight      = kStandardBitWrapperHeight;
 
-    // fix up button layout
+    _layoutKeypadH     = kStandardKeypadHeight;
+    _layoutScientificW = kStandardScientificWidth;
+    _layoutContainerH  = kStandardProgrammerInputHeight;
+    _layoutWrapperH    = kStandardBitWrapperHeight;
 
-#ifdef GNUSTEP
-    // Initialize shadow variables from the XIB constraint constants.
-    _gs_keypadH    = self.keypadHeightConstraint.constant;
-    _gs_scientificW = self.scientificWidthConstraint.constant;
-    _gs_containerH = self.programmerInputHeightConstraint.constant;
-    _gs_wrapperH   = self.bitWrapperHeightConstraint.constant;
-
-    // Remove inter-view constraints from self.view so we can position
-    // subviews manually.  GNUstep's solver loads constraints from XIBs
-    // but doesn't re-solve when the window resizes or constants change.
-    // Internal constraints on each subview (grids, stacks) stay intact.
-    // Note: performSelector: is used because GNUstep headers don't declare
-    // -constraints or -removeConstraints: on NSView (they exist at runtime).
-    {
-        NSArray *constraints = [self.view performSelector:@selector(constraints)];
-        if ([constraints count] > 0) {
-            [self.view performSelector:@selector(removeConstraints:)
-                            withObject:constraints];
-        }
-    }
-
-    // Enable autoresizing on the four top-level containers only (not
-    // recursively) so gnustepLayoutSubviews can position them.
-    // XIBs set translatesAutoresizingMaskIntoConstraints=NO which
-    // disables frame-based positioning; we reverse that here.
-    // Children keep their XIB-internal constraints/autoresizing.
-    enableAutoresizing(self.displayTabView);
-    enableAutoresizing(self.programmerInputView);
-    enableAutoresizing(self.scientificView);
-    enableAutoresizing(self.basicOrProgrammerTabView);
-
-    // GNUstep's XIB parser may not connect NSGridCell contentViews from
-    // Xcode XIBs.  Detect empty grids and rebuild them programmatically.
     [self rebuildBasicGrid];
     [self rebuildScientificGrid];
     [self rebuildProgrammerGrid];
-    // Apply orange operator colors (XIB color runtime attributes not decoded)
     [self applyOperatorColorsInView:self.view];
-    // GNUstep may resolve catalog colors (controlTextColor, labelColor)
-    // to white in some themes, making text invisible on light backgrounds.
+
+#ifdef GNUSTEP
     {
         NSColor *dark = [NSColor blackColor];
         [self.displayField setTextColor:dark];
@@ -553,31 +446,19 @@ static void enableAutoresizing(NSView *view) {
         [self.radLabelRPN setTextColor:dark];
         [self.charLabelRPN setTextColor:dark];
     }
-#else
-    // mergeCellsInHorizontalRange:verticalRange: is not yet implemented
-    // in GNUstep's NSGridView — skip on GNUstep (purely cosmetic).
+#endif
 
-    // button "0" (basic/scientific mode)
-    // merge row 5 (index 4), columns 1-2 (start 0, len 2)
+#ifndef GNUSTEP
     [self.basicGridView mergeCellsInHorizontalRange:NSMakeRange(0, 2)
                                       verticalRange:NSMakeRange(4, 1)];
-
-    // button "byte flip" (programmer mode)
-    // merge row 5 (index 4), columns 1-2 (start 0, len 2)
     [self.programmerGridView mergeCellsInHorizontalRange:NSMakeRange(0, 2)
                                            verticalRange:NSMakeRange(4, 1)];
-
-    // button "word flip" (programmer mode)
-    // merge row 6 (index 5), columns 1-2 (start 0, len 2)
     [self.programmerGridView mergeCellsInHorizontalRange:NSMakeRange(0, 2)
                                            verticalRange:NSMakeRange(5, 1)];
-
-    // button "enter" (programmer mode)
-    // merge row 6 (index 5), columns 6-7 (start 5, len 2)
     [self.programmerGridView mergeCellsInHorizontalRange:NSMakeRange(5, 2)
                                            verticalRange:NSMakeRange(5, 1)];
 #endif
-    
+
     // Listen for the app closing
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(saveApplicationState)
@@ -598,14 +479,7 @@ static void enableAutoresizing(NSView *view) {
 
     // Update Segment Control UI to match loaded state
     if (settings.encodingMode == UDCalcEncodingModeNone) {
-#ifdef GNUSTEP
-        // GNUstep doesn't support selectedSegment = -1 (deselect all)
-        for (NSInteger i = 0; i < self.encodingSegmentedControl.segmentCount; i++) {
-            [self.encodingSegmentedControl setSelected:NO forSegment:i];
-        }
-#else
         self.encodingSegmentedControl.selectedSegment = -1;
-#endif
     } else {
         self.encodingSegmentedControl.selectedSegment = settings.encodingMode == UDCalcEncodingModeASCII ? 0 : 1;
     }
@@ -615,11 +489,7 @@ static void enableAutoresizing(NSView *view) {
     
     // Update Show Binary Button
     self.showBinaryViewButton.state = settings.showBinaryView ? NSControlStateValueOn : NSControlStateValueOff;
-#ifdef GNUSTEP
-    _gs_wrapperH = settings.showBinaryView ? self.standardBitWrapperHeight : 0;
-#else
-    self.bitWrapperHeightConstraint.constant = settings.showBinaryView ? self.standardBitWrapperHeight : 0;
-#endif
+    _layoutWrapperH = settings.showBinaryView ? self.standardBitWrapperHeight : 0;
 
     [self setCalculatorMode:settings.calcMode animate:NO];
     if (self.calc.mode == UDCalcModeProgrammer) {
@@ -727,16 +597,9 @@ static void enableAutoresizing(NSView *view) {
     // 2. DETERMINE CURRENT STATE
     // ============================================================
 
-#ifdef GNUSTEP
-    // Read from shadow variables — GNUstep's solver doesn't track live changes
-    CGFloat currentKeypadH = _gs_keypadH;
-    CGFloat currentDrawerW = _gs_scientificW;
-    CGFloat currentContainerH = _gs_containerH;
-#else
-    CGFloat currentKeypadH = self.keypadHeightConstraint.constant;
-    CGFloat currentDrawerW = self.scientificWidthConstraint.constant;
-    CGFloat currentContainerH = self.programmerInputHeightConstraint.constant;
-#endif
+    CGFloat currentKeypadH = _layoutKeypadH;
+    CGFloat currentDrawerW = _layoutScientificW;
+    CGFloat currentContainerH = _layoutContainerH;
     
     // For width delta, use current grid fitting size
     NSGridView *currentGrid = (self.calc.mode == UDCalcModeProgrammer) ? self.programmerGridView : self.basicGridView;
@@ -792,23 +655,11 @@ static void enableAutoresizing(NSView *view) {
 
     [window setFrame:newFrame display:YES];
 
-#ifdef GNUSTEP
-    // Update shadow variables and manually position subviews.
-    _gs_keypadH    = targetKeypadH;
-    _gs_scientificW = targetDrawerW;
-    _gs_containerH = targetContainerH;
-    _gs_wrapperH   = targetWrapperH;
-    [self gnustepLayoutSubviews];
-#else
-    self.keypadHeightConstraint.constant = targetKeypadH;
-    self.scientificWidthConstraint.constant = targetDrawerW;
-
-    // 3. Animate Programmer Constraints (Both Inner and Outer)
-    self.programmerInputHeightConstraint.constant = targetContainerH;
-    self.bitWrapperHeightConstraint.constant = targetWrapperH;
-
-    [self.view.superview layoutSubtreeIfNeeded];
-#endif
+    _layoutKeypadH     = targetKeypadH;
+    _layoutScientificW = targetDrawerW;
+    _layoutContainerH  = targetContainerH;
+    _layoutWrapperH    = targetWrapperH;
+    [self layoutMainSubviews];
 
     self.calc.mode = mode;
     [self updateScientificButtons];
@@ -924,11 +775,7 @@ static void enableAutoresizing(NSView *view) {
     CGFloat targetWrapperHeight = isBitsVisible ? 0.0 : bitViewHeight;
     
     // 4. Calculate Window Delta (Target - Current)
-#ifdef GNUSTEP
-    CGFloat currentStackHeight = _gs_containerH;
-#else
-    CGFloat currentStackHeight = self.programmerInputHeightConstraint.constant;
-#endif
+    CGFloat currentStackHeight = _layoutContainerH;
     CGFloat deltaH = targetStackHeight - currentStackHeight;
 
     // 5. Animate
@@ -942,14 +789,9 @@ static void enableAutoresizing(NSView *view) {
     // B. Resize Wrapper (Inner Constraint)
     // C. Resize Main Container (Outer Constraint)
     // This stops exactly at 'buttonsOnlyHeight', keeping buttons visible.
-#ifdef GNUSTEP
-    _gs_wrapperH   = targetWrapperHeight;
-    _gs_containerH = targetStackHeight;
-    [self gnustepLayoutSubviews];
-#else
-    self.bitWrapperHeightConstraint.constant = targetWrapperHeight;
-    self.programmerInputHeightConstraint.constant = targetStackHeight;
-#endif
+    _layoutWrapperH   = targetWrapperHeight;
+    _layoutContainerH = targetStackHeight;
+    [self layoutMainSubviews];
 }
 
 - (IBAction)baseSelected:(NSSegmentedControl *)sender {
@@ -1121,18 +963,10 @@ static void enableAutoresizing(NSView *view) {
         
         if (isXRegister) {
             cell.textField.font = [NSFont boldSystemFontOfSize:22];
-#ifdef GNUSTEP
-            cell.textField.textColor = [NSColor blackColor];
-#else
             cell.textField.textColor = [NSColor labelColor];
-#endif
         } else {
             cell.textField.font = [NSFont systemFontOfSize:18];
-#ifdef GNUSTEP
-            cell.textField.textColor = [NSColor darkGrayColor];
-#else
-            cell.textField.textColor = [NSColor secondaryLabelColor]; // Dim history
-#endif
+            cell.textField.textColor = [NSColor secondaryLabelColor];
         }
     }
 
