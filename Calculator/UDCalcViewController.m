@@ -388,9 +388,16 @@ static void enableAutoresizing(NSView *view) {
                                              displayW, displayH)];
 
     // GNUstep's NSTabView doesn't propagate frame changes to tab item
-    // content views.  Explicitly resize the display text field so
-    // right-aligned text isn't clipped at its XIB-designed width (607px).
-    [self.displayField setFrame:NSMakeRect(0, 0, displayW, displayH)];
+    // content views.  Explicitly resize the content views and the display
+    // text field so right-aligned text isn't clipped at its XIB width.
+    {
+        NSRect dRect = [self.displayTabView contentRect];
+        for (NSTabViewItem *item in [self.displayTabView tabViewItems]) {
+            [[item view] setFrame:NSMakeRect(0, 0,
+                                             dRect.size.width, dRect.size.height)];
+        }
+        [self.displayField setFrame:NSMakeRect(0, 0, dRect.size.width, dRect.size.height)];
+    }
 
     // Programmer input below display
     [self.programmerInputView setFrame:NSMakeRect(0, keypadH, MAX(0, W), containerH)];
@@ -414,11 +421,20 @@ static void enableAutoresizing(NSView *view) {
                                                        keypadW, keypadH)];
 
     // GNUstep's NSTabView doesn't propagate frame changes to content
-    // views.  Resize BOTH grids so whichever is active fills the tab
-    // area.  (We can't rely on self.calc.mode here because it hasn't
-    // been updated yet when called from setCalculatorMode:.)
-    [self.basicGridView setFrame:NSMakeRect(0, 0, keypadW, keypadH)];
-    [self.programmerGridView setFrame:NSMakeRect(0, 0, keypadW, keypadH)];
+    // views.  Resize both tab item content views and their grids so
+    // whichever tab is active fills the tab area.  Without resizing the
+    // content views, mouse events are clipped to the old XIB-designed
+    // bounds, making buttons unresponsive.
+    {
+        NSRect contentRect = [self.basicOrProgrammerTabView contentRect];
+        CGFloat cw = contentRect.size.width;
+        CGFloat ch = contentRect.size.height;
+        for (NSTabViewItem *item in [self.basicOrProgrammerTabView tabViewItems]) {
+            [[item view] setFrame:NSMakeRect(0, 0, cw, ch)];
+        }
+        [self.basicGridView setFrame:NSMakeRect(0, 0, cw, ch)];
+        [self.programmerGridView setFrame:NSMakeRect(0, 0, cw, ch)];
+    }
 
     // Similarly, resize programmer input internals.  GNUstep's
     // NSStackView doesn't re-arrange children when frames change.
