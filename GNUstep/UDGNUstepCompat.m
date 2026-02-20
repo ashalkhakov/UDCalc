@@ -70,26 +70,23 @@
 @implementation NSView (UDGNUstepCompat)
 
 - (NSSize)fittingSize {
-    /* For NSGridView, compute content size from numberOfRows/Columns
-       and _prototypeFrame (which gives per-cell size).
-       total = cellSize * count + spacing * (count-1) */
-    SEL protoSel = @selector(_prototypeFrame);
+    /* For NSGridView, compute content size by summing explicit row
+       heights and column widths (set via row.height / column.width)
+       plus inter-row/column spacing.  _prototypeFrame can't be used
+       because it derives per-cell size from the current frame, which
+       is circular and produces wrong results when the frame hasn't
+       been set to the content size yet. */
     SEL rowsSel  = @selector(numberOfRows);
     SEL colsSel  = @selector(numberOfColumns);
+    SEL rowAtSel = @selector(rowAtIndex:);
+    SEL colAtSel = @selector(columnAtIndex:);
     SEL rSpacSel = @selector(rowSpacing);
     SEL cSpacSel = @selector(columnSpacing);
 
-    if ([self respondsToSelector:protoSel] &&
-        [self respondsToSelector:rowsSel] &&
-        [self respondsToSelector:colsSel]) {
-        NSMethodSignature *sig = [self methodSignatureForSelector:protoSel];
-        NSInvocation *inv = [NSInvocation invocationWithMethodSignature:sig];
-        [inv setTarget:self];
-        [inv setSelector:protoSel];
-        [inv invoke];
-        NSRect cellRect;
-        [inv getReturnValue:&cellRect];
-
+    if ([self respondsToSelector:rowsSel] &&
+        [self respondsToSelector:colsSel] &&
+        [self respondsToSelector:rowAtSel] &&
+        [self respondsToSelector:colAtSel]) {
         NSInteger nRows = ((NSInteger (*)(id, SEL))[self methodForSelector:rowsSel])(self, rowsSel);
         NSInteger nCols = ((NSInteger (*)(id, SEL))[self methodForSelector:colsSel])(self, colsSel);
 
@@ -99,8 +96,22 @@
         if ([self respondsToSelector:cSpacSel])
             cSpacing = ((CGFloat (*)(id, SEL))[self methodForSelector:cSpacSel])(self, cSpacSel);
 
-        CGFloat w = cellRect.size.width  * nCols + cSpacing * MAX(0, nCols - 1);
-        CGFloat h = cellRect.size.height * nRows + rSpacing * MAX(0, nRows - 1);
+        /* Sum explicit row heights */
+        CGFloat h = 0;
+        for (NSInteger r = 0; r < nRows; r++) {
+            id row = ((id (*)(id, SEL, NSInteger))[self methodForSelector:rowAtSel])(self, rowAtSel, r);
+            h += ((CGFloat (*)(id, SEL))[row methodForSelector:@selector(height)])(row, @selector(height));
+        }
+        h += rSpacing * MAX(0, nRows - 1);
+
+        /* Sum explicit column widths */
+        CGFloat w = 0;
+        for (NSInteger c = 0; c < nCols; c++) {
+            id col = ((id (*)(id, SEL, NSInteger))[self methodForSelector:colAtSel])(self, colAtSel, c);
+            w += ((CGFloat (*)(id, SEL))[col methodForSelector:@selector(width)])(col, @selector(width));
+        }
+        w += cSpacing * MAX(0, nCols - 1);
+
         return NSMakeSize(w, h);
     }
     return [self frame].size;

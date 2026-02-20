@@ -370,6 +370,17 @@ static void enableAutoresizing(NSView *view) {
     // Scientific view at bottom-left
     [self.scientificView setFrame:NSMakeRect(0, 0, drawerW, keypadH)];
 
+    // Resize the scientific grid to fill its parent (GNUstep doesn't
+    // propagate frame changes to children of plain NSView containers)
+    if (drawerW > 0) {
+        for (NSView *sub in self.scientificView.subviews) {
+            if ([sub isKindOfClass:[NSGridView class]]) {
+                [sub setFrame:NSMakeRect(0, 0, drawerW, keypadH)];
+                break;
+            }
+        }
+    }
+
     // Keypad at bottom-right (1px right margin matches XIB)
     [self.basicOrProgrammerTabView setFrame:NSMakeRect(drawerW, 0,
                                                        keypadW, keypadH)];
