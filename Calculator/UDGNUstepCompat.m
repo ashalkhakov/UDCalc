@@ -1,14 +1,25 @@
 /*
  * UDGNUstepCompat.m - Implementation of GNUstep compatibility shims
+ *
+ * This file provides runtime implementations of macOS AppKit and Foundation
+ * methods that are not available in the GNUstep framework libraries.
+ *
+ * Each category method below corresponds to a declaration in the companion
+ * header UDGNUstepCompat.h.  The implementations are intentionally simple
+ * and aim to replicate the essential behavior of the macOS originals without
+ * depending on any private GNUstep internals.
+ *
+ * The entire file is wrapped in an GNUSTEP preprocessor guard so that it
+ * compiles to nothing when building on macOS with Xcode.
  */
 
 #import "UDGNUstepCompat.h"
 
 #ifdef GNUSTEP
 
-/* ============================================================
- * NSFont compatibility
- * ============================================================ */
+/* Returns a fixed-pitch font suitable for displaying numbers in tabular
+   columns.  Falls back to the regular system font if no monospaced font
+   is available on the current GNUstep installation. */
 @implementation NSFont (UDGNUstepCompat)
 
 + (NSFont *)monospacedDigitSystemFontOfSize:(CGFloat)fontSize weight:(CGFloat)weight {
@@ -30,9 +41,10 @@
 
 @end
 
-/* ============================================================
- * NSTextField compatibility
- * ============================================================ */
+/* Creates a read-only text field configured as a static label.
+   The field has no border, no background, and is not editable or
+   selectable, matching the behavior of the macOS convenience
+   constructor used throughout the calculator user interface. */
 @implementation NSTextField (UDGNUstepCompat)
 
 + (NSTextField *)labelWithString:(NSString *)stringValue {
@@ -47,9 +59,10 @@
 
 @end
 
-/* ============================================================
- * NSPasteboard compatibility
- * ============================================================ */
+/* Checks whether the pasteboard currently holds data conforming to
+   at least one of the requested Uniform Type Identifiers.  This is
+   used by the calculator paste logic to verify clipboard content
+   before attempting to read numeric or text data from it. */
 @implementation NSPasteboard (UDGNUstepCompat)
 
 - (BOOL)canReadItemWithDataConformingToTypes:(NSArray<NSString *> *)types {
@@ -64,9 +77,15 @@
 
 @end
 
-/* ============================================================
- * NSView fittingSize compatibility
- * ============================================================ */
+/* Computes the intrinsic content size of a view.  For an NSGridView
+   the size is computed by iterating all rows and columns and summing
+   the explicit height and width values that were assigned during the
+   grid rebuild phase in UDCalcViewController.  Inter-row and
+   inter-column spacing is added between adjacent items.
+
+   For non-grid views the current frame size is returned as a
+   reasonable fallback since those views do not expose intrinsic
+   sizing information through a public interface on GNUstep. */
 @implementation NSView (UDGNUstepCompat)
 
 - (NSSize)fittingSize {
@@ -119,9 +138,10 @@
 
 @end
 
-/* ============================================================
- * NSPasteboard clearContents compatibility
- * ============================================================ */
+/* Removes all current items from the pasteboard.  This is called
+   before writing new content to ensure that stale data from a
+   previous copy operation does not remain on the pasteboard and
+   confuse paste targets that check available types before reading. */
 @implementation NSPasteboard (UDGNUstepClearCompat)
 
 - (void)clearContents {
