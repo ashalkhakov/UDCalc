@@ -1,0 +1,117 @@
+{
+    APPLICATIONICON = "";
+    "APP_DOCUMENT_BASED" = NO;
+    "APP_TYPE" = GORM;
+    "BUNDLE_IDENTIFIER" = "";
+    "CLASS_FILES" = (
+	"AppDelegate.m",
+	"UDAST.m",
+	"UDBitDisplayView.m",
+	"UDCalc.m",
+	"UDCalcButton.m",
+	"UDCalcViewController.m",
+	"UDCompiler.m",
+	"UDConstants.m",
+	"UDConversionHistoryManager.m",
+	"UDConversionWindowController.m",
+	"UDFrontend.m",
+	"UDFrontendContext.m",
+	"UDInputBuffer.m",
+	"UDInstruction.m",
+	"UDSettingsManager.m",
+	"UDTape.m",
+	"UDTapeWindowController.m",
+	"UDUnitConverter.m",
+	"UDVM.m",
+	"UDValueFormatter.m",
+	"UDGNUstepCompat.m"
+    );
+    COMPILEROPTIONS = "";
+    CPPOPTIONS = "";
+    "CREATION_DATE" = "2026-02-19 12:34:33 +0000";
+    "DOCU_FILES" = (
+    );
+    FRAMEWORKS = (
+    );
+    "HEADER_FILES" = (
+	"AppDelegate.h",
+	"UDAST.h",
+	"UDBitDisplayView.h",
+	"UDCalc.h",
+	"UDCalcButton.h",
+	"UDCalcViewController.h",
+	"UDCompiler.h",
+	"UDConstants.h",
+	"UDConversionHistoryManager.h",
+	"UDConversionWindowController.h",
+	"UDFrontend.h",
+	"UDFrontendContext.h",
+	"UDInputBuffer.h",
+	"UDInstruction.h",
+	"UDSettingsManager.h",
+	"UDTape.h",
+	"UDTapeWindowController.h",
+	"UDUnitConverter.h",
+	"UDVM.h",
+	"UDValue.h",
+	"UDValueFormatter.h",
+	"UDGNUstepCompat.h"
+    );
+    IMAGES = (
+    );
+    INSTALLDIR = "$(HOME)/GNUstep";
+    INTERFACES = (
+	"UDCalcView.xib",
+	"ConversionWindow.xib",
+	"UDTapeWindow.xib",
+	"MainMenu.xib"
+    );
+    LANGUAGE = English;
+    LIBRARIES = (
+	"gnustep-base",
+	"gnustep-gui"
+    );
+    LINKEROPTIONS = "-ldispatch";
+    "LOCALIZED_RESOURCES" = (
+    );
+    MAININTERFACE = "MainMenu.xib";
+    MAKEFILEDIR = "$(GNUSTEP_MAKEFILES)";
+    "OBJC_COMPILEROPTIONS" = "-fobjc-arc -include UDGNUstepCompat.h";
+    "OTHER_FILES" = (
+    );
+    "OTHER_RESOURCES" = (
+    );
+    "OTHER_SOURCES" = (
+	"main.m"
+    );
+    "PRINCIPAL_CLASS" = NSApplication;
+    "PROJECT_AUTHORS" = (
+    );
+    "PROJECT_COPYRIGHT" = "Copyright (C) 2026";
+    "PROJECT_COPYRIGHT_DESC" = "Released under ...";
+    "PROJECT_CREATOR" = "";
+    "PROJECT_DESCRIPTION" = "Calculator application for GNUstep";
+    "PROJECT_DOCUMENTTYPES" = (
+    );
+    "PROJECT_GROUP" = "";
+    "PROJECT_MAINTAINER" = "";
+    "PROJECT_NAME" = Calculator;
+    "PROJECT_RELEASE" = "0.1";
+    "PROJECT_SUMMARY" = "A scientific calculator with unit conversion support";
+    "PROJECT_TYPE" = Application;
+    "PROJECT_URL" = "";
+    "SEARCH_HEADER_DIRS" = (
+    );
+    "SEARCH_LIB_DIRS" = (
+    );
+    SUBPROJECTS = (
+    );
+    "SUPPORTING_FILES" = (
+	"GNUmakefile.preamble",
+	GNUmakefile,
+	"GNUmakefile.postamble"
+    );
+    "USER_LANGUAGES" = (
+	English
+    );
+}

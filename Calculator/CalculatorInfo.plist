@@ -1,0 +1,12 @@
+{
+    ApplicationDescription = "Calculator application for GNUstep";
+    ApplicationName = Calculator;
+    ApplicationRelease = "0.1";
+    Copyright = "Copyright (C) 2026";
+    CopyrightDescription = "Released under ...";
+    FullVersionID = "0.1";
+    NSExecutable = Calculator;
+    NSMainNibFile = "MainMenu.xib";
+    NSPrincipalClass = NSApplication;
+    NSRole = Application;
+}
