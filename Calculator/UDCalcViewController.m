@@ -432,31 +432,29 @@ static void enableAutoresizing(NSView *view) {
 
             // GNUstep's horizontal NSStackView doesn't re-arrange
             // children.  Position the three controls explicitly:
-            //   [encoding] [show-binary] [base]
+            //   [encoding|left] [show-binary|center] [base|right]
             static const CGFloat kPad = 8.0;
-            static const CGFloat kGap = 4.0;
             CGFloat ctrlH = kProgButtonRowH - 4;
             CGFloat ctrlY = 2.0;
-            CGFloat x = kPad;
+            CGFloat rowW = MAX(0, W) - 2 * kPad;
 
             // GNUstep's sizeToFit is broken for NSSegmentedControl
             // (returns ~0 width).  Compute width from segment labels.
             CGFloat encW = ud_segmentedControlFittingWidth(
                                self.encodingSegmentedControl);
             [self.encodingSegmentedControl setFrame:
-                NSMakeRect(x, ctrlY, encW, ctrlH)];
-            x += encW + kGap;
+                NSMakeRect(kPad, ctrlY, encW, ctrlH)];
 
             [self.showBinaryViewButton sizeToFit];
             NSSize btnSz = [self.showBinaryViewButton frame].size;
+            CGFloat btnX = kPad + (rowW - btnSz.width) / 2.0;
             [self.showBinaryViewButton setFrame:
-                NSMakeRect(x, ctrlY, btnSz.width, ctrlH)];
-            x += btnSz.width + kGap;
+                NSMakeRect(btnX, ctrlY, btnSz.width, ctrlH)];
 
             CGFloat baseW = ud_segmentedControlFittingWidth(
                                 self.baseSegmentedControl);
             [self.baseSegmentedControl setFrame:
-                NSMakeRect(x, ctrlY, baseW, ctrlH)];
+                NSMakeRect(kPad + rowW - baseW, ctrlY, baseW, ctrlH)];
         }
     }
 
