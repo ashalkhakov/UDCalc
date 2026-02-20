@@ -386,11 +386,11 @@ static void enableAutoresizing(NSView *view) {
                                                        keypadW, keypadH)];
 
     // GNUstep's NSTabView doesn't propagate frame changes to content
-    // views.  Resize the active grid so it fills the tab item area.
-    BOOL isProgrammer = (self.calc.mode == UDCalcModeProgrammer);
-    NSGridView *activeGrid = isProgrammer ? self.programmerGridView
-                                          : self.basicGridView;
-    [activeGrid setFrame:NSMakeRect(0, 0, keypadW, keypadH)];
+    // views.  Resize BOTH grids so whichever is active fills the tab
+    // area.  (We can't rely on self.calc.mode here because it hasn't
+    // been updated yet when called from setCalculatorMode:.)
+    [self.basicGridView setFrame:NSMakeRect(0, 0, keypadW, keypadH)];
+    [self.programmerGridView setFrame:NSMakeRect(0, 0, keypadW, keypadH)];
 
     // Similarly, resize programmer input internals.  GNUstep's
     // NSStackView doesn't re-arrange children when frames change.
@@ -413,6 +413,29 @@ static void enableAutoresizing(NSView *view) {
         if (buttonRow) {
             CGFloat rowY = containerH - kProgButtonRowH;
             [buttonRow setFrame:NSMakeRect(0, rowY, MAX(0, W), kProgButtonRowH)];
+
+            // GNUstep's horizontal NSStackView doesn't re-arrange
+            // children.  Position the three controls explicitly:
+            //   [encoding] [show-binary] [base]
+            static const CGFloat kPad = 8.0;
+            static const CGFloat kGap = 4.0;
+            CGFloat ctrlH = kProgButtonRowH - 4;
+            CGFloat ctrlY = 2.0;
+            CGFloat x = kPad;
+
+            NSSize encSz = [self.encodingSegmentedControl frame].size;
+            [self.encodingSegmentedControl setFrame:
+                NSMakeRect(x, ctrlY, encSz.width, ctrlH)];
+            x += encSz.width + kGap;
+
+            NSSize btnSz = [self.showBinaryViewButton frame].size;
+            [self.showBinaryViewButton setFrame:
+                NSMakeRect(x, ctrlY, btnSz.width, ctrlH)];
+            x += btnSz.width + kGap;
+
+            NSSize baseSz = [self.baseSegmentedControl frame].size;
+            [self.baseSegmentedControl setFrame:
+                NSMakeRect(x, ctrlY, baseSz.width, ctrlH)];
         }
     }
 
