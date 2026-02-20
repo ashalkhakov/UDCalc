@@ -423,16 +423,19 @@ static void enableAutoresizing(NSView *view) {
             CGFloat ctrlY = 2.0;
             CGFloat x = kPad;
 
+            [self.encodingSegmentedControl sizeToFit];
             NSSize encSz = [self.encodingSegmentedControl frame].size;
             [self.encodingSegmentedControl setFrame:
                 NSMakeRect(x, ctrlY, encSz.width, ctrlH)];
             x += encSz.width + kGap;
 
+            [self.showBinaryViewButton sizeToFit];
             NSSize btnSz = [self.showBinaryViewButton frame].size;
             [self.showBinaryViewButton setFrame:
                 NSMakeRect(x, ctrlY, btnSz.width, ctrlH)];
             x += btnSz.width + kGap;
 
+            [self.baseSegmentedControl sizeToFit];
             NSSize baseSz = [self.baseSegmentedControl frame].size;
             [self.baseSegmentedControl setFrame:
                 NSMakeRect(x, ctrlY, baseSz.width, ctrlH)];
