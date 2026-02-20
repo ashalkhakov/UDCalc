@@ -70,30 +70,38 @@
 @implementation NSView (UDGNUstepCompat)
 
 - (NSSize)fittingSize {
-    /* NSGridView exposes -_prototypeFrame which computes the intrinsic
-       content size from row/column dimensions.  Use it when available. */
-    SEL selector = @selector(_prototypeFrame);
-    if ([self respondsToSelector:selector]) {;
-        // Get the method signature for the selector
-        NSMethodSignature *signature = [self methodSignatureForSelector:selector];
-        if (!signature) {
-           [NSException raise:NSInvalidArgumentException format:@"Method signature not found for selector %@", NSStringFromSelector(selector)];
-        }
+    /* For NSGridView, compute content size from numberOfRows/Columns
+       and _prototypeFrame (which gives per-cell size).
+       total = cellSize * count + spacing * (count-1) */
+    SEL protoSel = @selector(_prototypeFrame);
+    SEL rowsSel  = @selector(numberOfRows);
+    SEL colsSel  = @selector(numberOfColumns);
+    SEL rSpacSel = @selector(rowSpacing);
+    SEL cSpacSel = @selector(columnSpacing);
 
-        // Create an NSInvocation object
-        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
-        [invocation setTarget:self];
-        [invocation setSelector:selector];
+    if ([self respondsToSelector:protoSel] &&
+        [self respondsToSelector:rowsSel] &&
+        [self respondsToSelector:colsSel]) {
+        NSMethodSignature *sig = [self methodSignatureForSelector:protoSel];
+        NSInvocation *inv = [NSInvocation invocationWithMethodSignature:sig];
+        [inv setTarget:self];
+        [inv setSelector:protoSel];
+        [inv invoke];
+        NSRect cellRect;
+        [inv getReturnValue:&cellRect];
 
-        // Invoke the method
-        [invocation invoke];
+        NSInteger nRows = ((NSInteger (*)(id, SEL))[self methodForSelector:rowsSel])(self, rowsSel);
+        NSInteger nCols = ((NSInteger (*)(id, SEL))[self methodForSelector:colsSel])(self, colsSel);
 
-        // Get the return value
-        NSRect rect;
-        // The `getReturnValue:` method expects a pointer to the memory location where the return value should be stored.
-        [invocation getReturnValue:&rect];
+        CGFloat rSpacing = 0, cSpacing = 0;
+        if ([self respondsToSelector:rSpacSel])
+            rSpacing = ((CGFloat (*)(id, SEL))[self methodForSelector:rSpacSel])(self, rSpacSel);
+        if ([self respondsToSelector:cSpacSel])
+            cSpacing = ((CGFloat (*)(id, SEL))[self methodForSelector:cSpacSel])(self, cSpacSel);
 
-        return rect.size;
+        CGFloat w = cellRect.size.width  * nCols + cSpacing * MAX(0, nCols - 1);
+        CGFloat h = cellRect.size.height * nRows + rSpacing * MAX(0, nRows - 1);
+        return NSMakeSize(w, h);
     }
     return [self frame].size;
 }
