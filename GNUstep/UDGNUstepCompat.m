@@ -72,9 +72,28 @@
 - (NSSize)fittingSize {
     /* NSGridView exposes -_prototypeFrame which computes the intrinsic
        content size from row/column dimensions.  Use it when available. */
-    if ([self respondsToSelector:@selector(_prototypeFrame)]) {
-        NSRect proto = [(id)self _prototypeFrame];
-        return proto.size;
+    SEL selector = @selector(_prototypeFrame);
+    if ([self respondsToSelector:selector]) {;
+        // Get the method signature for the selector
+        NSMethodSignature *signature = [self methodSignatureForSelector:selector];
+        if (!signature) {
+           [NSException raise:NSInvalidArgumentException format:@"Method signature not found for selector %@", NSStringFromSelector(selector)];
+        }
+
+        // Create an NSInvocation object
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+        [invocation setTarget:self];
+        [invocation setSelector:selector];
+
+        // Invoke the method
+        [invocation invoke];
+
+        // Get the return value
+        NSRect rect;
+        // The `getReturnValue:` method expects a pointer to the memory location where the return value should be stored.
+        [invocation getReturnValue:&rect];
+
+        return rect.size;
     }
     return [self frame].size;
 }
