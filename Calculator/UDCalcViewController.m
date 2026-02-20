@@ -16,6 +16,10 @@ NSString * const UDCalcDidFinishCalculationNotification = @"org.underivable.calc
 NSString * const UDCalcFormulaKey = @"UDCalcFormulaKey";
 NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
+@interface UDCalcViewController ()
+@property (nonatomic, assign) NSInteger previousEncodingSegment;
+@end
+
 @implementation UDCalcViewController
 
 #pragma mark - Grid Rebuild Helpers
@@ -208,16 +212,16 @@ static const CGFloat kStandardKeypadHeight          = 255.0;
 
     // Update Segment Control UI to match loaded state
     if (settings.encodingMode == UDCalcEncodingModeNone) {
-#ifdef GNUSTEP
-        // GNUstep doesn't support selectedSegment = -1 (deselect all)
+
         for (NSInteger i = 0; i < self.encodingSegmentedControl.segmentCount; i++) {
             [self.encodingSegmentedControl setSelected:NO forSegment:i];
         }
-#else
-        self.encodingSegmentedControl.selectedSegment = -1;
-#endif
+
+        self.previousEncodingSegment = -1;
     } else {
-        self.encodingSegmentedControl.selectedSegment = settings.encodingMode == UDCalcEncodingModeASCII ? 0 : 1;
+        NSInteger segment = settings.encodingMode == UDCalcEncodingModeASCII ? 0 : 1;
+        self.encodingSegmentedControl.selectedSegment = segment;
+        self.previousEncodingSegment = segment;
     }
 
     // Update Input Base Control UI to match loaded state
@@ -547,54 +551,39 @@ static const CGFloat kStandardKeypadHeight          = 255.0;
 }
 
 - (IBAction)encodingSelected:(NSSegmentedControl *)sender {
-    NSInteger index = [sender selectedSegment];
-
-#ifdef GNUSTEP
-    // GNUstep's selectAny tracking mode doesn't toggle segments on click:
-    // isSelectedForSegment: always returns YES for the clicked segment.
-    // Implement manual toggle by comparing with current encoding state.
-    UDCalcEncodingMode clickedMode = (index == 0) ? UDCalcEncodingModeASCII : UDCalcEncodingModeUnicode;
-    if (self.calc.encodingMode == clickedMode) {
-        // Was already selected -> deselect (toggle off)
-        [sender setSelected:NO forSegment:index];
-        self.calc.encodingMode = UDCalcEncodingModeNone;
-    } else {
-        // Select the clicked one, deselect the other
-        [sender setSelected:YES forSegment:index];
-        [sender setSelected:NO forSegment:(index == 0 ? 1 : 0)];
-        self.calc.encodingMode = clickedMode;
-    }
-#else
-    // Check visual state
-    BOOL isAsciiOn = [sender isSelectedForSegment:0];
-    BOOL isUnicodeOn = [sender isSelectedForSegment:1];
     
-    // LOGIC: Enforce Mutually Exclusive "Select Zero or One"
-    if (isAsciiOn && isUnicodeOn) {
-        // User tried to select the second one while first was on.
-        // We must turn off the OLD one.
-        if (self.calc.encodingMode == UDCalcEncodingModeASCII) {
-            // Was ASCII, user clicked Unicode -> Turn off ASCII
-            [sender setSelected:NO forSegment:0];
-            self.calc.encodingMode = UDCalcEncodingModeUnicode;
-        } else {
-            // Was Unicode, user clicked ASCII -> Turn off Unicode
-            [sender setSelected:NO forSegment:1];
-            self.calc.encodingMode = UDCalcEncodingModeASCII;
+    NSInteger clicked = sender.selectedSegment;
+
+    if (clicked == self.previousEncodingSegment) {
+        self.calc.encodingMode = UDCalcEncodingModeNone;
+
+        for (NSInteger i = 0; i < self.encodingSegmentedControl.segmentCount; i++) {
+            [self.encodingSegmentedControl setSelected:NO forSegment:i];
+        }
+
+        self.previousEncodingSegment = -1;
+    } else {
+        self.previousEncodingSegment = clicked;
+        
+        switch (clicked) {
+            case 0:
+                self.calc.encodingMode = UDCalcEncodingModeASCII;
+                break;
+            case 1:
+                self.calc.encodingMode = UDCalcEncodingModeUnicode;
+                break;
+            default:
+                self.calc.encodingMode = UDCalcEncodingModeNone;
+
+
+                for (NSInteger i = 0; i < self.encodingSegmentedControl.segmentCount; i++) {
+                    [self.encodingSegmentedControl setSelected:NO forSegment:i];
+                }
+
+                break;
         }
     }
-    else if (isAsciiOn) {
-        self.calc.encodingMode = UDCalcEncodingModeASCII;
-    }
-    else if (isUnicodeOn) {
-        self.calc.encodingMode = UDCalcEncodingModeUnicode;
-    }
-    else {
-        // Both are off (User clicked the active one to deselect it)
-        self.calc.encodingMode = UDCalcEncodingModeNone;
-    }
-#endif
-    
+
     // Now update the UI (show/hide the char label)
     [self updateDisplayIndicators];
 }
