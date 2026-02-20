@@ -75,6 +75,7 @@ static void applyOrangeIfOperator(UDCalcButton *btn) {
 - (void)rebuildBasicGrid {
     NSGridView *g = self.basicGridView;
     if (![self gridNeedsRebuild:g]) return;
+    NSLog(@"Rebuilding basic grid");
     [self clearGrid:g];
 
     SEL opAct  = @selector(operationPressed:);
@@ -133,6 +134,7 @@ static void applyOrangeIfOperator(UDCalcButton *btn) {
         }
     }
     if (!g || ![self gridNeedsRebuild:g]) return;
+    NSLog(@"Rebuilding scientific grid");
     [self clearGrid:g];
 
     SEL opAct  = @selector(operationPressed:);
@@ -206,6 +208,7 @@ static void applyOrangeIfOperator(UDCalcButton *btn) {
 - (void)rebuildProgrammerGrid {
     NSGridView *g = self.programmerGridView;
     if (![self gridNeedsRebuild:g]) return;
+    NSLog(@"Rebuilding programmer grid");
     [self clearGrid:g];
 
     SEL opAct  = @selector(operationPressed:);
