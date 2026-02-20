@@ -549,6 +549,22 @@ static const CGFloat kStandardKeypadHeight          = 255.0;
 - (IBAction)encodingSelected:(NSSegmentedControl *)sender {
     NSInteger index = [sender selectedSegment];
 
+#ifdef GNUSTEP
+    // GNUstep's selectAny tracking mode doesn't toggle segments on click:
+    // isSelectedForSegment: always returns YES for the clicked segment.
+    // Implement manual toggle by comparing with current encoding state.
+    UDCalcEncodingMode clickedMode = (index == 0) ? UDCalcEncodingModeASCII : UDCalcEncodingModeUnicode;
+    if (self.calc.encodingMode == clickedMode) {
+        // Was already selected -> deselect (toggle off)
+        [sender setSelected:NO forSegment:index];
+        self.calc.encodingMode = UDCalcEncodingModeNone;
+    } else {
+        // Select the clicked one, deselect the other
+        [sender setSelected:YES forSegment:index];
+        [sender setSelected:NO forSegment:(index == 0 ? 1 : 0)];
+        self.calc.encodingMode = clickedMode;
+    }
+#else
     // Check visual state
     BOOL isAsciiOn = [sender isSelectedForSegment:0];
     BOOL isUnicodeOn = [sender isSelectedForSegment:1];
@@ -577,6 +593,7 @@ static const CGFloat kStandardKeypadHeight          = 255.0;
         // Both are off (User clicked the active one to deselect it)
         self.calc.encodingMode = UDCalcEncodingModeNone;
     }
+#endif
     
     // Now update the UI (show/hide the char label)
     [self updateDisplayIndicators];
