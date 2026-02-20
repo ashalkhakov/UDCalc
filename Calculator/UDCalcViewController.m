@@ -149,6 +149,7 @@ static const CGFloat kStandardProgrammerInputHeight = 98.0;
 static const CGFloat kStandardBitWrapperHeight      = 60.0;
 static const CGFloat kStandardKeypadHeight          = 255.0;
 
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -532,11 +533,15 @@ static const CGFloat kStandardKeypadHeight          = 255.0;
 }
 
 - (IBAction)baseSelected:(NSSegmentedControl *)sender {
-    NSInteger selectedTag = [[sender cell] tagForSegment:[sender selectedSegment]];
-    
-    UDBase newBase = (UDBase)selectedTag;
+    /* Map selected segment index to base value directly.
+     * Segments are always: 0=Octal(8), 1=Decimal(10), 2=Hex(16).
+     * Using the index avoids [[sender cell] tagForSegment:] which
+     * returns 0 on GNUstep (cell tags not decoded from XIB). */
+    static const UDBase baseMap[] = { UDBaseOct, UDBaseDec, UDBaseHex };
+    NSInteger idx = [sender selectedSegment];
+    if (idx < 0 || idx > 2) return;
 
-    self.calc.inputBase = newBase;
+    self.calc.inputBase = baseMap[idx];
 
     [self updateUI];
 }
@@ -544,6 +549,22 @@ static const CGFloat kStandardKeypadHeight          = 255.0;
 - (IBAction)encodingSelected:(NSSegmentedControl *)sender {
     NSInteger index = [sender selectedSegment];
 
+#ifdef GNUSTEP
+    // GNUstep's selectAny tracking mode doesn't toggle segments on click:
+    // isSelectedForSegment: always returns YES for the clicked segment.
+    // Implement manual toggle by comparing with current encoding state.
+    UDCalcEncodingMode clickedMode = (index == 0) ? UDCalcEncodingModeASCII : UDCalcEncodingModeUnicode;
+    if (self.calc.encodingMode == clickedMode) {
+        // Was already selected -> deselect (toggle off)
+        [sender setSelected:NO forSegment:index];
+        self.calc.encodingMode = UDCalcEncodingModeNone;
+    } else {
+        // Select the clicked one, deselect the other
+        [sender setSelected:YES forSegment:index];
+        [sender setSelected:NO forSegment:(index == 0 ? 1 : 0)];
+        self.calc.encodingMode = clickedMode;
+    }
+#else
     // Check visual state
     BOOL isAsciiOn = [sender isSelectedForSegment:0];
     BOOL isUnicodeOn = [sender isSelectedForSegment:1];
@@ -572,6 +593,7 @@ static const CGFloat kStandardKeypadHeight          = 255.0;
         // Both are off (User clicked the active one to deselect it)
         self.calc.encodingMode = UDCalcEncodingModeNone;
     }
+#endif
     
     // Now update the UI (show/hide the char label)
     [self updateDisplayIndicators];

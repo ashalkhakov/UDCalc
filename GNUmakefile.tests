@@ -12,16 +12,15 @@
 # linked directly using clang rather than going through bundle.make.
 #
 
-GNUSTEP_COMPAT_DIR = GNUstep
 SRC_DIR = Calculator
 TEST_DIR = CalculatorTests
 OUT_DIR = obj/tests
 
 CLANG = clang
 OBJCFLAGS = -fobjc-arc -fobjc-runtime=gnustep-2.2 -fblocks -DGNUSTEP \
-  -I$(SRC_DIR) -I$(GNUSTEP_COMPAT_DIR)/include \
+  -I$(SRC_DIR) \
   -I/usr/local/include -I/usr/local/include/GNUstep \
-  -include $(GNUSTEP_COMPAT_DIR)/include/UDGNUstepCompat.h
+  -include $(SRC_DIR)/UDGNUstepCompat.h
 
 LDFLAGS = -fobjc-runtime=gnustep-2.2 -fobjc-arc \
   -L/usr/local/lib -lgnustep-base -lXCTest -lobjc -ldispatch -lm \

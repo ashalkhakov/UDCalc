@@ -58,6 +58,10 @@
 #define IBInspectable
 #endif
 
+/* GUI shims below require AppKit; skip when building non-GUI targets
+ * (e.g. command-line test runners linked with gnustep-base only). */
+#if __has_include(<AppKit/AppKit.h>)
+
 /* ------------------------------------------------------------
  * NSFont convenience methods missing in GNUstep
  * ------------------------------------------------------------ */
@@ -103,6 +107,8 @@
 @interface NSPasteboard (UDGNUstepClearCompat)
 - (void)clearContents;
 @end
+
+#endif /* __has_include AppKit */
 
 #endif /* GNUSTEP */
 
