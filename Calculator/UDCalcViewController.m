@@ -321,6 +321,22 @@ static CGFloat _gs_wrapperH;
  * recursive autoresizing causes negative child widths when parents
  * shrink below XIB-designed sizes.
  */
+/* Compute the fitting width for an NSSegmentedControl by measuring
+ * each segment's label text.  GNUstep's sizeToFit is broken for
+ * NSSegmentedControl (returns ~0 width).                            */
+static CGFloat ud_segmentedControlFittingWidth(NSSegmentedControl *sc) {
+    static const CGFloat kSegPad = 16.0; // per-segment padding
+    NSDictionary *attrs = @{NSFontAttributeName: [sc font] ?: [NSFont systemFontOfSize:0]};
+    CGFloat total = 0;
+    NSInteger count = [sc segmentCount];
+    for (NSInteger i = 0; i < count; i++) {
+        NSString *label = [sc labelForSegment:i] ?: @"";
+        CGFloat textW = [label sizeWithAttributes:attrs].width;
+        total += textW + kSegPad;
+    }
+    return total;
+}
+
 static void enableAutoresizing(NSView *view) {
     [view setTranslatesAutoresizingMaskIntoConstraints:YES];
     [view setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
@@ -423,11 +439,13 @@ static void enableAutoresizing(NSView *view) {
             CGFloat ctrlY = 2.0;
             CGFloat x = kPad;
 
-            [self.encodingSegmentedControl sizeToFit];
-            NSSize encSz = [self.encodingSegmentedControl frame].size;
+            // GNUstep's sizeToFit is broken for NSSegmentedControl
+            // (returns ~0 width).  Compute width from segment labels.
+            CGFloat encW = ud_segmentedControlFittingWidth(
+                               self.encodingSegmentedControl);
             [self.encodingSegmentedControl setFrame:
-                NSMakeRect(x, ctrlY, encSz.width, ctrlH)];
-            x += encSz.width + kGap;
+                NSMakeRect(x, ctrlY, encW, ctrlH)];
+            x += encW + kGap;
 
             [self.showBinaryViewButton sizeToFit];
             NSSize btnSz = [self.showBinaryViewButton frame].size;
@@ -435,10 +453,10 @@ static void enableAutoresizing(NSView *view) {
                 NSMakeRect(x, ctrlY, btnSz.width, ctrlH)];
             x += btnSz.width + kGap;
 
-            [self.baseSegmentedControl sizeToFit];
-            NSSize baseSz = [self.baseSegmentedControl frame].size;
+            CGFloat baseW = ud_segmentedControlFittingWidth(
+                                self.baseSegmentedControl);
             [self.baseSegmentedControl setFrame:
-                NSMakeRect(x, ctrlY, baseSz.width, ctrlH)];
+                NSMakeRect(x, ctrlY, baseW, ctrlH)];
         }
     }
 
