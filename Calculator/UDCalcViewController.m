@@ -42,6 +42,7 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
     CGFloat _layoutScientificW;
     CGFloat _layoutContainerH;
     CGFloat _layoutWrapperH;
+    CGFloat _layoutDisplayH;   /* current display tab height (kMinDisplayHeight or kRPNDisplayHeight) */
 }
 
 #pragma mark - Grid Rebuild Helpers
@@ -187,6 +188,7 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
     _layoutScientificW = kStandardScientificWidth;
     _layoutContainerH  = kStandardProgrammerInputHeight;
     _layoutWrapperH    = kStandardBitWrapperHeight;
+    _layoutDisplayH    = kMinDisplayHeight;
 
 #ifdef GNUSTEP
     {
@@ -314,13 +316,15 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
     // 4. Resize window to accommodate RPN display height
     NSWindow *window = self.view.window;
     if (window) {
-        CGFloat deltaH = isRPNMode
-            ? (kRPNDisplayHeight - kMinDisplayHeight)
-            : -(kRPNDisplayHeight - kMinDisplayHeight);
-        NSRect f = window.frame;
-        f.size.height += deltaH;
-        f.origin.y    -= deltaH;
-        [window setFrame:f display:YES];
+        CGFloat targetDisplayH = isRPNMode ? kRPNDisplayHeight : kMinDisplayHeight;
+        CGFloat deltaH = targetDisplayH - _layoutDisplayH;
+        if (deltaH != 0) {
+            NSRect f = window.frame;
+            f.size.height += deltaH;
+            f.origin.y    -= deltaH;
+            [window setFrame:f display:YES];
+        }
+        _layoutDisplayH = targetDisplayH;
         [self layoutMainSubviews];
     }
 
