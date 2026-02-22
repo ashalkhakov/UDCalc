@@ -57,6 +57,7 @@ extern NSString * const UDCalcResultKey;  // double
 @property (weak) IBOutlet NSTextField *radLabelRPN;
 @property (weak) IBOutlet NSTextField *charLabelRPN;
 @property (nonatomic, weak) IBOutlet NSTableView *stackTableView;
+@property (nonatomic, weak) IBOutlet NSStackView *stackButtonsView;
 
 @property (nonatomic, weak) IBOutlet NSButton *parenLeftButton;
 @property (nonatomic, weak) IBOutlet NSButton *parenRightButton;
