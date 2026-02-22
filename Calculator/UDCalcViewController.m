@@ -29,6 +29,7 @@ static const CGFloat kStandardKeypadHeight          = 255.0;
 static const CGFloat kGridButtonWidth    = 60.0;
 static const CGFloat kGridButtonHeight  = 50.0;
 static const CGFloat kMinDisplayHeight  = 20.0;
+static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN stack list */
 
 @implementation UDCalcViewController {
     /*
@@ -63,8 +64,9 @@ static const CGFloat kMinDisplayHeight  = 20.0;
     CGFloat containerH = _layoutContainerH;
     CGFloat drawerW    = _layoutScientificW;
 
+    CGFloat minDisplayH = self.calc.isRPNMode ? kRPNDisplayHeight : kMinDisplayHeight;
     CGFloat displayH = H - containerH - keypadH - 2.0;
-    if (displayH < kMinDisplayHeight) displayH = kMinDisplayHeight;
+    if (displayH < minDisplayH) displayH = minDisplayH;
 
     CGFloat displayW = MAX(0, W - 2);
     displayH = MAX(0, displayH);
@@ -311,7 +313,20 @@ static const CGFloat kMinDisplayHeight  = 20.0;
     self.parenLeftButton.enabled = !isRPNMode;
     self.parenRightButton.enabled = !isRPNMode;
 
-    // 4. Refresh Data
+    // 4. Resize window to accommodate RPN display height
+    NSWindow *window = self.view.window;
+    if (window) {
+        CGFloat deltaH = isRPNMode
+            ? (kRPNDisplayHeight - kMinDisplayHeight)
+            : -(kRPNDisplayHeight - kMinDisplayHeight);
+        NSRect f = window.frame;
+        f.size.height += deltaH;
+        f.origin.y    -= deltaH;
+        [window setFrame:f display:YES];
+        [self layoutMainSubviews];
+    }
+
+    // 5. Refresh Data
     [self updateUI];
 }
 
