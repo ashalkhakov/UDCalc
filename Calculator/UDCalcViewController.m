@@ -99,12 +99,16 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
                     && [sibling isKindOfClass:[NSStackView class]]) {
                     [sibling setFrame:NSMakeRect(scrollW, 0,
                                                  kRPNButtonColumnWidth, dh)];
-                    /* Lay out RPN buttons top-aligned, each 80×30. */
+                    /* Lay out RPN buttons top-aligned, equal size.
+                       Enable autoresizing so GNUstep's NSStackView
+                       doesn't override the explicit frames. */
+                    [sibling setTranslatesAutoresizingMaskIntoConstraints:YES];
                     NSArray *buttons = [sibling subviews];
                     NSInteger count = (NSInteger)[buttons count];
                     for (NSInteger i = 0; i < count; i++) {
                         NSView *btn = buttons[(NSUInteger)i];
                         if (![btn isKindOfClass:[NSButton class]]) continue;
+                        [btn setTranslatesAutoresizingMaskIntoConstraints:YES];
                         CGFloat y = dh - (i + 1) * (kRPNButtonHeight + kRPNButtonSpacing);
                         [btn setFrame:NSMakeRect(0, MAX(0, y),
                                                  kRPNButtonColumnWidth,
