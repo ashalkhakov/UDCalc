@@ -39,21 +39,6 @@ static CGFloat _layoutScientificW;
 static CGFloat _layoutContainerH;
 static CGFloat _layoutWrapperH;
 
-/* Compute the fitting width for an NSSegmentedControl by measuring
- * each segment's label text. */
-static CGFloat ud_segmentedControlFittingWidth(NSSegmentedControl *sc) {
-    static const CGFloat kSegPad = 16.0;
-    NSDictionary *attrs = @{NSFontAttributeName: [sc font] ?: [NSFont systemFontOfSize:0]};
-    CGFloat total = 0;
-    NSInteger count = [sc segmentCount];
-    for (NSInteger i = 0; i < count; i++) {
-        NSString *label = [sc labelForSegment:i] ?: @"";
-        CGFloat textW = [label sizeWithAttributes:attrs].width;
-        total += textW + kSegPad;
-    }
-    return total;
-}
-
 /*
  * Position the four main subviews of self.view based on the current
  * layout state.  Called after window frame changes.
@@ -131,7 +116,7 @@ static CGFloat ud_segmentedControlFittingWidth(NSSegmentedControl *sc) {
             CGFloat ctrlY = 2.0;
             CGFloat rowW = MAX(0, W) - 2 * kPad;
 
-            CGFloat encW = ud_segmentedControlFittingWidth(self.encodingSegmentedControl);
+            CGFloat encW = self.encodingSegmentedControl.fittingSize.width;
             [self.encodingSegmentedControl setFrame:NSMakeRect(kPad, ctrlY, encW, ctrlH)];
 
             [self.showBinaryViewButton sizeToFit];
@@ -139,7 +124,7 @@ static CGFloat ud_segmentedControlFittingWidth(NSSegmentedControl *sc) {
             CGFloat btnX = kPad + (rowW - btnSz.width) / 2.0;
             [self.showBinaryViewButton setFrame:NSMakeRect(btnX, ctrlY, btnSz.width, ctrlH)];
 
-            CGFloat baseW = ud_segmentedControlFittingWidth(self.baseSegmentedControl);
+            CGFloat baseW = self.baseSegmentedControl.fittingSize.width;
             [self.baseSegmentedControl setFrame:NSMakeRect(kPad + rowW - baseW, ctrlY, baseW, ctrlH)];
         }
     }

@@ -13,6 +13,7 @@
  * compiles to nothing when building on macOS with Xcode.
  */
 
+#import <AppKit/AppKit.h>
 #import "UDGNUstepCompat.h"
 
 #ifdef GNUSTEP
@@ -86,7 +87,7 @@
    For non-grid views the current frame size is returned as a
    reasonable fallback since those views do not expose intrinsic
    sizing information through a public interface on GNUstep. */
-@implementation NSView (UDGNUstepCompat)
+@implementation NSGridView (UDGNUstepCompat)
 
 - (NSSize)fittingSize {
     /* For NSGridView, compute content size by summing explicit row
@@ -95,48 +96,57 @@
        because it derives per-cell size from the current frame, which
        is circular and produces wrong results when the frame hasn't
        been set to the content size yet. */
-    SEL rowsSel  = @selector(numberOfRows);
-    SEL colsSel  = @selector(numberOfColumns);
-    SEL rowAtSel = @selector(rowAtIndex:);
-    SEL colAtSel = @selector(columnAtIndex:);
-    SEL rSpacSel = @selector(rowSpacing);
-    SEL cSpacSel = @selector(columnSpacing);
 
-    if ([self respondsToSelector:rowsSel] &&
-        [self respondsToSelector:colsSel] &&
-        [self respondsToSelector:rowAtSel] &&
-        [self respondsToSelector:colAtSel]) {
-        NSInteger nRows = ((NSInteger (*)(id, SEL))[self methodForSelector:rowsSel])(self, rowsSel);
-        NSInteger nCols = ((NSInteger (*)(id, SEL))[self methodForSelector:colsSel])(self, colsSel);
+    NSInteger nRows = [self numberOfRows];
+    NSInteger nCols = [self numberOfColumns];
 
-        CGFloat rSpacing = 0, cSpacing = 0;
-        if ([self respondsToSelector:rSpacSel])
-            rSpacing = ((CGFloat (*)(id, SEL))[self methodForSelector:rSpacSel])(self, rSpacSel);
-        if ([self respondsToSelector:cSpacSel])
-            cSpacing = ((CGFloat (*)(id, SEL))[self methodForSelector:cSpacSel])(self, cSpacSel);
+    CGFloat rSpacing = [self rowSpacing];
+    CGFloat cSpacing = [self columnSpacing];
 
-        /* Sum explicit row heights */
-        CGFloat h = 0;
-        for (NSInteger r = 0; r < nRows; r++) {
-            id row = ((id (*)(id, SEL, NSInteger))[self methodForSelector:rowAtSel])(self, rowAtSel, r);
-            h += ((CGFloat (*)(id, SEL))[row methodForSelector:@selector(height)])(row, @selector(height));
-        }
-        h += rSpacing * MAX(0, nRows - 1);
-
-        /* Sum explicit column widths */
-        CGFloat w = 0;
-        for (NSInteger c = 0; c < nCols; c++) {
-            id col = ((id (*)(id, SEL, NSInteger))[self methodForSelector:colAtSel])(self, colAtSel, c);
-            w += ((CGFloat (*)(id, SEL))[col methodForSelector:@selector(width)])(col, @selector(width));
-        }
-        w += cSpacing * MAX(0, nCols - 1);
-
-        return NSMakeSize(w, h);
+    /* Sum explicit row heights */
+    CGFloat h = 0;
+    for (NSInteger r = 0; r < nRows; r++) {
+        NSGridRow *row = [self rowAtIndex:r];
+        h += [row height];
     }
-    return [self frame].size;
+    h += rSpacing * MAX(0, nRows - 1);
+
+    /* Sum explicit column widths */
+    CGFloat w = 0;
+    for (NSInteger c = 0; c < nCols; c++) {
+        NSGridColumn *col = [self columnAtIndex:c];
+        w += [col width];
+    }
+    w += cSpacing * MAX(0, nCols - 1);
+
+    return NSMakeSize(w, h);
 }
 
 @end
+
+@implementation NSSegmentedControl (UDGNUstepCompat)
+/* Compute the fitting width for an NSSegmentedControl by measuring
+ * each segment's label text. */
+- (NSSize)fittingSize {
+    static const CGFloat kSegPad = 16.0;
+    static const CGFloat kSegPadH = 8.0;
+
+    NSInteger nSegments = [self segmentCount];
+    NSDictionary *attrs = @{NSFontAttributeName: [self font] ?: [NSFont systemFontOfSize:0]};
+    CGFloat totalWidth = 0;
+    CGFloat maxHeight = 0;
+    
+    for (NSInteger c = 0; c < nSegments; c++) {
+        NSString *label = [self labelForSegment:c] ?: @""; // TODO: image segments?
+        NSSize textSize = [label sizeWithAttributes:attrs];
+        totalWidth += textSize.width + kSegPad;
+        maxHeight = MAX(maxHeight, textSize.height + kSegPadH);
+    }
+
+    return NSMakeSize(totalWidth, maxHeight);
+}
+@end
+
 
 /* Removes all current items from the pasteboard.  This is called
    before writing new content to ensure that stale data from a

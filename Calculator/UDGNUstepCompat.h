@@ -94,9 +94,14 @@
 /* ------------------------------------------------------------
  * NSView fittingSize (not available in GNUstep)
  * ------------------------------------------------------------ */
-#import <AppKit/NSView.h>
+#import <AppKit/NSGridView.h>
+#import <AppKit/NSSegmentedControl.h>
 
-@interface NSView (UDGNUstepCompat)
+@interface NSGridView (UDGNUstepCompat)
+- (NSSize)fittingSize;
+@end
+
+@interface NSSegmentedControl (UDGNUstepCompat)
 - (NSSize)fittingSize;
 @end
 
