@@ -1,0 +1,4 @@
+# Additional flags to pass to Objective-C compiler
+ADDITIONAL_OBJCFLAGS += -fobjc-arc
+
+ADDITIONAL_LDFLAGS += -ldispatch

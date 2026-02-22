@@ -1,7 +1,9 @@
 # GNUstep build artifacts
 obj/
-Calculator.app/
+*.app/
+*.bundle/
 *.o
 *.d
 stamp.make
 _codeql_detected_source_root
+*~
