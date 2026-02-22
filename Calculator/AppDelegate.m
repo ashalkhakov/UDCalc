@@ -6,9 +6,6 @@
 //
 
 #import "AppDelegate.h"
-#if __has_include(<QuartzCore/QuartzCore.h>)
-#import <QuartzCore/QuartzCore.h>
-#endif
 #import "UDCalcButton.h"
 #import "UDSettingsManager.h"
 
@@ -81,6 +78,7 @@
                 NSMenuItem *mi = [sub itemAtIndex:j];
                 SEL act = [mi action];
                 if (!act) continue;
+
                 if (act == @selector(changeMode:) ||
                     act == @selector(changeRPNMode:)) {
                     [mi setTarget:self.calcViewController];
@@ -88,7 +86,7 @@
                            act == @selector(conversionMenuClicked:) ||
                            act == @selector(openConverter:)) {
                     [mi setTarget:self];
-                }
+                 }
             }
         }
     }

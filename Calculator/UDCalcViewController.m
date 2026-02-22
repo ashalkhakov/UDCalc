@@ -20,24 +20,30 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 @property (nonatomic, assign) NSInteger previousEncodingSegment;
 @end
 
-@implementation UDCalcViewController
-
-#pragma mark - Grid Rebuild Helpers
+// XIB-designed standard sizes (matching the frame rects in UDCalcView.xib)
+static const CGFloat kStandardScientificWidth       = 365.0;
+static const CGFloat kStandardProgrammerInputHeight = 98.0;
+static const CGFloat kStandardBitWrapperHeight      = 60.0;
+static const CGFloat kStandardKeypadHeight          = 255.0;
 
 static const CGFloat kGridButtonWidth    = 60.0;
 static const CGFloat kGridButtonHeight  = 50.0;
 static const CGFloat kMinDisplayHeight  = 20.0;
 
-/*
- * Frame-based layout state.  Since all constraints have been removed from
- * the XIB, these variables track the "logical" sizes of each panel.
- * They are initialised from hard-coded constants that match the XIB
- * frame design and updated when the calculator mode changes.
- */
-static CGFloat _layoutKeypadH;
-static CGFloat _layoutScientificW;
-static CGFloat _layoutContainerH;
-static CGFloat _layoutWrapperH;
+@implementation UDCalcViewController {
+    /*
+     * Frame-based layout state.  Since all constraints have been removed from
+     * the XIB, these variables track the "logical" sizes of each panel.
+     * They are initialised from hard-coded constants that match the XIB
+     * frame design and updated when the calculator mode changes.
+     */
+    CGFloat _layoutKeypadH;
+    CGFloat _layoutScientificW;
+    CGFloat _layoutContainerH;
+    CGFloat _layoutWrapperH;
+}
+
+#pragma mark - Grid Rebuild Helpers
 
 /*
  * Position the four main subviews of self.view based on the current
@@ -131,13 +137,6 @@ static CGFloat _layoutWrapperH;
 
     [self.view setNeedsDisplay:YES];
 }
-
-// XIB-designed standard sizes (matching the frame rects in UDCalcView.xib)
-static const CGFloat kStandardScientificWidth       = 365.0;
-static const CGFloat kStandardProgrammerInputHeight = 98.0;
-static const CGFloat kStandardBitWrapperHeight      = 60.0;
-static const CGFloat kStandardKeypadHeight          = 255.0;
-
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -720,7 +719,7 @@ static const CGFloat kStandardKeypadHeight          = 255.0;
     UDCalcMode mode = self.calc.mode;
     NSTextField *radLabel = self.calc.isRPNMode ? self.radLabelRPN : self.radLabel;
     NSTextField *charLabel = self.calc.isRPNMode ? self.charLabelRPN : self.charLabel;
-    
+
     // ============================================================
     // 1. RADIAN INDICATOR (Scientific Mode)
     // ============================================================
@@ -731,7 +730,7 @@ static const CGFloat kStandardKeypadHeight          = 255.0;
     } else {
         radLabel.hidden = YES;
     }
-    
+
     // ============================================================
     // 2. CHARACTER INDICATOR (Programmer Mode)
     // ============================================================
