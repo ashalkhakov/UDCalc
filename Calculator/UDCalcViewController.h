@@ -84,6 +84,7 @@ extern NSString * const UDCalcResultKey;  // double
 @property (nonatomic, weak) IBOutlet NSButton *pEButton;
 @property (nonatomic, weak) IBOutlet NSButton *pFButton;
 @property (nonatomic, weak) IBOutlet NSButton *pFFButton;
+@property (nonatomic, weak) IBOutlet NSButton *pEqualsButton;
 
 - (void)restoreApplicationState;
 - (void)updateUI;

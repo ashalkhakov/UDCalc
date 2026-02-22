@@ -298,6 +298,8 @@ static const CGFloat kMinDisplayHeight  = 20.0;
     // 2. Toggle "Enter" vs "=" Button Title
     self.equalsButton.title = isRPNMode ? @"enter" : @"=";
     self.equalsButton.tag = isRPNMode ? UDOpEnter : UDOpEq;
+    self.pEqualsButton.title = isRPNMode ? @"enter" : @"=";
+    self.pEqualsButton.tag = isRPNMode ? UDOpEnter : UDOpEq;
 
     // 3. Disable Parens in RPN
     self.parenLeftButton.enabled = !isRPNMode;
