@@ -741,6 +741,7 @@ static const CGFloat kMinDisplayHeight  = 20.0;
         if (glyph.length > 0) {
             charLabel.hidden = NO;
             charLabel.stringValue = glyph;
+            [charLabel setNeedsDisplay:YES];
         } else {
             charLabel.hidden = YES;
         }
