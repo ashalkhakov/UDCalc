@@ -23,9 +23,8 @@
                 <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" id="YOJ-sA-avY">
+                    <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YOJ-sA-avY">
                         <rect key="frame" x="15" y="40" width="450" height="215"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" drawsBackground="NO" id="2Aw-NQ-GPZ">
                             <rect key="frame" x="0.0" y="0.0" width="435" height="215"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -33,7 +32,7 @@
                                 <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="J6z-QQ-VY6">
                                     <rect key="frame" x="0.0" y="0.0" width="435" height="215"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <size key="minSize" width="435" height="215"/>
                                     <size key="maxSize" width="465" height="10000000"/>
@@ -50,9 +49,8 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
-                    <button identifier="clear" verticalHuggingPriority="750" id="7S0-c6-ROc">
+                    <button identifier="clear" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7S0-c6-ROc">
                         <rect key="frame" x="406" y="8" width="66" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7oq-Tc-N48">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -62,6 +60,14 @@
                         </connections>
                     </button>
                 </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="YOJ-sA-avY" secondAttribute="trailing" constant="15" id="6Np-xA-NEU"/>
+                    <constraint firstItem="YOJ-sA-avY" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="15" id="LQx-vw-EPf"/>
+                    <constraint firstItem="YOJ-sA-avY" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="15" id="SNi-ks-wQs"/>
+                    <constraint firstAttribute="bottom" secondItem="7S0-c6-ROc" secondAttribute="bottom" constant="15" id="W7f-0Q-Gp4"/>
+                    <constraint firstAttribute="trailing" secondItem="7S0-c6-ROc" secondAttribute="trailing" constant="15" id="vRJ-zw-gq7"/>
+                    <constraint firstItem="7S0-c6-ROc" firstAttribute="top" secondItem="YOJ-sA-avY" secondAttribute="bottom" constant="5" id="y81-2h-jmY"/>
+                </constraints>
             </view>
             <point key="canvasLocation" x="136" y="104"/>
         </window>
