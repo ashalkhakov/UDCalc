@@ -188,10 +188,10 @@
                                         <rect key="frame" x="550" y="0.0" width="240" height="103"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <subviews>
-                                            <button identifier="swap" verticalHuggingPriority="750" id="Hx5-6J-Uy1" customClass="UDCalcButton">
+                                            <button identifier="swap" verticalHuggingPriority="750" tag="92" id="Hx5-6J-Uy1" customClass="UDCalcButton">
                                                 <rect key="frame" x="0.0" y="78" width="60" height="25"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                <buttonCell key="cell" type="square" title="x↔y" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="N11-3f-F8C">
+                                                <buttonCell key="cell" type="square" title="x↔y" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" tag="92" imageScaling="proportionallyDown" inset="2" id="N11-3f-F8C">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
@@ -199,10 +199,10 @@
                                                     <action selector="operationPressed:" target="-2" id="aN9-S6-GN1"/>
                                                 </connections>
                                             </button>
-                                            <button identifier="rolldown" verticalHuggingPriority="750" id="r6N-wb-toc" customClass="UDCalcButton">
+                                            <button identifier="rolldown" verticalHuggingPriority="750" tag="94" id="r6N-wb-toc" customClass="UDCalcButton">
                                                 <rect key="frame" x="0.0" y="52" width="60" height="25"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                <buttonCell key="cell" type="square" title="R↓" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="H4A-nn-mgv">
+                                                <buttonCell key="cell" type="square" title="R↓" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" tag="94" imageScaling="proportionallyDown" inset="2" id="H4A-nn-mgv">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
@@ -210,10 +210,10 @@
                                                     <action selector="operationPressed:" target="-2" id="OSU-5y-uq9"/>
                                                 </connections>
                                             </button>
-                                            <button identifier="rollup" verticalHuggingPriority="750" id="H7M-Pz-sjK" customClass="UDCalcButton">
+                                            <button identifier="rollup" verticalHuggingPriority="750" tag="95" id="H7M-Pz-sjK" customClass="UDCalcButton">
                                                 <rect key="frame" x="0.0" y="26" width="60" height="25"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                <buttonCell key="cell" type="square" title="R↑" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OFT-Ut-TsU">
+                                                <buttonCell key="cell" type="square" title="R↑" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" tag="95" imageScaling="proportionallyDown" inset="2" id="OFT-Ut-TsU">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
@@ -221,10 +221,10 @@
                                                     <action selector="operationPressed:" target="-2" id="0p0-Eo-MpX"/>
                                                 </connections>
                                             </button>
-                                            <button identifier="drop" verticalHuggingPriority="750" id="MzR-LY-7Gd" customClass="UDCalcButton">
+                                            <button identifier="drop" verticalHuggingPriority="750" tag="93" id="MzR-LY-7Gd" customClass="UDCalcButton">
                                                 <rect key="frame" x="0.0" y="0.0" width="60" height="25"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                <buttonCell key="cell" type="square" title="drop" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yoH-oK-liW">
+                                                <buttonCell key="cell" type="square" title="drop" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" tag="93" imageScaling="proportionallyDown" inset="2" id="yoH-oK-liW">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
