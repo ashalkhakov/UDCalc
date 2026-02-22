@@ -82,8 +82,10 @@ static const CGFloat kMinDisplayHeight  = 20.0;
         [self.displayField setFrame:NSMakeRect(0, 0, dw, dh)];
 
         /* RPN tab (index 1): scroll view (stack table) fills left,
-           button column hugs the right edge. */
-        static const CGFloat kRPNButtonColumnWidth = 64.0;
+           button column hugs the right edge, aligned to the top. */
+        static const CGFloat kRPNButtonColumnWidth  = 80.0;
+        static const CGFloat kRPNButtonHeight       = 30.0;
+        static const CGFloat kRPNButtonSpacing      =  2.0;
         NSScrollView *rpnScroll = [self.stackTableView enclosingScrollView];
         if (rpnScroll) {
             CGFloat scrollW = MAX(0, dw - kRPNButtonColumnWidth);
@@ -95,12 +97,16 @@ static const CGFloat kMinDisplayHeight  = 20.0;
                     && [sibling isKindOfClass:[NSStackView class]]) {
                     [sibling setFrame:NSMakeRect(scrollW, 0,
                                                  kRPNButtonColumnWidth, dh)];
-                    /* Size each RPN button to fill the column width */
-                    for (NSView *btn in [sibling subviews]) {
+                    /* Lay out RPN buttons top-aligned, each 80×30. */
+                    NSArray *buttons = [sibling subviews];
+                    NSInteger count = (NSInteger)[buttons count];
+                    for (NSInteger i = 0; i < count; i++) {
+                        NSView *btn = buttons[(NSUInteger)i];
                         if (![btn isKindOfClass:[NSButton class]]) continue;
-                        NSRect bf = [btn frame];
-                        bf.size.width = kRPNButtonColumnWidth;
-                        [btn setFrame:bf];
+                        CGFloat y = dh - (i + 1) * (kRPNButtonHeight + kRPNButtonSpacing);
+                        [btn setFrame:NSMakeRect(0, MAX(0, y),
+                                                 kRPNButtonColumnWidth,
+                                                 kRPNButtonHeight)];
                     }
                     break;
                 }
