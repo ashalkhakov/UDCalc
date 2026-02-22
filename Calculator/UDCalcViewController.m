@@ -75,9 +75,37 @@ static const CGFloat kMinDisplayHeight  = 20.0;
 
     {
         NSRect dRect = [self.displayTabView contentRect];
+        CGFloat dw = dRect.size.width;
+        CGFloat dh = dRect.size.height;
         for (NSTabViewItem *item in [self.displayTabView tabViewItems])
-            [[item view] setFrame:NSMakeRect(0, 0, dRect.size.width, dRect.size.height)];
-        [self.displayField setFrame:NSMakeRect(0, 0, dRect.size.width, dRect.size.height)];
+            [[item view] setFrame:NSMakeRect(0, 0, dw, dh)];
+        [self.displayField setFrame:NSMakeRect(0, 0, dw, dh)];
+
+        /* RPN tab (index 1): scroll view (stack table) fills left,
+           button column hugs the right edge. */
+        static const CGFloat kRPNButtonColumnWidth = 64.0;
+        NSScrollView *rpnScroll = [self.stackTableView enclosingScrollView];
+        if (rpnScroll) {
+            CGFloat scrollW = MAX(0, dw - kRPNButtonColumnWidth);
+            [rpnScroll setFrame:NSMakeRect(0, 0, scrollW, dh)];
+
+            /* The button stack view is the sibling of the scroll view */
+            for (NSView *sibling in [[rpnScroll superview] subviews]) {
+                if (sibling != rpnScroll
+                    && [sibling isKindOfClass:[NSStackView class]]) {
+                    [sibling setFrame:NSMakeRect(scrollW, 0,
+                                                 kRPNButtonColumnWidth, dh)];
+                    /* Size each RPN button to fill the column width */
+                    for (NSView *btn in [sibling subviews]) {
+                        if (![btn isKindOfClass:[NSButton class]]) continue;
+                        NSRect bf = [btn frame];
+                        bf.size.width = kRPNButtonColumnWidth;
+                        [btn setFrame:bf];
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     [self.programmerInputView setFrame:NSMakeRect(0, keypadH, MAX(0, W), containerH)];
