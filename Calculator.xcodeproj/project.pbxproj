@@ -16,6 +16,9 @@
 		9A5589862F1FFDA500159E7B /* UDFrontendContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5589852F1FFDA500159E7B /* UDFrontendContext.m */; };
 		9A5E28BF2F2E76F2001A7618 /* UDValueFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5E28BE2F2E76F2001A7618 /* UDValueFormatter.m */; };
 		9A5E28C02F2E76FB001A7618 /* UDValueFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5E28BE2F2E76F2001A7618 /* UDValueFormatter.m */; };
+		9A6666A82F4C36200088C676 /* UDUnitConverterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A6666A72F4C36200088C676 /* UDUnitConverterTests.m */; };
+		9A6666AD2F4C5A5B0088C676 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 9A6666AC2F4C5A5B0088C676 /* en.lproj */; };
+		9A6666AF2F4C96040088C676 /* UDConversionHistoryManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A6666AE2F4C96040088C676 /* UDConversionHistoryManagerTests.m */; };
 		9A717CA52F1D1D9F005A27B7 /* UDTape.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CA42F1D1D9F005A27B7 /* UDTape.m */; };
 		9A717CAB2F1D2085005A27B7 /* UDTapeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CAA2F1D2085005A27B7 /* UDTapeWindowController.m */; };
 		9A717CAF2F1D493A005A27B7 /* UDFrontend.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CAE2F1D493A005A27B7 /* UDFrontend.m */; };
@@ -82,6 +85,9 @@
 		9A5E28BC2F2E0481001A7618 /* UDValue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDValue.h; sourceTree = "<group>"; };
 		9A5E28BD2F2E76CE001A7618 /* UDValueFormatter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDValueFormatter.h; sourceTree = "<group>"; };
 		9A5E28BE2F2E76F2001A7618 /* UDValueFormatter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDValueFormatter.m; sourceTree = "<group>"; };
+		9A6666A72F4C36200088C676 /* UDUnitConverterTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDUnitConverterTests.m; sourceTree = "<group>"; };
+		9A6666AC2F4C5A5B0088C676 /* en.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = en.lproj; sourceTree = "<group>"; };
+		9A6666AE2F4C96040088C676 /* UDConversionHistoryManagerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDConversionHistoryManagerTests.m; sourceTree = "<group>"; };
 		9A717CA32F1D1D44005A27B7 /* UDTape.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDTape.h; sourceTree = "<group>"; };
 		9A717CA42F1D1D9F005A27B7 /* UDTape.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDTape.m; sourceTree = "<group>"; };
 		9A717CA92F1D2062005A27B7 /* UDTapeWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDTapeWindowController.h; sourceTree = "<group>"; };
@@ -165,6 +171,7 @@
 		9A7B94EB2F1BB18600ED7306 /* Calculator */ = {
 			isa = PBXGroup;
 			children = (
+				9A6666AC2F4C5A5B0088C676 /* en.lproj */,
 				9ADD9A112F487B1B00C2C65E /* ConversionWindow.xib */,
 				9ADD9A132F487B1B00C2C65E /* MainMenu.xib */,
 				9ADD9A122F487B1B00C2C65E /* UDCalcView.xib */,
@@ -225,6 +232,8 @@
 				9AA27CF52F3779C200C55FAE /* UDCompilerTests.m */,
 				9AA27CF82F377AA100C55FAE /* UDVMTests.m */,
 				9A3E0DFA2F438C6900EFEFD9 /* UDASTTests.m */,
+				9A6666A72F4C36200088C676 /* UDUnitConverterTests.m */,
+				9A6666AE2F4C96040088C676 /* UDConversionHistoryManagerTests.m */,
 			);
 			path = CalculatorTests;
 			sourceTree = "<group>";
@@ -310,6 +319,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9ADD9A182F487B1B00C2C65E /* UDTapeWindow.xib in Resources */,
+				9A6666AD2F4C5A5B0088C676 /* en.lproj in Resources */,
 				9A7B94F02F1BB18800ED7306 /* Assets.xcassets in Resources */,
 				9ADD9A162F487B1B00C2C65E /* UDCalcView.xib in Resources */,
 				9ADD9A152F487B1B00C2C65E /* ConversionWindow.xib in Resources */,
@@ -364,6 +374,7 @@
 				9AA27CF42F3760A600C55FAE /* UDConstants.m in Sources */,
 				9AC4C6192F27CAA900CD3AD4 /* UDCalcButton.m in Sources */,
 				9AC4C60B2F27CA7C00CD3AD4 /* AppDelegate.m in Sources */,
+				9A6666A82F4C36200088C676 /* UDUnitConverterTests.m in Sources */,
 				9AC4C6122F27CA9500CD3AD4 /* UDTapeWindowController.m in Sources */,
 				9AC4C6052F27CA3000CD3AD4 /* UDCalcTests.m in Sources */,
 				9AA27CF72F3779C200C55FAE /* UDCompilerTests.m in Sources */,
@@ -382,6 +393,7 @@
 				9AC4C60C2F27CA8300CD3AD4 /* UDCalc.m in Sources */,
 				9AC4C60F2F27CA8C00CD3AD4 /* UDConversionHistoryManager.m in Sources */,
 				9AC4C6162F27CAA000CD3AD4 /* UDCompiler.m in Sources */,
+				9A6666AF2F4C96040088C676 /* UDConversionHistoryManagerTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

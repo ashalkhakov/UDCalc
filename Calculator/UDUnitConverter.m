@@ -6,6 +6,7 @@
 //
 
 #import "UDUnitConverter.h"
+#import "UDConstants.h"
 
 @interface UDUnitConverter()
 @property (strong) NSDictionary<NSString *, NSArray<NSUnit *> *> *unitData;
@@ -25,72 +26,74 @@
     return [self.unitData.allKeys sortedArrayUsingSelector:@selector(compare:)];
 }
 
-- (NSArray<NSString *> *)unitNamesForCategory:(NSString *)category {
-    NSArray *units = self.unitData[category];
-    if (!units) return @[];
-    
-    NSMutableArray *names = [NSMutableArray array];
-    NSMeasurementFormatter *fmt = [[NSMeasurementFormatter alloc] init];
-    fmt.unitOptions = NSMeasurementFormatterUnitOptionsProvidedUnit;
-    
-    for (NSUnit *u in units) {
-        [names addObject:[fmt stringFromUnit:u]];
-    }
-    return names;
+- (NSArray<NSUnit *> *)unitsForCategory:(NSString *)category {
+    return _unitData[category] ?: @[];
 }
 
-- (double)convertValue:(double)value category:(NSString *)category fromUnit:(NSString *)fromName toUnit:(NSString *)toName {
-    NSArray *units = self.unitData[category];
-    if (!units) return value;
-    
+- (NSString *)localizedNameForCategory:(NSString *)categoryKey {
+    return NSLocalizedString(categoryKey, @"Unit conversion category");
+}
+
+- (NSString *)localizedNameForUnit:(NSUnit *)unit {
     NSMeasurementFormatter *fmt = [[NSMeasurementFormatter alloc] init];
+    // This ensures we get the full name (e.g. "meters") instead of just "m"
     fmt.unitOptions = NSMeasurementFormatterUnitOptionsProvidedUnit;
+    return [fmt stringFromUnit:unit];
+}
+
+- (NSUnit *)unitForSymbol:(NSString *)symbol ofCategory:(NSString *)category {
+    NSArray<NSUnit *> *units = self.unitData[category];
+    if (!units) return nil;
     
-    NSUnit *fromUnit = nil;
-    NSUnit *toUnit = nil;
-    
-    // Find the NSUnit objects matching the names
-    for (NSUnit *u in units) {
-        NSString *name = [fmt stringFromUnit:u];
-        if ([name isEqualToString:fromName]) fromUnit = u;
-        if ([name isEqualToString:toName]) toUnit = u;
+    for (NSInteger i = 0; i < units.count; i++) {
+        NSUnit *u = units[i];
+
+        if ([u.symbol isEqualToString:symbol]) {
+            return u;
+        }
     }
-    
-    if (fromUnit && toUnit) {
+
+    return nil;
+}
+
+- (NSString *)symbolForUnit:(NSUnit *)unit {
+    return unit.symbol;
+}
+
+- (double)convertValue:(double)value fromUnit:(NSUnit *)fromUnit toUnit:(NSUnit *)toUnit {
+    if (!fromUnit || !toUnit) return value;
+
 #ifdef GNUSTEP
-        // GNUstep's NSMeasurement.measurementByConvertingToUnit: is broken
-        // (calls -converter on NSUnit which only exists on NSDimension).
-        // Use NSDimension's converter directly instead.
-        if ([fromUnit isKindOfClass:[NSDimension class]] && [toUnit isKindOfClass:[NSDimension class]]) {
-            NSUnitConverter *fromConv = [(NSDimension *)fromUnit converter];
-            NSUnitConverter *toConv   = [(NSDimension *)toUnit converter];
-            double baseValue = [fromConv baseUnitValueFromValue:value];
-            return [toConv valueFromBaseUnitValue:baseValue];
-        }
-#else
-        NSMeasurement *measurement = [[NSMeasurement alloc] initWithDoubleValue:value unit:fromUnit];
-        if ([measurement canBeConvertedToUnit:toUnit]) {
-            NSMeasurement *result = [measurement measurementByConvertingToUnit:toUnit];
-            return result.doubleValue;
-        }
-#endif
+    // Fix for GNUstep: NSMeasurement conversion is currently limited.
+    // We manually use the NSDimension converters.
+    if ([fromUnit isKindOfClass:[NSDimension class]] && [toUnit isKindOfClass:[NSDimension class]]) {
+        NSUnitConverter *fromConv = [(NSDimension *)fromUnit converter];
+        NSUnitConverter *toConv   = [(NSDimension *)toUnit converter];
+        double baseValue = [fromConv baseUnitValueFromValue:value];
+        return [toConv valueFromBaseUnitValue:baseValue];
     }
-    
+#else
+    // Standard Apple Cocoa path
+    NSMeasurement *measurement = [[NSMeasurement alloc] initWithDoubleValue:value unit:fromUnit];
+    if ([measurement canBeConvertedToUnit:toUnit]) {
+        return [measurement measurementByConvertingToUnit:toUnit].doubleValue;
+    }
+#endif
     return value;
 }
 
 - (void)setupUnits {
     // Populate with all standard Apple NSUnit types
     self.unitData = @{
-        @"Length" : @[
+        UDConstLength : @[
             [NSUnitLength meters], [NSUnitLength kilometers], [NSUnitLength centimeters],
             [NSUnitLength feet], [NSUnitLength inches], [NSUnitLength miles], [NSUnitLength yards]
         ],
-        @"Area" : @[
+        UDConstArea : @[
             [NSUnitArea squareMeters], [NSUnitArea squareKilometers], [NSUnitArea squareFeet],
             [NSUnitArea squareMiles], [NSUnitArea acres], [NSUnitArea hectares]
         ],
-        @"Mass" : @[
+        UDConstMass : @[
             [NSUnitMass kilograms], [NSUnitMass grams],
 #ifdef GNUSTEP
             [NSUnitMass pounds],
@@ -99,28 +102,28 @@
 #endif
             [NSUnitMass ounces], [NSUnitMass stones]
         ],
-        @"Temperature" : @[
+        UDConstTemperature : @[
             [NSUnitTemperature celsius], [NSUnitTemperature fahrenheit], [NSUnitTemperature kelvin]
         ],
-        @"Speed" : @[
+        UDConstSpeed : @[
             [NSUnitSpeed metersPerSecond], [NSUnitSpeed kilometersPerHour],
             [NSUnitSpeed milesPerHour], [NSUnitSpeed knots]
         ],
-        @"Energy" : @[
+        UDConstEnergy : @[
             [NSUnitEnergy joules], [NSUnitEnergy kilojoules], [NSUnitEnergy calories], [NSUnitEnergy kilocalories]
         ],
-        @"Pressure" : @[
+        UDConstPressure : @[
             [NSUnitPressure newtonsPerMetersSquared], [NSUnitPressure bars], [NSUnitPressure millimetersOfMercury],
             [NSUnitPressure poundsForcePerSquareInch]
         ],
-        @"Volume" : @[
+        UDConstVolume : @[
             [NSUnitVolume liters], [NSUnitVolume milliliters], [NSUnitVolume cubicMeters],
             [NSUnitVolume gallons], [NSUnitVolume cups], [NSUnitVolume pints]
         ],
-        @"Power" : @[
+        UDConstPower : @[
             [NSUnitPower watts], [NSUnitPower kilowatts], [NSUnitPower horsepower]
         ],
-        @"Time" : @[
+        UDConstTime : @[
             [NSUnitDuration seconds], [NSUnitDuration minutes], [NSUnitDuration hours]
         ]
     };

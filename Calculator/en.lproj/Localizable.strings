@@ -1,0 +1,17 @@
+/* 
+  Localizable.strings
+  Calculator
+
+  Created by Artyom Shalkhakov on 23.02.2026.
+  
+*/
+"Length" = "Length";
+"Area" = "Area";
+"Mass" = "Mass";
+"Temperature" = "Temperature";
+"Speed" = "Speed";
+"Energy" = "Energy";
+"Pressure" = "Pressure";
+"Volume" = "Volume";
+"Power" = "Power";
+"Time" = "Time";

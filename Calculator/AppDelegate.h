@@ -23,6 +23,7 @@
 @property (nonatomic, strong) UDTapeWindowController *tapeWindowController;
 @property (nonatomic, strong) UDCalcViewController *calcViewController;
 
+@property (nonatomic, weak) IBOutlet NSMenu *convertMenu;
 @property (nonatomic, weak) IBOutlet NSMenu *recentMenu;
 
 - (IBAction)conversionMenuClicked:(NSMenuItem *)sender;
