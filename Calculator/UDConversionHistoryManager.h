@@ -6,14 +6,19 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "UDUnitConverter.h"
 
 @interface UDConversionHistoryManager : NSObject
+
+@property (nonatomic, strong) UDUnitConverter *unitConverter;
 
 /**
  Returns the current list of conversion dictionaries.
  format: @{ @"cat":..., @"from":..., @"to":... }
  */
 @property (nonatomic, readonly) NSArray<NSDictionary *> *history;
+
+- (instancetype)initWithDefaults:(NSUserDefaults *)defaults converter:(UDUnitConverter *)converter;
 
 /**
  Adds a conversion to the top of the history.

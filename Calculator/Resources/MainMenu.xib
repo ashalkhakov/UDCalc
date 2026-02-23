@@ -15,6 +15,7 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
+                <outlet property="convertMenu" destination="GEO-Iw-cKr" id="8Qd-S1-KVa"/>
                 <outlet property="recentMenu" destination="aXa-aM-Jaq" id="55J-1a-QDd"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="l2l-L2-C5x"/>
             </connections>
@@ -311,66 +312,6 @@
                             <menuItem title="Recent Conversions..." id="Gi5-1S-RQB">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Recent Conversions..." systemMenu="font" id="aXa-aM-Jaq"/>
-                            </menuItem>
-                            <menuItem title="Area..." identifier="convArea" id="ZM1-6Q-yy1">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="conversionMenuClicked:" target="-1" id="hrm-HF-WNr"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Energy or Work..." identifier="convEnergy" id="VIY-Ag-zcb">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="conversionMenuClicked:" target="-1" id="dZq-uN-Qkz"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Length..." identifier="convLength" id="J5U-5w-g23">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="conversionMenuClicked:" target="-1" id="Uou-rB-9a0"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Power..." identifier="convPower" id="wb2-vD-lq4">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="conversionMenuClicked:" target="-1" id="ofX-q5-sZ3"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Pressure..." identifier="convPressure" id="H1b-Si-o9J">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="conversionMenuClicked:" target="-1" id="XAG-4T-g9O"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Speed..." identifier="convSpeed" id="vLm-3I-IUL">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="conversionMenuClicked:" target="-1" id="iHC-Qj-hhD"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Temperature..." identifier="convTemperature" id="MkV-Pr-PK5">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="conversionMenuClicked:" target="-1" id="cWW-yY-9F2"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Time..." identifier="convTime" id="LVM-kO-fVI">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="conversionMenuClicked:" target="-1" id="IMf-v2-EPw"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Volume..." identifier="convVolume" id="Fal-I4-PZk">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="conversionMenuClicked:" target="-1" id="9uY-ns-gCu"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Weights and Masses..." identifier="convMass" id="LVe-uD-Xp5">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="conversionMenuClicked:" target="-1" id="Ecb-rw-hpT"/>
-                                </connections>
                             </menuItem>
                         </items>
                     </menu>

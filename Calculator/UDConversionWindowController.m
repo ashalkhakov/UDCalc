@@ -6,6 +6,7 @@
 //
 
 #import "UDConversionWindowController.h"
+#import "UDConstants.h"
 
 NSString * const UDUnitConverterDidConvertNotification = @"org.underivable.calculator.UDUnitConverterDidConvertNotification";
 NSString * const UDUnitConverterCategoryKey = @"UDUnitConverterCategoryKey";
@@ -20,29 +21,45 @@ NSString * const UDUnitConverterResultKey = @"UDUnitConverterResultKey";
 @property (weak) IBOutlet NSComboBox *fromBox;
 @property (weak) IBOutlet NSComboBox *toBox;
 
-// Data Source: Dictionary where Key = Category Name, Value = Array of NSUnit objects
-@property (strong) NSDictionary<NSString *, NSArray<NSUnit *> *> *unitData;
-@property (strong) NSArray<NSUnit *> *currentUnits;
-
 @end
 
-@implementation UDConversionWindowController
+@implementation UDConversionWindowController {
+    NSArray<NSUnit *> *_currentUnits; // Shadow array to track objects by index
+}
 
 - (void)windowDidLoad {
     [super windowDidLoad];
     
-    // 1. Use the Converter to populate categories
+    // Initial UI Population
     [self.typeBox removeAllItems];
-    [self.typeBox addItemsWithObjectValues:[self.converter availableCategories]];
+
+    NSArray *internalKeys = [self.converter availableCategories];
+    
+    NSMutableArray *localizedCategories = [NSMutableArray array];
+    for (NSString *key in internalKeys) {
+        [localizedCategories addObject:[self.converter localizedNameForCategory:key]];
+    }
+    
+    [self.typeBox addItemsWithObjectValues:localizedCategories];
+
     [self.typeBox selectItemAtIndex:0];
     [self typeChanged:self.typeBox];
 }
 
 - (IBAction)typeChanged:(NSComboBox *)sender {
-    NSString *category = sender.stringValue;
+    NSInteger selectedIdx = [sender indexOfSelectedItem];
+    if (selectedIdx == -1) return;
+    
+    NSString *internalKey = [self.converter availableCategories][selectedIdx];
 
-    // 2. Use the Converter to get units
-    NSArray *names = [self.converter unitNamesForCategory:category];
+    // 1. Fetch raw objects from the model
+    _currentUnits = [self.converter unitsForCategory:internalKey];
+    
+    // 2. Generate display strings for the UI
+    NSMutableArray *names = [NSMutableArray array];
+    for (NSUnit *u in _currentUnits) {
+        [names addObject:[self.converter localizedNameForUnit:u]];
+    }
     
     [self.fromBox removeAllItems];
     [self.toBox removeAllItems];
@@ -53,33 +70,6 @@ NSString * const UDUnitConverterResultKey = @"UDUnitConverterResultKey";
         [self.fromBox selectItemAtIndex:0];
         if (names.count > 1) [self.toBox selectItemAtIndex:1];
     }
-}
-
-- (IBAction)convertPressed:(id)sender {
-    NSString *cat = self.typeBox.stringValue;
-    NSString *from = self.fromBox.stringValue;
-    NSString *to = self.toBox.stringValue;
-    double input = UDValueAsDouble(self.calc.currentInputValue);
-    
-    // 3. Perform conversion via the Converter object
-    double result = [self.converter convertValue:input
-                                        category:cat
-                                        fromUnit:from
-                                          toUnit:to];
-    
-    NSDictionary *userInfo = @{
-        UDUnitConverterCategoryKey: cat,
-        UDUnitConverterFromUnitKey: from,
-        UDUnitConverterToUnitKey: to,
-        UDUnitConverterInputKey: @(input),
-        UDUnitConverterResultKey: @(result)
-    };
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:UDUnitConverterDidConvertNotification
-                                                        object:self
-                                                      userInfo:userInfo];
-
-    [self.window close];
 }
 
 - (void)selectCategory:(NSString *)categoryName {
@@ -93,6 +83,38 @@ NSString * const UDUnitConverterResultKey = @"UDUnitConverterResultKey";
     
     // Trigger the update logic manually so the Unit boxes refresh
     [self typeChanged:self.typeBox];
+}
+
+- (IBAction)convertPressed:(id)sender {
+    // Use Index-based lookup to remain language-agnostic
+    NSInteger fromIdx = [self.fromBox indexOfSelectedItem];
+    NSInteger toIdx = [self.toBox indexOfSelectedItem];
+    
+    if (fromIdx == -1 || toIdx == -1) return;
+
+    // Retrieve objects from shadow array
+    NSUnit *fromUnit = _currentUnits[fromIdx];
+    NSUnit *toUnit = _currentUnits[toIdx];
+    
+    double input = UDValueAsDouble(self.calc.currentInputValue);
+
+    // Convert using objects
+    double result = [self.converter convertValue:input
+                                        fromUnit:fromUnit
+                                          toUnit:toUnit];
+
+    NSDictionary *userInfo = @{
+        UDUnitConverterCategoryKey: self.typeBox.objectValue,
+        UDUnitConverterFromUnitKey: fromUnit,
+        UDUnitConverterToUnitKey: toUnit,
+        UDUnitConverterInputKey: @(input),
+        UDUnitConverterResultKey: @(result)
+    };
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:UDUnitConverterDidConvertNotification
+                                                        object:self
+                                                      userInfo:userInfo];
+    [self.window close];
 }
 
 - (IBAction)cancelPressed:(id)sender {

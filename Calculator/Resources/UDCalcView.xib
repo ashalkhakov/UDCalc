@@ -14,7 +14,6 @@
                 <outlet property="basicOrProgrammerTabView" destination="RaS-hH-kkg" id="2Cp-pG-rPv"/>
                 <outlet property="bitDisplayView" destination="ocr-3f-wD7" id="Pkr-ci-t8F"/>
                 <outlet property="bitDisplayWrapperView" destination="XCR-QC-knV" id="nKt-qp-HVc"/>
-                <outlet property="bitWrapperHeightConstraint" destination="DWU-Os-cjQ" id="3Wa-bP-qat"/>
                 <outlet property="charLabel" destination="uBC-6e-c6g" id="iYC-p3-ffq"/>
                 <outlet property="charLabelRPN" destination="Eqi-fi-emF" id="j6Q-a5-ecB"/>
                 <outlet property="cosButton" destination="oCw-6H-Wbo" id="8XK-aI-EWt"/>
@@ -24,7 +23,6 @@
                 <outlet property="encodingSegmentedControl" destination="g9X-GB-cFN" id="HCE-mM-3N0"/>
                 <outlet property="equalsButton" destination="ZsI-G8-7Lm" id="fpk-nb-myA"/>
                 <outlet property="expButton" destination="xSX-QO-2eZ" id="VRj-j4-Jdr"/>
-                <outlet property="keypadHeightConstraint" destination="rAx-3U-k0u" id="zUB-Kb-sCM"/>
                 <outlet property="lnButton" destination="5ur-nj-HL3" id="LhJ-af-PiJ"/>
                 <outlet property="log10Button" destination="tbe-yY-gLY" id="8K3-ND-uP0"/>
                 <outlet property="p8Button" destination="0FW-Wm-ujL" id="3KP-gV-PXg"/>
@@ -34,21 +32,21 @@
                 <outlet property="pCButton" destination="e3z-MI-i8Z" id="a69-2p-Cxp"/>
                 <outlet property="pDButton" destination="TZx-oZ-CoT" id="dsn-F7-ZKA"/>
                 <outlet property="pEButton" destination="QCA-I9-MHk" id="8wO-z4-THy"/>
+                <outlet property="pEqualsButton" destination="WOo-ca-Ngh" id="XDr-ut-fw3"/>
                 <outlet property="pFButton" destination="Jjp-wb-va4" id="T2o-7H-eza"/>
                 <outlet property="pFFButton" destination="oV5-jO-b1v" id="SVE-AI-wom"/>
                 <outlet property="parenLeftButton" destination="9mo-FQ-0yq" id="3ib-yb-EbW"/>
                 <outlet property="parenRightButton" destination="Vu2-5F-MUF" id="wUY-FG-ZSa"/>
                 <outlet property="programmerGridView" destination="jL4-l5-bBF" id="yve-qe-b8v"/>
-                <outlet property="programmerInputHeightConstraint" destination="X4h-AC-Pq1" id="OHO-EO-vYE"/>
                 <outlet property="programmerInputView" destination="Edd-dC-mYj" id="dga-ie-NbR"/>
                 <outlet property="radDegButton" destination="lkn-C6-ADf" id="qhd-qF-B61"/>
                 <outlet property="radLabel" destination="SMT-VF-0Db" id="eZ2-ez-YSW"/>
                 <outlet property="radLabelRPN" destination="z5b-h6-iaY" id="6hD-uT-NQB"/>
                 <outlet property="scientificView" destination="bFY-1e-YAa" id="Gib-eH-Ajx"/>
-                <outlet property="scientificWidthConstraint" destination="wOx-WE-dTm" id="ma0-Qm-kIJ"/>
                 <outlet property="showBinaryViewButton" destination="jHm-XK-1ab" id="BjB-bk-bea"/>
                 <outlet property="sinButton" destination="cjE-Zz-bqi" id="ZWC-GR-SEo"/>
                 <outlet property="sinhButton" destination="XkM-5E-LSk" id="siI-li-TlZ"/>
+                <outlet property="stackButtonsView" destination="YJh-qu-GYm" id="CPs-3O-yHC"/>
                 <outlet property="stackTableView" destination="bHB-yu-49O" id="232-ib-x0W"/>
                 <outlet property="tanButton" destination="2rM-Je-Fgr" id="bie-Ro-7sa"/>
                 <outlet property="tanhButton" destination="Ko4-tz-nHH" id="6XD-1U-K8v"/>
@@ -62,8 +60,9 @@
             <rect key="frame" x="0.0" y="0.0" width="609" height="416"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <tabView type="noTabsNoBorder" translatesAutoresizingMaskIntoConstraints="NO" id="uKU-TP-rML">
+                <tabView type="noTabsNoBorder" id="uKU-TP-rML">
                     <rect key="frame" x="1" y="354" width="607" height="61"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <font key="font" metaFont="system"/>
                     <tabViewItems>
                         <tabViewItem label="Standard" identifier="" id="a84-Rr-Hz9">
@@ -71,53 +70,47 @@
                                 <rect key="frame" x="0.0" y="0.0" width="607" height="61"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
-                                    <textField identifier="display" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dJx-PN-gbn">
+                                    <textField identifier="display" focusRingType="none" verticalHuggingPriority="750" id="dJx-PN-gbn">
                                         <rect key="frame" x="0.0" y="0.0" width="607" height="61"/>
-                                        <textFieldCell key="cell" controlSize="large" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" drawsBackground="YES" usesSingleLineMode="YES" id="DIk-ym-U6A">
-                                            <font key="font" metaFont="systemLight" size="52"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" drawsBackground="YES" usesSingleLineMode="YES" id="DIk-ym-U6A">
+                                            <font key="font" metaFont="system" size="52"/>
                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SMT-VF-0Db">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="SMT-VF-0Db">
                                         <rect key="frame" x="4" y="6" width="28" height="16"/>
-                                        <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Rad" id="g1e-kR-e2q">
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Rad" id="g1e-kR-e2q">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uBC-6e-c6g">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="uBC-6e-c6g">
                                         <rect key="frame" x="4" y="6" width="28" height="16"/>
-                                        <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Char" id="GY9-Gw-9Wf">
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Char" id="GY9-Gw-9Wf">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
                                 </subviews>
-                                <constraints>
-                                    <constraint firstItem="uBC-6e-c6g" firstAttribute="bottom" secondItem="dJx-PN-gbn" secondAttribute="bottom" constant="-6" id="95E-uQ-j8U"/>
-                                    <constraint firstItem="uBC-6e-c6g" firstAttribute="leading" secondItem="dJx-PN-gbn" secondAttribute="leading" constant="6" id="HkC-fe-Wf7"/>
-                                    <constraint firstItem="SMT-VF-0Db" firstAttribute="leading" secondItem="dJx-PN-gbn" secondAttribute="leading" constant="6" id="Mnc-VI-tA8"/>
-                                    <constraint firstItem="dJx-PN-gbn" firstAttribute="top" secondItem="FPS-Kl-RQk" secondAttribute="top" id="U9U-9m-t8a"/>
-                                    <constraint firstItem="SMT-VF-0Db" firstAttribute="bottom" secondItem="dJx-PN-gbn" secondAttribute="bottom" constant="-6" id="b4b-IY-4Pe"/>
-                                    <constraint firstItem="dJx-PN-gbn" firstAttribute="leading" secondItem="FPS-Kl-RQk" secondAttribute="leading" id="b7d-fA-oqj"/>
-                                    <constraint firstAttribute="bottom" secondItem="dJx-PN-gbn" secondAttribute="bottom" id="bH9-B3-idx"/>
-                                    <constraint firstAttribute="trailing" secondItem="dJx-PN-gbn" secondAttribute="trailing" id="vr6-Kd-8xZ"/>
-                                </constraints>
                             </view>
                         </tabViewItem>
                         <tabViewItem label="RPN" identifier="" id="2e7-9g-ahd">
                             <view key="view" id="e9A-Iv-sGG">
-                                <rect key="frame" x="0.0" y="0.0" width="790" height="103"/>
+                                <rect key="frame" x="0.0" y="0.0" width="607" height="61"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
-                                    <scrollView autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="79k-fR-WS1">
-                                        <rect key="frame" x="0.0" y="0.0" width="550" height="103"/>
+                                    <scrollView autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="79k-fR-WS1">
+                                        <rect key="frame" x="0.0" y="-42" width="550" height="103"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <clipView key="contentView" id="vhC-Uf-t0j">
                                             <rect key="frame" x="1" y="1" width="548" height="101"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="24" rowSizeStyle="automatic" viewBased="YES" id="bHB-yu-49O">
                                                     <rect key="frame" x="0.0" y="0.0" width="548" height="101"/>
@@ -139,11 +132,12 @@
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
                                                                 <tableCellView id="25A-dm-cLc">
-                                                                    <rect key="frame" x="18" y="0.0" width="531" height="24"/>
+                                                                    <rect key="frame" x="8" y="0.0" width="531" height="24"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
-                                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="OmS-tm-vRr">
+                                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" id="OmS-tm-vRr">
                                                                             <rect key="frame" x="0.0" y="0.0" width="531" height="24"/>
+                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="12e-1a-RDN">
                                                                                 <font key="font" metaFont="system" size="20"/>
                                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -151,11 +145,6 @@
                                                                             </textFieldCell>
                                                                         </textField>
                                                                     </subviews>
-                                                                    <constraints>
-                                                                        <constraint firstItem="OmS-tm-vRr" firstAttribute="centerX" secondItem="25A-dm-cLc" secondAttribute="centerX" id="MIG-ml-N0a"/>
-                                                                        <constraint firstItem="OmS-tm-vRr" firstAttribute="centerY" secondItem="25A-dm-cLc" secondAttribute="centerY" id="Msq-yB-WDj"/>
-                                                                        <constraint firstItem="OmS-tm-vRr" firstAttribute="leading" secondItem="25A-dm-cLc" secondAttribute="leading" constant="2" id="RlH-RE-VSG"/>
-                                                                    </constraints>
                                                                     <connections>
                                                                         <outlet property="textField" destination="OmS-tm-vRr" id="z0W-Jm-vEt"/>
                                                                     </connections>
@@ -179,32 +168,32 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                     </scrollView>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="z5b-h6-iaY">
-                                        <rect key="frame" x="4" y="6" width="28" height="16"/>
-                                        <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Rad" id="jfR-qh-i6s">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="z5b-h6-iaY">
+                                        <rect key="frame" x="4" y="-36" width="28" height="16"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Rad" id="jfR-qh-i6s">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Eqi-fi-emF">
-                                        <rect key="frame" x="4" y="6" width="33" height="16"/>
-                                        <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Char" id="tTI-gO-jFw">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Eqi-fi-emF">
+                                        <rect key="frame" x="4" y="-36" width="33" height="16"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="Char" id="tTI-gO-jFw">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="1" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YJh-qu-GYm">
-                                        <rect key="frame" x="550" y="0.0" width="240" height="103"/>
+                                    <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="1" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" id="YJh-qu-GYm">
+                                        <rect key="frame" x="550" y="-42" width="240" height="103"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <subviews>
-                                            <button identifier="swap" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Hx5-6J-Uy1" customClass="UDCalcButton">
+                                            <button identifier="swap" verticalHuggingPriority="750" tag="92" id="Hx5-6J-Uy1" customClass="UDCalcButton">
                                                 <rect key="frame" x="0.0" y="78" width="60" height="25"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="60" id="QrX-y8-wY0"/>
-                                                    <constraint firstAttribute="height" constant="25" id="YFP-gv-yZr"/>
-                                                </constraints>
-                                                <buttonCell key="cell" type="square" title="x↔y" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="N11-3f-F8C">
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <buttonCell key="cell" type="square" title="x↔y" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" tag="92" imageScaling="proportionallyDown" inset="2" id="N11-3f-F8C">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
@@ -212,13 +201,10 @@
                                                     <action selector="operationPressed:" target="-2" id="aN9-S6-GN1"/>
                                                 </connections>
                                             </button>
-                                            <button identifier="rolldown" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="r6N-wb-toc" customClass="UDCalcButton">
+                                            <button identifier="rolldown" verticalHuggingPriority="750" tag="94" id="r6N-wb-toc" customClass="UDCalcButton">
                                                 <rect key="frame" x="0.0" y="52" width="60" height="25"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="60" id="9l9-Vi-9wZ"/>
-                                                    <constraint firstAttribute="height" constant="25" id="Jiq-oJ-xgm"/>
-                                                </constraints>
-                                                <buttonCell key="cell" type="square" title="R↓" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="H4A-nn-mgv">
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <buttonCell key="cell" type="square" title="R↓" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" tag="94" imageScaling="proportionallyDown" inset="2" id="H4A-nn-mgv">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
@@ -226,13 +212,10 @@
                                                     <action selector="operationPressed:" target="-2" id="OSU-5y-uq9"/>
                                                 </connections>
                                             </button>
-                                            <button identifier="rollup" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="H7M-Pz-sjK" customClass="UDCalcButton">
+                                            <button identifier="rollup" verticalHuggingPriority="750" tag="95" id="H7M-Pz-sjK" customClass="UDCalcButton">
                                                 <rect key="frame" x="0.0" y="26" width="60" height="25"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="25" id="LZf-A2-ht7"/>
-                                                    <constraint firstAttribute="width" constant="60" id="Wl8-Qp-kNg"/>
-                                                </constraints>
-                                                <buttonCell key="cell" type="square" title="R↑" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OFT-Ut-TsU">
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <buttonCell key="cell" type="square" title="R↑" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" tag="95" imageScaling="proportionallyDown" inset="2" id="OFT-Ut-TsU">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
@@ -240,13 +223,10 @@
                                                     <action selector="operationPressed:" target="-2" id="0p0-Eo-MpX"/>
                                                 </connections>
                                             </button>
-                                            <button identifier="drop" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MzR-LY-7Gd" customClass="UDCalcButton">
+                                            <button identifier="drop" verticalHuggingPriority="750" tag="93" id="MzR-LY-7Gd" customClass="UDCalcButton">
                                                 <rect key="frame" x="0.0" y="0.0" width="60" height="25"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="25" id="dil-uI-98L"/>
-                                                    <constraint firstAttribute="width" constant="60" id="erR-ST-215"/>
-                                                </constraints>
-                                                <buttonCell key="cell" type="square" title="drop" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yoH-oK-liW">
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                <buttonCell key="cell" type="square" title="drop" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" tag="93" imageScaling="proportionallyDown" inset="2" id="yoH-oK-liW">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
@@ -269,32 +249,22 @@
                                         </customSpacing>
                                     </stackView>
                                 </subviews>
-                                <constraints>
-                                    <constraint firstItem="79k-fR-WS1" firstAttribute="leading" secondItem="e9A-Iv-sGG" secondAttribute="leading" id="0me-wI-T4I"/>
-                                    <constraint firstItem="z5b-h6-iaY" firstAttribute="bottom" secondItem="79k-fR-WS1" secondAttribute="bottom" constant="-6" id="4BE-Rp-DKu"/>
-                                    <constraint firstItem="YJh-qu-GYm" firstAttribute="top" secondItem="e9A-Iv-sGG" secondAttribute="top" id="7dg-D7-Awt"/>
-                                    <constraint firstAttribute="bottom" secondItem="YJh-qu-GYm" secondAttribute="bottom" id="8Jd-tG-U8Y"/>
-                                    <constraint firstItem="YJh-qu-GYm" firstAttribute="leading" secondItem="79k-fR-WS1" secondAttribute="trailing" id="NAZ-PE-bKv"/>
-                                    <constraint firstAttribute="trailing" secondItem="YJh-qu-GYm" secondAttribute="trailing" id="YEA-JT-sP3"/>
-                                    <constraint firstItem="79k-fR-WS1" firstAttribute="top" secondItem="e9A-Iv-sGG" secondAttribute="top" id="eFV-9H-nC8"/>
-                                    <constraint firstAttribute="bottom" secondItem="79k-fR-WS1" secondAttribute="bottom" id="lM8-1O-uSb"/>
-                                    <constraint firstItem="z5b-h6-iaY" firstAttribute="leading" secondItem="79k-fR-WS1" secondAttribute="leading" constant="6" id="liH-R0-Xno"/>
-                                    <constraint firstItem="Eqi-fi-emF" firstAttribute="leading" secondItem="79k-fR-WS1" secondAttribute="leading" constant="6" id="o3l-Nb-Cdm"/>
-                                    <constraint firstItem="Eqi-fi-emF" firstAttribute="bottom" secondItem="79k-fR-WS1" secondAttribute="bottom" constant="-6" id="tBG-Wt-tIz"/>
-                                </constraints>
                             </view>
                         </tabViewItem>
                     </tabViewItems>
                 </tabView>
-                <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="750" horizontalClippingResistancePriority="250" verticalClippingResistancePriority="100" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="100" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Edd-dC-mYj">
+                <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="750" horizontalClippingResistancePriority="250" verticalClippingResistancePriority="100" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="100" detachesHiddenViews="YES" id="Edd-dC-mYj">
                     <rect key="frame" x="0.0" y="255" width="609" height="98"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <subviews>
-                        <stackView distribution="equalCentering" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalClippingResistancePriority="250" verticalClippingResistancePriority="250" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XdZ-aa-uKh">
+                        <stackView distribution="equalCentering" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalClippingResistancePriority="250" verticalClippingResistancePriority="250" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" detachesHiddenViews="YES" id="XdZ-aa-uKh">
                             <rect key="frame" x="0.0" y="68" width="609" height="30"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <subviews>
-                                <segmentedControl identifier="encoding" horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="g9X-GB-cFN">
+                                <segmentedControl identifier="encoding" horizontalHuggingPriority="249" verticalHuggingPriority="750" id="g9X-GB-cFN">
                                     <rect key="frame" x="5" y="4" width="301" height="21"/>
-                                    <segmentedCell key="cell" controlSize="small" borderStyle="border" alignment="left" style="rounded" trackingMode="selectAny" id="kAk-AN-FFS">
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <segmentedCell key="cell" controlSize="small" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="kAk-AN-FFS">
                                         <font key="font" metaFont="smallSystem"/>
                                         <segments>
                                             <segment label="ASCII" width="64"/>
@@ -305,8 +275,9 @@
                                         <action selector="encodingSelected:" target="-2" id="qCl-ga-N1i"/>
                                     </connections>
                                 </segmentedControl>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jHm-XK-1ab">
+                                <button verticalHuggingPriority="750" id="jHm-XK-1ab">
                                     <rect key="frame" x="305" y="0.0" width="94" height="27"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="push" title="Hide Binary" alternateTitle="Show Binary" bezelStyle="rounded" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="P6g-ZH-BGV">
                                         <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="smallSystem"/>
@@ -315,8 +286,9 @@
                                         <action selector="showBinaryPressed:" target="-2" id="Hdl-mc-vD0"/>
                                     </connections>
                                 </button>
-                                <segmentedControl identifier="inputBase" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sme-38-1cA">
+                                <segmentedControl identifier="inputBase" verticalHuggingPriority="750" id="sme-38-1cA">
                                     <rect key="frame" x="495" y="4" width="108" height="21"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <segmentedCell key="cell" controlSize="small" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="xsr-7T-aU7">
                                         <font key="font" metaFont="smallSystem"/>
                                         <segments>
@@ -342,27 +314,17 @@
                                 <real value="3.4028234663852886e+38"/>
                             </customSpacing>
                         </stackView>
-                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="XCR-QC-knV">
+                        <customView id="XCR-QC-knV">
                             <rect key="frame" x="0.0" y="0.0" width="792" height="60"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <subviews>
-                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="ocr-3f-wD7" customClass="UDBitDisplayView">
+                                <customView id="ocr-3f-wD7" customClass="UDBitDisplayView">
                                     <rect key="frame" x="0.0" y="0.0" width="792" height="60"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="60" id="DWU-Os-cjQ"/>
-                                    </constraints>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 </customView>
                             </subviews>
-                            <constraints>
-                                <constraint firstAttribute="bottom" secondItem="ocr-3f-wD7" secondAttribute="bottom" id="BEC-KW-w6n"/>
-                                <constraint firstItem="ocr-3f-wD7" firstAttribute="top" secondItem="XCR-QC-knV" secondAttribute="top" id="Mmc-KP-z6s"/>
-                                <constraint firstAttribute="trailing" secondItem="ocr-3f-wD7" secondAttribute="trailing" id="kQH-gN-ILh"/>
-                                <constraint firstItem="ocr-3f-wD7" firstAttribute="leading" secondItem="XCR-QC-knV" secondAttribute="leading" id="rec-yV-ncj"/>
-                            </constraints>
                         </customView>
                     </subviews>
-                    <constraints>
-                        <constraint firstAttribute="height" priority="750" constant="98" id="X4h-AC-Pq1"/>
-                    </constraints>
                     <visibilityPriorities>
                         <real value="750"/>
                         <integer value="1000"/>
@@ -372,11 +334,13 @@
                         <real value="3.4028234663852886e+38"/>
                     </customSpacing>
                 </stackView>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="bFY-1e-YAa">
+                <customView id="bFY-1e-YAa">
                     <rect key="frame" x="0.0" y="0.0" width="365" height="255"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <subviews>
-                        <gridView horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="100" xPlacement="fill" yPlacement="fill" rowAlignment="none" rowSpacing="1" columnSpacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="H0K-Mh-s5Y">
+                        <gridView horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="100" xPlacement="fill" yPlacement="fill" rowAlignment="none" rowSpacing="1" columnSpacing="1" id="H0K-Mh-s5Y">
                             <rect key="frame" x="-1" y="0.0" width="365" height="255"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <rows>
                                 <gridRow height="50" id="E21-hO-xMT"/>
                                 <gridRow height="50" id="5C6-84-KEb"/>
@@ -830,18 +794,10 @@
                             </gridCells>
                         </gridView>
                     </subviews>
-                    <constraints>
-                        <constraint firstAttribute="trailing" secondItem="H0K-Mh-s5Y" secondAttribute="trailing" constant="1" id="J2E-GV-VJ4"/>
-                        <constraint firstAttribute="bottom" secondItem="H0K-Mh-s5Y" secondAttribute="bottom" id="Rn1-V8-PJ3"/>
-                        <constraint firstItem="H0K-Mh-s5Y" firstAttribute="top" secondItem="bFY-1e-YAa" secondAttribute="top" id="fWp-fi-K0g"/>
-                        <constraint firstAttribute="width" constant="365" id="wOx-WE-dTm"/>
-                    </constraints>
                 </customView>
-                <tabView horizontalHuggingPriority="750" verticalHuggingPriority="750" type="noTabsNoBorder" translatesAutoresizingMaskIntoConstraints="NO" id="RaS-hH-kkg">
+                <tabView horizontalHuggingPriority="750" verticalHuggingPriority="750" type="noTabsNoBorder" id="RaS-hH-kkg">
                     <rect key="frame" x="365" y="0.0" width="243" height="255"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="255" id="rAx-3U-k0u"/>
-                    </constraints>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <font key="font" metaFont="system"/>
                     <tabViewItems>
                         <tabViewItem label="Basic Tab" identifier="" id="B7s-1L-l8V">
@@ -849,8 +805,9 @@
                                 <rect key="frame" x="0.0" y="0.0" width="243" height="255"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
-                                    <gridView identifier="basicContainer" autoresizesSubviews="NO" horizontalHuggingPriority="600" verticalHuggingPriority="600" xPlacement="fill" yPlacement="fill" rowAlignment="none" rowSpacing="1" columnSpacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="fAm-Dk-MXS">
+                                    <gridView identifier="basicContainer" autoresizesSubviews="NO" horizontalHuggingPriority="600" verticalHuggingPriority="600" xPlacement="fill" yPlacement="fill" rowAlignment="none" rowSpacing="1" columnSpacing="1" id="fAm-Dk-MXS">
                                         <rect key="frame" x="0.0" y="1" width="243" height="254"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <rows>
                                             <gridRow height="50" id="eT9-dM-IOZ"/>
                                             <gridRow height="50" id="yMb-4d-j8b"/>
@@ -868,9 +825,9 @@
                                             <gridCell row="eT9-dM-IOZ" column="9z0-VX-R72" xPlacement="fill" yPlacement="fill" id="27f-1e-1uI">
                                                 <button key="contentView" identifier="clear" toolTip="Clear" verticalHuggingPriority="750" tag="26" translatesAutoresizingMaskIntoConstraints="NO" id="Fcd-8F-P1e" customClass="UDCalcButton">
                                                     <rect key="frame" x="0.0" y="204" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="AC" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" tag="26" imageScaling="proportionallyDown" inset="2" id="S2X-9H-kLG">
+                                                    <buttonCell key="cell" type="square" title="AC" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" tag="26" imageScaling="proportionallyDown" inset="2" id="S2X-9H-kLG">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent" base64-UTF8="YES">
 Gw
 </string>
@@ -888,9 +845,9 @@ Gw
                                             <gridCell row="eT9-dM-IOZ" column="B4E-zv-9Qi" xPlacement="fill" yPlacement="fill" id="MAf-al-9Ol">
                                                 <button key="contentView" identifier="negate" toolTip="Negate the displayed value" tag="28" translatesAutoresizingMaskIntoConstraints="NO" id="kNF-Yt-SfB" customClass="UDCalcButton">
                                                     <rect key="frame" x="61" y="204" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="±" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iDC-QA-iYn">
+                                                    <buttonCell key="cell" type="square" title="±" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iDC-QA-iYn">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">-</string>
                                                         <modifierMask key="keyEquivalentModifierMask" option="YES"/>
                                                     </buttonCell>
@@ -907,9 +864,9 @@ Gw
                                             <gridCell row="eT9-dM-IOZ" column="6xh-vT-FmR" xPlacement="fill" yPlacement="fill" id="j4p-OI-6Jv">
                                                 <button key="contentView" identifier="percent" toolTip="Per cent" verticalHuggingPriority="750" tag="27" translatesAutoresizingMaskIntoConstraints="NO" id="dvj-7z-Lqm" customClass="UDCalcButton">
                                                     <rect key="frame" x="122" y="204" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="%" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1Fr-8B-y9v">
+                                                    <buttonCell key="cell" type="square" title="%" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1Fr-8B-y9v">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">5</string>
                                                         <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
                                                     </buttonCell>
@@ -926,22 +883,16 @@ Gw
                                             <gridCell row="eT9-dM-IOZ" column="Ply-5H-Ij9" xPlacement="fill" yPlacement="fill" id="g9P-Bk-DNU">
                                                 <button key="contentView" identifier="div" verticalHuggingPriority="750" tag="24" translatesAutoresizingMaskIntoConstraints="NO" id="HWJ-7B-Xmg" customClass="UDCalcButton">
                                                     <rect key="frame" x="183" y="204" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="÷" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" identifier="divide" imageScaling="proportionallyDown" inset="2" id="Krj-RS-yJI">
+                                                    <buttonCell key="cell" type="square" title="÷" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" identifier="divide" imageScaling="proportionallyDown" inset="2" id="Krj-RS-yJI">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">/</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="u3P-Zn-9eL"/>
@@ -951,9 +902,9 @@ Gw
                                             <gridCell row="yMb-4d-j8b" column="9z0-VX-R72" xPlacement="fill" id="wed-mN-5Bf">
                                                 <button key="contentView" identifier="b7" verticalHuggingPriority="750" tag="7" translatesAutoresizingMaskIntoConstraints="NO" id="P6b-D0-Qu3" customClass="UDCalcButton">
                                                     <rect key="frame" x="0.0" y="153" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="7" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="WaJ-RH-g7g">
+                                                    <buttonCell key="cell" type="square" title="7" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="WaJ-RH-g7g">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">7</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -969,9 +920,9 @@ Gw
                                             <gridCell row="yMb-4d-j8b" column="B4E-zv-9Qi" xPlacement="fill" id="Mn7-Xf-7Y8">
                                                 <button key="contentView" identifier="b8" verticalHuggingPriority="750" tag="8" translatesAutoresizingMaskIntoConstraints="NO" id="Yzw-5p-Od2" customClass="UDCalcButton">
                                                     <rect key="frame" x="61" y="153" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="8" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vq2-mc-aMx">
+                                                    <buttonCell key="cell" type="square" title="8" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vq2-mc-aMx">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">8</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -987,9 +938,9 @@ Gw
                                             <gridCell row="yMb-4d-j8b" column="6xh-vT-FmR" xPlacement="fill" yPlacement="fill" id="nIc-lV-yaH">
                                                 <button key="contentView" identifier="b9" verticalHuggingPriority="750" tag="9" translatesAutoresizingMaskIntoConstraints="NO" id="GQz-9w-Enx" customClass="UDCalcButton">
                                                     <rect key="frame" x="122" y="153" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="9" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="y81-0V-lqK">
+                                                    <buttonCell key="cell" type="square" title="9" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="y81-0V-lqK">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">9</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1005,23 +956,17 @@ Gw
                                             <gridCell row="yMb-4d-j8b" column="Ply-5H-Ij9" xPlacement="fill" yPlacement="fill" id="mAg-dE-PfV">
                                                 <button key="contentView" identifier="mul" verticalHuggingPriority="750" tag="23" translatesAutoresizingMaskIntoConstraints="NO" id="AGi-pP-6YW" customClass="UDCalcButton">
                                                     <rect key="frame" x="183" y="153" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="×" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="DTM-Wa-30Z">
+                                                    <buttonCell key="cell" type="square" title="×" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="DTM-Wa-30Z">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">8</string>
                                                         <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="k55-9s-AOQ"/>
@@ -1031,9 +976,9 @@ Gw
                                             <gridCell row="7YE-P2-NOH" column="9z0-VX-R72" xPlacement="fill" yPlacement="fill" id="JXe-Z4-nOI">
                                                 <button key="contentView" identifier="b4" verticalHuggingPriority="750" tag="4" translatesAutoresizingMaskIntoConstraints="NO" id="cQx-Ne-AlY" customClass="UDCalcButton">
                                                     <rect key="frame" x="0.0" y="102" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="4" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="84P-qr-NlF">
+                                                    <buttonCell key="cell" type="square" title="4" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="84P-qr-NlF">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">4</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1049,9 +994,9 @@ Gw
                                             <gridCell row="7YE-P2-NOH" column="B4E-zv-9Qi" xPlacement="fill" yPlacement="fill" id="qOl-Bk-nUs">
                                                 <button key="contentView" identifier="b5" verticalHuggingPriority="750" tag="5" translatesAutoresizingMaskIntoConstraints="NO" id="ce5-e5-h0h" customClass="UDCalcButton">
                                                     <rect key="frame" x="61" y="102" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="5" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="66Y-Uv-UMI">
+                                                    <buttonCell key="cell" type="square" title="5" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="66Y-Uv-UMI">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">5</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1067,9 +1012,9 @@ Gw
                                             <gridCell row="7YE-P2-NOH" column="6xh-vT-FmR" xPlacement="fill" yPlacement="fill" id="1zC-pc-1vU">
                                                 <button key="contentView" identifier="b6" verticalHuggingPriority="750" tag="6" translatesAutoresizingMaskIntoConstraints="NO" id="yWD-uJ-nCT" customClass="UDCalcButton">
                                                     <rect key="frame" x="122" y="102" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="6" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" identifier="b6" imageScaling="proportionallyDown" inset="2" id="dyO-VP-tZq">
+                                                    <buttonCell key="cell" type="square" title="6" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" identifier="b6" imageScaling="proportionallyDown" inset="2" id="dyO-VP-tZq">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">6</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1085,22 +1030,16 @@ Gw
                                             <gridCell row="7YE-P2-NOH" column="Ply-5H-Ij9" xPlacement="fill" yPlacement="fill" id="ZSW-cD-rJx">
                                                 <button key="contentView" identifier="sub" verticalHuggingPriority="750" tag="22" translatesAutoresizingMaskIntoConstraints="NO" id="wkr-eW-Jkx" customClass="UDCalcButton">
                                                     <rect key="frame" x="183" y="102" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="−" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="hSM-vW-A6c">
+                                                    <buttonCell key="cell" type="square" title="−" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="hSM-vW-A6c">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">-</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="fIY-P3-Ch9"/>
@@ -1110,9 +1049,9 @@ Gw
                                             <gridCell row="t9I-OR-qET" column="9z0-VX-R72" xPlacement="fill" yPlacement="fill" id="q36-np-qiX">
                                                 <button key="contentView" identifier="b1" verticalHuggingPriority="750" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="GYv-Y1-Ojk" customClass="UDCalcButton">
                                                     <rect key="frame" x="0.0" y="51" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="1" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="8de-mb-Yhc">
+                                                    <buttonCell key="cell" type="square" title="1" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="8de-mb-Yhc">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">1</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1128,9 +1067,9 @@ Gw
                                             <gridCell row="t9I-OR-qET" column="B4E-zv-9Qi" xPlacement="fill" yPlacement="fill" id="mHJ-ls-P0R">
                                                 <button key="contentView" identifier="b2" verticalHuggingPriority="750" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="ah1-7o-ySc" customClass="UDCalcButton">
                                                     <rect key="frame" x="61" y="51" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="2" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Tup-la-PGT">
+                                                    <buttonCell key="cell" type="square" title="2" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Tup-la-PGT">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">2</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1146,9 +1085,9 @@ Gw
                                             <gridCell row="t9I-OR-qET" column="6xh-vT-FmR" xPlacement="fill" yPlacement="fill" id="XLN-IG-FSF">
                                                 <button key="contentView" identifier="b3" verticalHuggingPriority="750" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="25d-bL-2G0" customClass="UDCalcButton">
                                                     <rect key="frame" x="122" y="51" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="3" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="d7a-PB-cUP">
+                                                    <buttonCell key="cell" type="square" title="3" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="d7a-PB-cUP">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">3</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1164,23 +1103,17 @@ Gw
                                             <gridCell row="t9I-OR-qET" column="Ply-5H-Ij9" xPlacement="fill" yPlacement="fill" id="waT-G9-mIO">
                                                 <button key="contentView" identifier="add" verticalHuggingPriority="750" tag="21" translatesAutoresizingMaskIntoConstraints="NO" id="Yje-EN-Dxm" customClass="UDCalcButton">
                                                     <rect key="frame" x="183" y="51" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="+" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6mq-wu-XJV">
+                                                    <buttonCell key="cell" type="square" title="+" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6mq-wu-XJV">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">=</string>
                                                         <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="jht-Wm-LzQ"/>
@@ -1190,9 +1123,9 @@ Gw
                                             <gridCell row="t1c-fm-H5e" column="9z0-VX-R72" xPlacement="fill" yPlacement="fill" id="JdX-Td-VSD">
                                                 <button key="contentView" identifier="b0" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GbZ-UY-1Ru" customClass="UDCalcButton">
                                                     <rect key="frame" x="0.0" y="0.0" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="0" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1c5-GF-r3K">
+                                                    <buttonCell key="cell" type="square" title="0" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1c5-GF-r3K">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">0</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1209,9 +1142,9 @@ Gw
                                             <gridCell row="t1c-fm-H5e" column="6xh-vT-FmR" xPlacement="fill" yPlacement="fill" id="kpd-15-wey">
                                                 <button key="contentView" identifier="comma" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="44Q-Tg-Djr" customClass="UDCalcButton">
                                                     <rect key="frame" x="122" y="0.0" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="," bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" tag="29" imageScaling="proportionallyDown" inset="2" id="Pg0-7y-455">
+                                                    <buttonCell key="cell" type="square" title="," bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" tag="29" imageScaling="proportionallyDown" inset="2" id="Pg0-7y-455">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent">.</string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
@@ -1227,24 +1160,18 @@ Gw
                                             <gridCell row="t1c-fm-H5e" column="Ply-5H-Ij9" xPlacement="fill" yPlacement="fill" id="hq6-8a-TlD">
                                                 <button key="contentView" identifier="equals" toolTip="Equal" verticalHuggingPriority="750" tag="25" translatesAutoresizingMaskIntoConstraints="NO" id="ZsI-G8-7Lm" customClass="UDCalcButton">
                                                     <rect key="frame" x="183" y="0.0" width="60" height="50"/>
-                                                    <buttonCell key="cell" type="square" title="=" bezelStyle="shadowlessSquare" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="jBk-o3-xfT">
+                                                    <buttonCell key="cell" type="square" title="=" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="jBk-o3-xfT">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                        <font key="font" metaFont="system" size="20"/>
                                                         <string key="keyEquivalent" base64-UTF8="YES">
 DQ
 </string>
                                                     </buttonCell>
                                                     <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="wantsLayer" value="YES"/>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="Y83-7R-431"/>
@@ -1254,21 +1181,16 @@ DQ
                                         </gridCells>
                                     </gridView>
                                 </subviews>
-                                <constraints>
-                                    <constraint firstItem="fAm-Dk-MXS" firstAttribute="leading" secondItem="9tP-C0-UVy" secondAttribute="leading" id="DzH-6D-tby"/>
-                                    <constraint firstAttribute="bottom" secondItem="fAm-Dk-MXS" secondAttribute="bottom" priority="750" constant="1" id="TIM-dw-89i"/>
-                                    <constraint firstItem="fAm-Dk-MXS" firstAttribute="top" secondItem="9tP-C0-UVy" secondAttribute="top" id="g2B-rw-Ak4"/>
-                                    <constraint firstAttribute="trailing" secondItem="fAm-Dk-MXS" secondAttribute="trailing" id="uNM-rH-0DQ"/>
-                                </constraints>
                             </view>
                         </tabViewItem>
                         <tabViewItem label="Programmer Tab" identifier="" id="Xeu-Yt-a2B">
                             <view key="view" id="2tv-1G-pQv">
-                                <rect key="frame" x="0.0" y="0.0" width="426" height="255"/>
+                                <rect key="frame" x="0.0" y="0.0" width="243" height="255"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
-                                    <gridView xPlacement="fill" yPlacement="fill" rowAlignment="none" rowSpacing="1" columnSpacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="jL4-l5-bBF">
+                                    <gridView xPlacement="fill" yPlacement="fill" rowAlignment="none" rowSpacing="1" columnSpacing="1" id="jL4-l5-bBF">
                                         <rect key="frame" x="0.0" y="-50" width="426" height="305"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <rows>
                                             <gridRow height="50" id="bU9-aq-ZUy"/>
                                             <gridRow height="50" id="gPV-Es-Kpc"/>
@@ -1568,9 +1490,6 @@ DQ
                                             <gridCell row="s0G-xO-I5I" column="7Jo-3h-HMq" id="PRD-aZ-alj">
                                                 <button key="contentView" identifier="pb7" verticalHuggingPriority="750" tag="7" translatesAutoresizingMaskIntoConstraints="NO" id="U9h-3c-afV" customClass="UDCalcButton">
                                                     <rect key="frame" x="122" y="153" width="60" height="50"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" constant="60" id="IXg-SA-Pwl"/>
-                                                    </constraints>
                                                     <buttonCell key="cell" type="square" title="7" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="RpY-3T-1rK">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="system"/>
@@ -1755,9 +1674,7 @@ DQ
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="5Ff-w0-OrH"/>
@@ -1775,9 +1692,7 @@ DQ
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="hLw-pL-p7j"/>
@@ -1867,9 +1782,7 @@ DQ
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="QWr-Ie-z0K"/>
@@ -1887,9 +1800,7 @@ DQ
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="Bp3-zt-qpZ"/>
@@ -1976,9 +1887,7 @@ DQ
                                                         <userDefinedRuntimeAttribute type="number" keyPath="symbolType">
                                                             <integer key="value" value="0"/>
                                                         </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                                            <color key="value" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isAccented" value="YES"/>
                                                     </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <action selector="operationPressed:" target="-2" id="hvG-8I-46T"/>
@@ -1989,32 +1898,11 @@ DQ
                                         </gridCells>
                                     </gridView>
                                 </subviews>
-                                <constraints>
-                                    <constraint firstAttribute="trailing" secondItem="jL4-l5-bBF" secondAttribute="trailing" id="GJg-u0-wXp"/>
-                                    <constraint firstItem="jL4-l5-bBF" firstAttribute="leading" secondItem="2tv-1G-pQv" secondAttribute="leading" id="X3G-IW-Vle"/>
-                                    <constraint firstAttribute="bottom" secondItem="jL4-l5-bBF" secondAttribute="bottom" priority="750" id="ir8-Jo-zJk"/>
-                                    <constraint firstItem="jL4-l5-bBF" firstAttribute="top" secondItem="2tv-1G-pQv" secondAttribute="top" id="mSo-sC-BKB"/>
-                                </constraints>
                             </view>
                         </tabViewItem>
                     </tabViewItems>
                 </tabView>
             </subviews>
-            <constraints>
-                <constraint firstItem="Edd-dC-mYj" firstAttribute="leading" secondItem="cNn-5o-2k8" secondAttribute="leading" id="34B-gW-9QL"/>
-                <constraint firstAttribute="trailing" secondItem="Edd-dC-mYj" secondAttribute="trailing" id="5JF-lg-kf0"/>
-                <constraint firstItem="Edd-dC-mYj" firstAttribute="top" secondItem="uKU-TP-rML" secondAttribute="bottom" constant="1" id="C2L-0c-6KE"/>
-                <constraint firstItem="bFY-1e-YAa" firstAttribute="top" secondItem="Edd-dC-mYj" secondAttribute="bottom" id="Cpd-gh-zeh"/>
-                <constraint firstItem="bFY-1e-YAa" firstAttribute="leading" secondItem="cNn-5o-2k8" secondAttribute="leading" id="KnP-Jc-ZP5"/>
-                <constraint firstItem="uKU-TP-rML" firstAttribute="top" secondItem="cNn-5o-2k8" secondAttribute="top" constant="1" id="MDh-tb-n1c"/>
-                <constraint firstAttribute="bottom" secondItem="bFY-1e-YAa" secondAttribute="bottom" id="R0k-rZ-4ov"/>
-                <constraint firstItem="uKU-TP-rML" firstAttribute="leading" secondItem="cNn-5o-2k8" secondAttribute="leading" constant="1" id="mYq-OF-HSb"/>
-                <constraint firstAttribute="trailing" secondItem="uKU-TP-rML" secondAttribute="trailing" constant="1" id="oGD-Rv-flD"/>
-                <constraint firstItem="RaS-hH-kkg" firstAttribute="top" secondItem="Edd-dC-mYj" secondAttribute="bottom" id="rWL-o2-E92"/>
-                <constraint firstAttribute="trailing" secondItem="RaS-hH-kkg" secondAttribute="trailing" constant="1" id="tXP-il-59n"/>
-                <constraint firstItem="RaS-hH-kkg" firstAttribute="leading" secondItem="bFY-1e-YAa" secondAttribute="trailing" id="veB-YX-WrF"/>
-                <constraint firstAttribute="bottom" secondItem="RaS-hH-kkg" secondAttribute="bottom" id="zk3-eU-1xG"/>
-            </constraints>
             <point key="canvasLocation" x="22" y="538"/>
         </view>
     </objects>

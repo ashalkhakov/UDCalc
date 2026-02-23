@@ -7,6 +7,17 @@
 
 #import <Foundation/Foundation.h>
 
+NSString * const UDConstLength = @"Length";
+NSString * const UDConstArea = @"Area";
+NSString * const UDConstMass = @"Mass";
+NSString * const UDConstTemperature = @"Temperature";
+NSString * const UDConstSpeed = @"Speed";
+NSString * const UDConstEnergy = @"Energy";
+NSString * const UDConstPressure = @"Pressure";
+NSString * const UDConstVolume = @"Volume";
+NSString * const UDConstPower = @"Power";
+NSString * const UDConstTime = @"Time";
+
 NSString * const UDConstAdd = @"+";
 NSString * const UDConstSub = @"-";
 NSString * const UDConstDiv = @"/";

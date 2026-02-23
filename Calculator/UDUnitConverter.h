@@ -14,18 +14,19 @@
  */
 - (NSArray<NSString *> *)availableCategories;
 
-/**
- Returns localized unit names for a specific category.
- */
-- (NSArray<NSString *> *)unitNamesForCategory:(NSString *)category;
+- (NSArray<NSUnit *> *)unitsForCategory:(NSString *)category;
+- (NSUnit *)unitForSymbol:(NSString *)symbol ofCategory:(NSString *)category;
+- (NSString *)symbolForUnit:(NSUnit *)unit;
+
+- (NSString *)localizedNameForCategory:(NSString *)category;
+- (NSString *)localizedNameForUnit:(NSUnit *)unit;
 
 /**
  Converts a value from one unit string to another.
  Returns the original value if conversion is impossible.
  */
 - (double)convertValue:(double)value
-              category:(NSString *)category
-              fromUnit:(NSString *)fromName
-                toUnit:(NSString *)toName;
+              fromUnit:(NSUnit *)fromUnit
+                toUnit:(NSUnit *)toUnit;
 
 @end

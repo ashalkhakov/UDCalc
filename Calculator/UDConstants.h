@@ -7,6 +7,17 @@
 
 #import <Foundation/Foundation.h>
 
+extern NSString * const UDConstLength;
+extern NSString * const UDConstArea;
+extern NSString * const UDConstMass;
+extern NSString * const UDConstTemperature;
+extern NSString * const UDConstSpeed;
+extern NSString * const UDConstEnergy;
+extern NSString * const UDConstPressure;
+extern NSString * const UDConstVolume;
+extern NSString * const UDConstPower;
+extern NSString * const UDConstTime;
+
 extern NSString * const UDConstAdd;
 extern NSString * const UDConstSub;
 extern NSString * const UDConstDiv;

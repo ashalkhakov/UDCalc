@@ -5,7 +5,7 @@
 //  Created by Artyom Shalkhakov on 21.01.2026.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 
 typedef NS_ENUM(NSInteger, CalcButtonType) {
     // We will use this to mean "Just draw the button title"
@@ -55,6 +55,7 @@ typedef NS_ENUM(NSInteger, CalcButtonType) {
 @interface UDCalcButton : NSButton
 
 @property (nonatomic, assign) IBInspectable NSInteger symbolType;
+@property (nonatomic, assign) IBInspectable BOOL isAccented;          // YES = orange, NO = default gray
 @property (nonatomic, strong) IBInspectable NSColor *textColor;
 @property (nonatomic, strong) IBInspectable NSColor *buttonColor;      // Normal background
 @property (nonatomic, strong) IBInspectable NSColor *highlightColor;   // Color when pressed

@@ -7,7 +7,6 @@
 
 
 #import "UDCalcViewController.h"
-#import <QuartzCore/QuartzCore.h>
 #import "UDCalcButton.h"
 #import "UDValueFormatter.h"
 #import "UDSettingsManager.h"
@@ -17,7 +16,162 @@ NSString * const UDCalcDidFinishCalculationNotification = @"org.underivable.calc
 NSString * const UDCalcFormulaKey = @"UDCalcFormulaKey";
 NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
-@implementation UDCalcViewController
+@interface UDCalcViewController ()
+@property (nonatomic, assign) NSInteger previousEncodingSegment;
+@end
+
+// XIB-designed standard sizes (matching the frame rects in UDCalcView.xib)
+static const CGFloat kStandardScientificWidth       = 365.0;
+static const CGFloat kStandardProgrammerInputHeight = 98.0;
+static const CGFloat kStandardBitWrapperHeight      = 60.0;
+static const CGFloat kStandardKeypadHeight          = 255.0;
+
+static const CGFloat kGridButtonWidth    = 60.0;
+static const CGFloat kGridButtonHeight  = 50.0;
+static const CGFloat kMinDisplayHeight  = 20.0;
+static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN stack list */
+
+@implementation UDCalcViewController {
+    /*
+     * Frame-based layout state.  Since all constraints have been removed from
+     * the XIB, these variables track the "logical" sizes of each panel.
+     * They are initialised from hard-coded constants that match the XIB
+     * frame design and updated when the calculator mode changes.
+     */
+    CGFloat _layoutKeypadH;
+    CGFloat _layoutScientificW;
+    CGFloat _layoutContainerH;
+    CGFloat _layoutWrapperH;
+    CGFloat _layoutDisplayH;   /* current display tab height (kMinDisplayHeight or kRPNDisplayHeight) */
+}
+
+#pragma mark - Grid Rebuild Helpers
+
+/*
+ * Position the four main subviews of self.view based on the current
+ * layout state.  Called after window frame changes.
+ *
+ * Layout (AppKit coords, origin bottom-left):
+ *   Top:    displayTabView        (1px margins on top/left/right)
+ *   Middle: programmerInputView   (visible in programmer mode only)
+ *   Bottom: scientificView (left) + keypadTabView (right)
+ */
+- (void)layoutMainSubviews {
+    NSRect bounds = self.view.bounds;
+    CGFloat W = bounds.size.width;
+    CGFloat H = bounds.size.height;
+
+    CGFloat keypadH    = _layoutKeypadH;
+    CGFloat containerH = _layoutContainerH;
+    CGFloat drawerW    = _layoutScientificW;
+
+    CGFloat minDisplayH = self.calc.isRPNMode ? kRPNDisplayHeight : kMinDisplayHeight;
+    CGFloat displayH = H - containerH - keypadH - 2.0;
+    if (displayH < minDisplayH) displayH = minDisplayH;
+
+    CGFloat displayW = MAX(0, W - 2);
+    displayH = MAX(0, displayH);
+    CGFloat keypadW = MAX(0, W - drawerW - 1);
+
+    [self.displayTabView setFrame:NSMakeRect(1, containerH + keypadH + 1,
+                                             displayW, displayH)];
+
+    {
+        NSRect dRect = [self.displayTabView contentRect];
+        CGFloat dw = dRect.size.width;
+        CGFloat dh = dRect.size.height;
+        for (NSTabViewItem *item in [self.displayTabView tabViewItems])
+            [[item view] setFrame:NSMakeRect(0, 0, dw, dh)];
+        [self.displayField setFrame:NSMakeRect(0, 0, dw, dh)];
+
+        /* RPN tab (index 1): scroll view (stack table) fills left,
+           button column hugs the right edge, aligned to the top. */
+        static const CGFloat kRPNButtonColumnWidth  = 80.0;
+        static const CGFloat kRPNButtonHeight       = 30.0;
+        static const CGFloat kRPNButtonSpacing      =  2.0;
+        NSScrollView *rpnScroll = [self.stackTableView enclosingScrollView];
+        if (rpnScroll) {
+            CGFloat scrollW = MAX(0, dw - kRPNButtonColumnWidth);
+            [rpnScroll setFrame:NSMakeRect(0, 0, scrollW, dh)];
+
+            /* The button stack view is the sibling of the scroll view */
+            [self.stackButtonsView setFrame:NSMakeRect(scrollW, 0,
+                                         kRPNButtonColumnWidth, dh)];
+            /* Lay out RPN buttons top-aligned, equal size.
+               Enable autoresizing so GNUstep's NSStackView
+               doesn't override the explicit frames. */
+            [self.stackButtonsView setTranslatesAutoresizingMaskIntoConstraints:YES];
+            NSArray *buttons = [self.stackButtonsView subviews];
+            NSInteger count = (NSInteger)[buttons count];
+            for (NSInteger i = 0; i < count; i++) {
+                NSView *btn = buttons[(NSUInteger)i];
+                if (![btn isKindOfClass:[NSButton class]]) continue;
+                [btn setTranslatesAutoresizingMaskIntoConstraints:YES];
+                CGFloat y = dh - (i + 1) * (kRPNButtonHeight + kRPNButtonSpacing);
+                [btn setFrame:NSMakeRect(0, MAX(0, y),
+                                         kRPNButtonColumnWidth,
+                                         kRPNButtonHeight)];
+            }
+        }
+    }
+
+    [self.programmerInputView setFrame:NSMakeRect(0, keypadH, MAX(0, W), containerH)];
+
+    [self.scientificView setFrame:NSMakeRect(0, 0, drawerW, keypadH)];
+
+    if (drawerW > 0) {
+        for (NSView *sub in self.scientificView.subviews) {
+            if ([sub isKindOfClass:[NSGridView class]]) {
+                [sub setFrame:NSMakeRect(0, 0, drawerW, keypadH)];
+                break;
+            }
+        }
+    }
+
+    [self.basicOrProgrammerTabView setFrame:NSMakeRect(drawerW, 0, keypadW, keypadH)];
+
+    {
+        NSRect contentRect = [self.basicOrProgrammerTabView contentRect];
+        CGFloat cw = contentRect.size.width;
+        CGFloat ch = contentRect.size.height;
+        for (NSTabViewItem *item in [self.basicOrProgrammerTabView tabViewItems])
+            [[item view] setFrame:NSMakeRect(0, 0, cw, ch)];
+        [self.basicGridView setFrame:NSMakeRect(0, 0, cw, ch)];
+        [self.programmerGridView setFrame:NSMakeRect(0, 0, cw, ch)];
+    }
+
+    if (containerH > 0) {
+        static const CGFloat kProgButtonRowH = 30.0;
+        CGFloat wrapperH = _layoutWrapperH;
+
+        [self.bitDisplayWrapperView setFrame:NSMakeRect(0, 0, MAX(0, W), wrapperH)];
+        [self.bitDisplayView setFrame:NSMakeRect(0, 0, MAX(0, W), wrapperH)];
+
+        NSView *buttonRow = [self.baseSegmentedControl superview];
+        if (buttonRow) {
+            CGFloat rowY = containerH - kProgButtonRowH;
+            [buttonRow setFrame:NSMakeRect(0, rowY, MAX(0, W), kProgButtonRowH)];
+
+            static const CGFloat kPad = 8.0;
+            CGFloat ctrlH = kProgButtonRowH - 4;
+            CGFloat ctrlY = 2.0;
+            CGFloat rowW = MAX(0, W) - 2 * kPad;
+
+            CGFloat encW = self.encodingSegmentedControl.fittingSize.width;
+            [self.encodingSegmentedControl setFrame:NSMakeRect(kPad, ctrlY, encW, ctrlH)];
+
+            [self.showBinaryViewButton sizeToFit];
+            NSSize btnSz = [self.showBinaryViewButton frame].size;
+            CGFloat btnX = kPad + (rowW - btnSz.width) / 2.0;
+            [self.showBinaryViewButton setFrame:NSMakeRect(btnX, ctrlY, btnSz.width, ctrlH)];
+
+            CGFloat baseW = self.baseSegmentedControl.fittingSize.width;
+            [self.baseSegmentedControl setFrame:NSMakeRect(kPad + rowW - baseW, ctrlY, baseW, ctrlH)];
+        }
+    }
+
+    [self.view setNeedsDisplay:YES];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -26,33 +180,38 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     self.calc.delegate = self;
     self.bitDisplayView.delegate = self;
 
-    // Store the designed width of the scientific pane
-    self.standardScientificWidth = self.scientificWidthConstraint.constant;
-    self.standardProgrammerInputHeight = self.programmerInputHeightConstraint.constant;
-    self.standardBitWrapperHeight = self.bitWrapperHeightConstraint.constant;
+    self.standardScientificWidth       = kStandardScientificWidth;
+    self.standardProgrammerInputHeight = kStandardProgrammerInputHeight;
+    self.standardBitWrapperHeight      = kStandardBitWrapperHeight;
 
-    // fix up button layout
+    _layoutKeypadH     = kStandardKeypadHeight;
+    _layoutScientificW = kStandardScientificWidth;
+    _layoutContainerH  = kStandardProgrammerInputHeight;
+    _layoutWrapperH    = kStandardBitWrapperHeight;
+    _layoutDisplayH    = kMinDisplayHeight;
 
-    // button "0" (basic/scientific mode)
-    // merge row 5 (index 4), columns 1-2 (start 0, len 2)
+#ifdef GNUSTEP
+    {
+        NSColor *dark = [NSColor blackColor];
+        [self.displayField setTextColor:dark];
+        [self.radLabel setTextColor:dark];
+        [self.charLabel setTextColor:dark];
+        [self.radLabelRPN setTextColor:dark];
+        [self.charLabelRPN setTextColor:dark];
+    }
+#endif
+
+#ifndef GNUSTEP
     [self.basicGridView mergeCellsInHorizontalRange:NSMakeRange(0, 2)
                                       verticalRange:NSMakeRange(4, 1)];
-
-    // button "byte flip" (programmer mode)
-    // merge row 5 (index 4), columns 1-2 (start 0, len 2)
     [self.programmerGridView mergeCellsInHorizontalRange:NSMakeRange(0, 2)
                                            verticalRange:NSMakeRange(4, 1)];
-
-    // button "word flip" (programmer mode)
-    // merge row 6 (index 5), columns 1-2 (start 0, len 2)
     [self.programmerGridView mergeCellsInHorizontalRange:NSMakeRange(0, 2)
                                            verticalRange:NSMakeRange(5, 1)];
-
-    // button "enter" (programmer mode)
-    // merge row 6 (index 5), columns 6-7 (start 5, len 2)
     [self.programmerGridView mergeCellsInHorizontalRange:NSMakeRange(5, 2)
                                            verticalRange:NSMakeRange(5, 1)];
-    
+#endif
+
     // Listen for the app closing
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(saveApplicationState)
@@ -73,9 +232,16 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
     // Update Segment Control UI to match loaded state
     if (settings.encodingMode == UDCalcEncodingModeNone) {
-        self.encodingSegmentedControl.selectedSegment = -1;
+
+        for (NSInteger i = 0; i < self.encodingSegmentedControl.segmentCount; i++) {
+            [self.encodingSegmentedControl setSelected:NO forSegment:i];
+        }
+
+        self.previousEncodingSegment = -1;
     } else {
-        self.encodingSegmentedControl.selectedSegment = settings.encodingMode == UDCalcEncodingModeASCII ? 0 : 1;
+        NSInteger segment = settings.encodingMode == UDCalcEncodingModeASCII ? 0 : 1;
+        self.encodingSegmentedControl.selectedSegment = segment;
+        self.previousEncodingSegment = segment;
     }
 
     // Update Input Base Control UI to match loaded state
@@ -83,7 +249,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     
     // Update Show Binary Button
     self.showBinaryViewButton.state = settings.showBinaryView ? NSControlStateValueOn : NSControlStateValueOff;
-    self.bitWrapperHeightConstraint.constant = settings.showBinaryView ? self.standardBitWrapperHeight : 0;
+    _layoutWrapperH = settings.showBinaryView ? self.standardBitWrapperHeight : 0;
 
     [self setCalculatorMode:settings.calcMode animate:NO];
     if (self.calc.mode == UDCalcModeProgrammer) {
@@ -140,12 +306,29 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     // 2. Toggle "Enter" vs "=" Button Title
     self.equalsButton.title = isRPNMode ? @"enter" : @"=";
     self.equalsButton.tag = isRPNMode ? UDOpEnter : UDOpEq;
+    self.pEqualsButton.title = isRPNMode ? @"enter" : @"=";
+    self.pEqualsButton.tag = isRPNMode ? UDOpEnter : UDOpEq;
 
     // 3. Disable Parens in RPN
     self.parenLeftButton.enabled = !isRPNMode;
     self.parenRightButton.enabled = !isRPNMode;
 
-    // 4. Refresh Data
+    // 4. Resize window to accommodate RPN display height
+    NSWindow *window = self.view.window;
+    if (window) {
+        CGFloat targetDisplayH = isRPNMode ? kRPNDisplayHeight : kMinDisplayHeight;
+        CGFloat deltaH = targetDisplayH - _layoutDisplayH;
+        if (deltaH != 0) {
+            NSRect f = window.frame;
+            f.size.height += deltaH;
+            f.origin.y    -= deltaH;
+            [window setFrame:f display:YES];
+        }
+        _layoutDisplayH = targetDisplayH;
+        [self layoutMainSubviews];
+    }
+
+    // 5. Refresh Data
     [self updateUI];
 }
 
@@ -161,7 +344,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     // ============================================================
     
     // A. Keypad (Grid) Size
-    NSView *targetGrid = isProgrammer ? self.programmerGridView : self.basicGridView;
+    NSGridView *targetGrid = isProgrammer ? self.programmerGridView : self.basicGridView;
     NSSize targetGridFit = [targetGrid fittingSize];
     CGFloat targetKeypadH = targetGridFit.height;
     CGFloat targetKeypadW = targetGridFit.width;
@@ -191,12 +374,12 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     // 2. DETERMINE CURRENT STATE
     // ============================================================
 
-    CGFloat currentKeypadH = self.keypadHeightConstraint.constant;
-    CGFloat currentDrawerW = self.scientificWidthConstraint.constant;
-    CGFloat currentContainerH = self.programmerInputHeightConstraint.constant;
+    CGFloat currentKeypadH = _layoutKeypadH;
+    CGFloat currentDrawerW = _layoutScientificW;
+    CGFloat currentContainerH = _layoutContainerH;
     
     // For width delta, use current grid fitting size
-    NSView *currentGrid = (self.calc.mode == UDCalcModeProgrammer) ? self.programmerGridView : self.basicGridView;
+    NSGridView *currentGrid = (self.calc.mode == UDCalcModeProgrammer) ? self.programmerGridView : self.basicGridView;
     CGFloat currentKeypadW = [currentGrid fittingSize].width;
 
     // ============================================================
@@ -249,14 +432,11 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
     [window setFrame:newFrame display:YES];
 
-    self.keypadHeightConstraint.constant = targetKeypadH;
-    self.scientificWidthConstraint.constant = targetDrawerW;
-
-    // 3. Animate Programmer Constraints (Both Inner and Outer)
-    self.programmerInputHeightConstraint.constant = targetContainerH;
-    self.bitWrapperHeightConstraint.constant = targetWrapperH;
-
-    [self.view.superview layoutSubtreeIfNeeded];
+    _layoutKeypadH     = targetKeypadH;
+    _layoutScientificW = targetDrawerW;
+    _layoutContainerH  = targetContainerH;
+    _layoutWrapperH    = targetWrapperH;
+    [self layoutMainSubviews];
 
     self.calc.mode = mode;
     [self updateScientificButtons];
@@ -293,7 +473,9 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 }
 
 - (IBAction)decimalPressed:(NSButton *)sender {
-    // 1. Update Calc
+   NSLog(@"decimal pressed");
+
+     // 1. Update Calc
     // This switches 'typing' to YES and sets the internal decimal multiplier
     [self.calc inputDecimal];
 
@@ -372,7 +554,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     CGFloat targetWrapperHeight = isBitsVisible ? 0.0 : bitViewHeight;
     
     // 4. Calculate Window Delta (Target - Current)
-    CGFloat currentStackHeight = self.programmerInputHeightConstraint.constant;
+    CGFloat currentStackHeight = _layoutContainerH;
     CGFloat deltaH = targetStackHeight - currentStackHeight;
 
     // 5. Animate
@@ -384,55 +566,61 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     [self.view.window setFrame:winFrame display:YES];
     
     // B. Resize Wrapper (Inner Constraint)
-    self.bitWrapperHeightConstraint.constant = targetWrapperHeight;
-    
     // C. Resize Main Container (Outer Constraint)
     // This stops exactly at 'buttonsOnlyHeight', keeping buttons visible.
-    self.programmerInputHeightConstraint.constant = targetStackHeight;
+    _layoutWrapperH   = targetWrapperHeight;
+    _layoutContainerH = targetStackHeight;
+    [self layoutMainSubviews];
 }
 
 - (IBAction)baseSelected:(NSSegmentedControl *)sender {
-    NSInteger selectedTag = [[sender cell] tagForSegment:[sender selectedSegment]];
-    
-    UDBase newBase = (UDBase)selectedTag;
+    /* Map selected segment index to base value directly.
+     * Segments are always: 0=Octal(8), 1=Decimal(10), 2=Hex(16).
+     * Using the index avoids [[sender cell] tagForSegment:] which
+     * returns 0 on GNUstep (cell tags not decoded from XIB). */
+    static const UDBase baseMap[] = { UDBaseOct, UDBaseDec, UDBaseHex };
+    NSInteger idx = [sender selectedSegment];
+    if (idx < 0 || idx > 2) return;
 
-    self.calc.inputBase = newBase;
+    self.calc.inputBase = baseMap[idx];
 
     [self updateUI];
 }
 
 - (IBAction)encodingSelected:(NSSegmentedControl *)sender {
-    NSInteger index = [sender selectedSegment];
-
-    // Check visual state
-    BOOL isAsciiOn = [sender isSelectedForSegment:0];
-    BOOL isUnicodeOn = [sender isSelectedForSegment:1];
     
-    // LOGIC: Enforce Mutually Exclusive "Select Zero or One"
-    if (isAsciiOn && isUnicodeOn) {
-        // User tried to select the second one while first was on.
-        // We must turn off the OLD one.
-        if (self.calc.encodingMode == UDCalcEncodingModeASCII) {
-            // Was ASCII, user clicked Unicode -> Turn off ASCII
-            [sender setSelected:NO forSegment:0];
-            self.calc.encodingMode = UDCalcEncodingModeUnicode;
-        } else {
-            // Was Unicode, user clicked ASCII -> Turn off Unicode
-            [sender setSelected:NO forSegment:1];
-            self.calc.encodingMode = UDCalcEncodingModeASCII;
+    NSInteger clicked = sender.selectedSegment;
+
+    if (clicked == self.previousEncodingSegment) {
+        self.calc.encodingMode = UDCalcEncodingModeNone;
+
+        for (NSInteger i = 0; i < self.encodingSegmentedControl.segmentCount; i++) {
+            [self.encodingSegmentedControl setSelected:NO forSegment:i];
+        }
+
+        self.previousEncodingSegment = -1;
+    } else {
+        self.previousEncodingSegment = clicked;
+        
+        switch (clicked) {
+            case 0:
+                self.calc.encodingMode = UDCalcEncodingModeASCII;
+                break;
+            case 1:
+                self.calc.encodingMode = UDCalcEncodingModeUnicode;
+                break;
+            default:
+                self.calc.encodingMode = UDCalcEncodingModeNone;
+
+
+                for (NSInteger i = 0; i < self.encodingSegmentedControl.segmentCount; i++) {
+                    [self.encodingSegmentedControl setSelected:NO forSegment:i];
+                }
+
+                break;
         }
     }
-    else if (isAsciiOn) {
-        self.calc.encodingMode = UDCalcEncodingModeASCII;
-    }
-    else if (isUnicodeOn) {
-        self.calc.encodingMode = UDCalcEncodingModeUnicode;
-    }
-    else {
-        // Both are off (User clicked the active one to deselect it)
-        self.calc.encodingMode = UDCalcEncodingModeNone;
-    }
-    
+
     // Now update the UI (show/hide the char label)
     [self updateDisplayIndicators];
 }
@@ -560,10 +748,18 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
         
         if (isXRegister) {
             cell.textField.font = [NSFont boldSystemFontOfSize:22];
+#ifdef GNUSTEP
+            cell.textField.textColor = [NSColor blackColor];
+#else
             cell.textField.textColor = [NSColor labelColor];
+#endif
         } else {
             cell.textField.font = [NSFont systemFontOfSize:18];
-            cell.textField.textColor = [NSColor secondaryLabelColor]; // Dim history
+#ifdef GNUSTEP
+            cell.textField.textColor = [NSColor darkGrayColor];
+#else
+            cell.textField.textColor = [NSColor secondaryLabelColor];
+#endif
         }
     }
 
@@ -576,7 +772,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     UDCalcMode mode = self.calc.mode;
     NSTextField *radLabel = self.calc.isRPNMode ? self.radLabelRPN : self.radLabel;
     NSTextField *charLabel = self.calc.isRPNMode ? self.charLabelRPN : self.charLabel;
-    
+
     // ============================================================
     // 1. RADIAN INDICATOR (Scientific Mode)
     // ============================================================
@@ -587,7 +783,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
     } else {
         radLabel.hidden = YES;
     }
-    
+
     // ============================================================
     // 2. CHARACTER INDICATOR (Programmer Mode)
     // ============================================================
@@ -598,6 +794,7 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
         if (glyph.length > 0) {
             charLabel.hidden = NO;
             charLabel.stringValue = glyph;
+            [charLabel setNeedsDisplay:YES];
         } else {
             charLabel.hidden = YES;
         }

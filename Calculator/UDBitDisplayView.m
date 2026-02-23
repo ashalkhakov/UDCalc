@@ -18,6 +18,10 @@
 
 - (void)drawRect:(NSRect)dirtyRect {
     [super drawRect:dirtyRect];
+
+    // Draw an explicit dark background so the light text is always visible.
+    [[NSColor blackColor] setFill];
+    NSRectFill(self.bounds);
     
     if (!_bitRects) _bitRects = [NSMutableArray array];
     [_bitRects removeAllObjects];

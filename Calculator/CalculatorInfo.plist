@@ -1,0 +1,13 @@
+{
+    ApplicationDescription = "Calculator application for GNUstep";
+    ApplicationName = Calculator;
+    ApplicationRelease = "0.1";
+    Copyright = "Copyright (C) 2026 Artyom Shalkhakov";
+    CopyrightDescription = "Released under BSD";
+    FullVersionID = "0.1";
+    NSExecutable = Calculator;
+    NSMainNibFile = "MainMenu.xib";
+    NSPrincipalClass = NSApplication;
+    NSRole = Application;
+    URL = "https://github.com/ashalkhakov/UDCalc";
+}

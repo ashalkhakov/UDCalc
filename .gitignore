@@ -1,0 +1,9 @@
+# GNUstep build artifacts
+obj/
+*.app/
+*.bundle/
+*.o
+*.d
+stamp.make
+_codeql_detected_source_root
+*~

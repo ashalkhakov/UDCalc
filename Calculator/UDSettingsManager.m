@@ -102,6 +102,9 @@ static NSString * const kUDKeyDecimalPlaces             = @"UDDecimalPlaces";
 // --- Input Base ---
 - (UDBase)inputBase {
     NSInteger val = [[NSUserDefaults standardUserDefaults] integerForKey:kUDKeyInputBase];
+    if (!val) {
+        val = UDBaseDec;
+    }
     return (UDBase)val;
 }
 

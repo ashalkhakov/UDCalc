@@ -5,7 +5,7 @@
 //  Created by Artyom Shalkhakov on 17.01.2026.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 #import "UDCalcViewController.h"
 #import "UDUnitConverter.h"
 #import "UDConversionHistoryManager.h"
@@ -23,6 +23,7 @@
 @property (nonatomic, strong) UDTapeWindowController *tapeWindowController;
 @property (nonatomic, strong) UDCalcViewController *calcViewController;
 
+@property (nonatomic, weak) IBOutlet NSMenu *convertMenu;
 @property (nonatomic, weak) IBOutlet NSMenu *recentMenu;
 
 - (IBAction)conversionMenuClicked:(NSMenuItem *)sender;

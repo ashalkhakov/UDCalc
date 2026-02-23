@@ -115,7 +115,7 @@
     UDASTNode *rightPow = [UDBinaryOpNode info:self.powOp left:n3 right:n4];
     UDASTNode *expr = [UDBinaryOpNode info:self.powOp left:n2 right:rightPow];
     
-    XCTAssertEqualObjects([expr prettyPrint], @"2 ^ 3 ^ 4");
+    XCTAssertEqualObjects([expr prettyPrint], @"2 pow 3 pow 4");
 }
 
 - (void)testRightAssociativity_Forced {
@@ -130,7 +130,7 @@
     UDASTNode *leftPow = [UDBinaryOpNode info:self.powOp left:n2 right:n3];
     UDASTNode *expr = [UDBinaryOpNode info:self.powOp left:leftPow right:n4];
     
-    XCTAssertEqualObjects([expr prettyPrint], @"(2 ^ 3) ^ 4");
+    XCTAssertEqualObjects([expr prettyPrint], @"(2 pow 3) pow 4");
 }
 
 #pragma mark - 6. Postfix / Unary Mixing

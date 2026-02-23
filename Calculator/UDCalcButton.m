@@ -25,11 +25,33 @@
 
 - (void)setupDefaults {
     self.bordered = NO; // Handle our own drawing
-    
-    // Default "Dark Mode" Calculator Colors
-    self.textColor = [NSColor whiteColor];
-    self.buttonColor = [NSColor colorWithCalibratedWhite:0.2 alpha:1.0];      // Dark Grey
-    self.highlightColor = [NSColor colorWithCalibratedWhite:0.4 alpha:1.0];   // Lighter Grey
+    [self applyAccentedStyle];
+}
+
+- (void)setIsAccented:(BOOL)isAccented {
+    _isAccented = isAccented;
+    [self applyAccentedStyle];
+}
+
+- (void)applyAccentedStyle {
+    if (_isAccented) {
+        // Orange "operator" style
+        self.buttonColor = [NSColor orangeColor];
+        self.highlightColor = [NSColor colorWithCalibratedRed:1.0 green:0.72 blue:0.28 alpha:1.0];
+        self.textColor = [NSColor whiteColor];
+    } else {
+#ifdef GNUSTEP
+        // Use theme-aware colors on GNUstep
+        self.textColor = [NSColor controlTextColor];
+        self.buttonColor = [NSColor controlColor];
+        self.highlightColor = [NSColor selectedControlColor];
+#else
+        // Default "Dark Mode" Calculator Colors
+        self.textColor = [NSColor whiteColor];
+        self.buttonColor = [NSColor colorWithCalibratedWhite:0.2 alpha:1.0];      // Dark Grey
+        self.highlightColor = [NSColor colorWithCalibratedWhite:0.4 alpha:1.0];   // Lighter Grey
+#endif
+    }
 }
 
 #pragma mark - Main Draw Loop
@@ -39,8 +61,12 @@
     NSColor *bg;
     
     if (!self.isEnabled) {
+#ifdef GNUSTEP
+        bg = [NSColor colorWithCalibratedWhite:0.85 alpha:1.0]; // light gray for disabled
+#else
         // DISABLED: Use a flat, dark gray to indicate inactivity
         bg = [NSColor colorWithCalibratedWhite:0.15 alpha:1.0];
+#endif
     }
     else if ([self.cell isHighlighted]) {
         // HIGHLIGHTED: Use the specified highlight color
@@ -52,7 +78,16 @@
     }
     
     [bg setFill];
-    [[NSBezierPath bezierPathWithRoundedRect:self.bounds xRadius:0 yRadius:0] fill];
+    NSRect bounds = self.bounds;
+    NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:bounds xRadius:4 yRadius:4];
+    [path fill];
+
+#ifdef GNUSTEP
+    // Draw a subtle border for visual depth on light themes
+    [[NSColor colorWithCalibratedWhite:0.7 alpha:1.0] setStroke];
+    NSRect inset = NSInsetRect(bounds, 0.5, 0.5);
+    [[NSBezierPath bezierPathWithRoundedRect:inset xRadius:4 yRadius:4] stroke];
+#endif
 
     // 2. Draw Symbol
     // Note: The drawing helpers below now check [self isEnabled] to dim the text automatically.
