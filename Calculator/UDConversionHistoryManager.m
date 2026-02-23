@@ -6,6 +6,7 @@
 //
 
 #import "UDConversionHistoryManager.h"
+#import "UDGNUstepCompat.h"
 
 // Constant for the UserDefaults key
 static NSString * const kHistoryKey = @"ConversionHistory";
@@ -80,15 +81,18 @@ static const NSUInteger kMaxHistoryItems = 10;
     }
     
     // 4. Save
+    NSMutableArray *serializedHistory = [NSMutableArray array];
     for (NSInteger i = 0; i < currentHistory.count; i++) {
-        currentHistory[i] = [self serializeToHistory:currentHistory[i]];
+        [serializedHistory addObject: [self serializeToHistory:currentHistory[i]]];
     }
-    [self.defaults setObject:currentHistory forKey:kHistoryKey];
+
+    [self.defaults setObject:serializedHistory forKey:kHistoryKey];
     [self.defaults synchronize];
 }
 
 - (void)clearHistory {
     [self.defaults removeObjectForKey:kHistoryKey];
+    [self.defaults synchronize];
 }
 
 @end

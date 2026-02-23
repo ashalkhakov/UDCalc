@@ -18,6 +18,60 @@
 
 #ifdef GNUSTEP
 
+@implementation NSDimension (UDGNUstepCompat)
+
+- (BOOL)isEqual:(id)object {
+    if (self == object) return YES;
+
+    if (![object isKindOfClass:[NSDimension class]]) return NO;
+
+    NSDimension *other = (NSDimension *)object;
+    if (![self isMemberOfClass:[other class]]) return NO;
+
+    if (![self.symbol isEqualToString:other.symbol]) return NO;
+
+    if (![self.converter isEqual:other.converter]) return NO;
+
+    return YES;
+}
+
+- (NSUInteger)hash {
+    return [self.class hash] ^ [self.symbol hash];
+}
+
+@end
+
+@implementation NSUnitConverter (UDGNUstepCompat)
+
+- (BOOL)isEqual:(id)object {
+    if (self == object) return YES;
+    if (![object isKindOfClass:[NSUnitConverter class]]) return NO;
+
+    if ([self isMemberOfClass:[NSUnitConverter class]]) {
+        return [object isMemberOfClass:[NSUnitConverter class]];
+    }
+
+    // handle the most common case of linear converters (y = ax + b)
+    if ([self isKindOfClass:[NSUnitConverterLinear class]] && [object isKindOfClass:[NSUnitConverterLinear class]]) {
+        NSUnitConverterLinear *thisLinear = (NSUnitConverterLinear *)self;
+        NSUnitConverterLinear *otherLinear = (NSUnitConverterLinear *)object;
+
+        return (thisLinear.coefficient == otherLinear.coefficient && thisLinear.constant == otherLinear.constant);
+    }
+
+    return NO;
+}
+
+- (NSUInteger)hash {
+    if ([self isKindOfClass:[NSUnitConverterLinear class]]) {
+        NSUnitConverterLinear *linear = (NSUnitConverterLinear *)self;
+        return (NSUInteger)(linear.coefficient * 1000) ^ (NSUInteger)linear.constant;
+    }
+    return [self.class hash];
+}
+
+@end
+
 /* Returns a fixed-pitch font suitable for displaying numbers in tabular
    columns.  Falls back to the regular system font if no monospaced font
    is available on the current GNUstep installation. */

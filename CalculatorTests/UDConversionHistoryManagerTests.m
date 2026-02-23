@@ -19,39 +19,50 @@
 
 - (void)setUp {
     [super setUp];
-    // Use a unique suite name for testing
-    NSString *suiteName = @"org.underivable.calculator.testHistory";
-    self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:suiteName];
+    self.testDefaults = [NSUserDefaults standardUserDefaults];
 
     self.converter = [[UDUnitConverter alloc] init];
     self.mgr = [[UDConversionHistoryManager alloc] initWithDefaults:self.testDefaults converter:self.converter];
+    [self.mgr clearHistory];
 }
 
 - (void)tearDown {
-    // Wipe the test suite from disk
-    [self.testDefaults removePersistentDomainForName:@"org.underivable.calculator.testHistory"];
     self.mgr = nil;
     self.converter = nil;
+    self.testDefaults = nil;
     [super tearDown];
 }
 
 - (void)testAddConversionAddsToHistory {
-    NSUnit *meters = [self.converter unitForSymbol:@"m" ofCategory:UDConstLength];
+    NSUnit *meters = [NSUnitLength meters];
+    XCTAssertTrue(meters != nil);
     NSDictionary *entry = @{
         @"cat": UDConstLength,
         @"from": meters,
-        @"to": [self.converter unitForSymbol:@"km" ofCategory:UDConstLength]};
+        @"to": [NSUnitLength kilometers]
+    };
     [self.mgr addConversion:entry];
-    
+
     XCTAssertEqual(self.mgr.history.count, 1);
     XCTAssertEqualObjects(self.mgr.history.firstObject[@"from"], meters);
+}
+
+- (void)testDeduplicationWithUnits {
+    NSUnit *u1 = [NSUnitLength meters];
+    NSUnit *u2 = [NSUnitLength meters];
+
+    NSDictionary *dict1 = @{@"from": u1};
+    NSDictionary *dict2 = @{@"from": u2};
+
+    XCTAssertEqualObjects(dict1, dict2);
 }
 
 - (void)testDeduplication {
     NSDictionary *entry = @{
         @"cat": UDConstMass,
-        @"from": [self.converter unitForSymbol:@"kg" ofCategory:UDConstMass],
-        @"to": [self.converter unitForSymbol:@"g" ofCategory:UDConstMass]};
+        @"from": [NSUnitMass kilograms],
+        @"to": [NSUnitMass grams]
+    };
 
     [self.mgr addConversion:entry];
     [self.mgr addConversion:entry]; // Add same entry twice
@@ -62,8 +73,8 @@
 - (void)testClearHistory {
     [self.mgr addConversion:@{
         @"cat": UDConstMass,
-        @"from": [self.converter unitForSymbol:@"kg" ofCategory:UDConstMass],
-        @"to": [self.converter unitForSymbol:@"g" ofCategory:UDConstMass]
+        @"from": [NSUnitMass kilograms],
+        @"to": [NSUnitMass grams]
     }];
     [self.mgr clearHistory];
     

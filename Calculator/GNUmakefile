@@ -39,6 +39,14 @@ Resources/MainMenu.xib
 
 
 #
+# Localization
+#
+Calculator_LANGUAGES = en
+Calculator_LOCALIZED_RESOURCE_FILES = \
+en.lproj/Localizable.strings 
+
+
+#
 # Header files
 #
 Calculator_HEADER_FILES = \

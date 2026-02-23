@@ -2,6 +2,14 @@
     APPLICATIONICON = "";
     "APP_DOCUMENT_BASED" = NO;
     "APP_TYPE" = GORM;
+    "BUILDER_TARGETS" = (
+	all,
+	install,
+	uninstall,
+	clean,
+	distclean,
+	dist
+    );
     "BUNDLE_IDENTIFIER" = "";
     "CLASS_FILES" = (
 	"AppDelegate.m",
@@ -66,13 +74,14 @@
 	"UDTapeWindow.xib",
 	"MainMenu.xib"
     );
-    LANGUAGE = English;
+    LANGUAGE = en;
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui"
     );
     LINKEROPTIONS = "-ldispatch";
     "LOCALIZED_RESOURCES" = (
+	"en.lproj/Localizable.strings"
     );
     MAININTERFACE = "MainMenu.xib";
     MAKEFILEDIR = "$(GNUSTEP_MAKEFILES)";
@@ -87,8 +96,8 @@
     "PRINCIPAL_CLASS" = NSApplication;
     "PROJECT_AUTHORS" = (
     );
-    "PROJECT_COPYRIGHT" = "Copyright (C) 2026";
-    "PROJECT_COPYRIGHT_DESC" = "Released under ...";
+    "PROJECT_COPYRIGHT" = "Copyright (C) 2026 Artyom Shalkhakov";
+    "PROJECT_COPYRIGHT_DESC" = "Released under BSD";
     "PROJECT_CREATOR" = "";
     "PROJECT_DESCRIPTION" = "Calculator application for GNUstep";
     "PROJECT_DOCUMENTTYPES" = (
@@ -99,7 +108,7 @@
     "PROJECT_RELEASE" = "0.1";
     "PROJECT_SUMMARY" = "A scientific calculator with unit conversion support";
     "PROJECT_TYPE" = Application;
-    "PROJECT_URL" = "";
+    "PROJECT_URL" = "https://github.com/ashalkhakov/UDCalc";
     "SEARCH_HEADER_DIRS" = (
     );
     "SEARCH_LIB_DIRS" = (
@@ -112,6 +121,6 @@
 	"GNUmakefile.postamble"
     );
     "USER_LANGUAGES" = (
-	English
+	en
     );
 }

@@ -16,7 +16,9 @@ CalculatorTests_OBJC_FILES += \
     ../Calculator/UDTape.m \
     ../Calculator/UDUnitConverter.m \
     ../Calculator/UDVM.m \
-    ../Calculator/UDValueFormatter.m
+    ../Calculator/UDValueFormatter.m \
+    ../Calculator/UDConversionHistoryManager.m \
+    ../Calculator/UDGNUstepCompat.m
 
 CalculatorTests_INCLUDE_DIRS = \
     -I../Calculator
