@@ -25,7 +25,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 VERSION = 0.1
 PACKAGE_NAME = Calculator
 APP_NAME = Calculator
-Calculator_APPLICATION_ICON = 
+Calculator_APPLICATION_ICON = CalcIcon.png
 
 
 #
@@ -35,7 +35,9 @@ Calculator_RESOURCE_FILES = \
 Resources/UDCalcView.xib \
 Resources/ConversionWindow.xib \
 Resources/UDTapeWindow.xib \
-Resources/MainMenu.xib 
+Resources/MainMenu.xib \
+Resources/CalcIcon-512.png \
+Resources/CalcIcon.png 
 
 
 #
