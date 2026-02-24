@@ -1,5 +1,5 @@
 {
-    APPLICATIONICON = "";
+    APPLICATIONICON = "CalcIcon.png";
     "APP_DOCUMENT_BASED" = NO;
     "APP_TYPE" = GORM;
     "BUILDER_TARGETS" = (
@@ -66,6 +66,8 @@
 	"UDGNUstepCompat.h"
     );
     IMAGES = (
+	"CalcIcon-512.png",
+	"CalcIcon.png"
     );
     INSTALLDIR = "$(HOME)/GNUstep";
     INTERFACES = (
@@ -95,6 +97,7 @@
     );
     "PRINCIPAL_CLASS" = NSApplication;
     "PROJECT_AUTHORS" = (
+	"Artyom Shalkhakov"
     );
     "PROJECT_COPYRIGHT" = "Copyright (C) 2026 Artyom Shalkhakov";
     "PROJECT_COPYRIGHT_DESC" = "Released under BSD";

@@ -1,11 +1,16 @@
 {
     ApplicationDescription = "Calculator application for GNUstep";
+    ApplicationIcon = "CalcIcon.png";
     ApplicationName = Calculator;
     ApplicationRelease = "0.1";
+    Authors = (
+	"Artyom Shalkhakov"
+    );
     Copyright = "Copyright (C) 2026 Artyom Shalkhakov";
     CopyrightDescription = "Released under BSD";
     FullVersionID = "0.1";
     NSExecutable = Calculator;
+    NSIcon = "CalcIcon.png";
     NSMainNibFile = "MainMenu.xib";
     NSPrincipalClass = NSApplication;
     NSRole = Application;
