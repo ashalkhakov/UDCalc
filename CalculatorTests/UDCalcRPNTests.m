@@ -22,91 +22,81 @@
 }
 
 - (void)testRPN_Drop {
-    // Scenario: 5 Enter 10 Drop -> 5
-    
     [self.calculator inputNumber:UDValueMakeDouble(5)];
-    [self.calculator performOperation:UDOpEnter]; // Stack: [5]
-    
-    
+    [self.calculator performOperation:UDOpEnter];  // Stack: [5]
+
     [self.calculator inputNumber:UDValueMakeDouble(10)];
-    [self.calculator performOperation:UDOpEnter]; // Stack: [5, 10]
-    
-    // Action
-    [self.calculator performOperation:UDOpDrop];  // Stack: [5]
-    
-    // Verify
-    XCTAssertEqual(self.calculator.currentStackValues.count, 2);
-    XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator currentInputValue]), 10.0, 0.0001);
+    [self.calculator performOperation:UDOpEnter];  // Stack: [5, 10]
+
+    [self.calculator performOperation:UDOpDrop];   // Removes X=10 -> Stack: [5]
+
+    // X is now 5
     XCTAssertEqual(self.calculator.nodeStack.count, 1);
-    XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator evaluateNode:self.calculator.nodeStack[0]]), 5.0, 0.0001);
+    XCTAssertEqualWithAccuracy(
+        UDValueAsDouble([self.calculator evaluateNode:self.calculator.nodeStack[0]]), 5.0, 1e-9);
+    XCTAssertEqualWithAccuracy(
+        UDValueAsDouble([self.calculator currentInputValue]), 5.0, 1e-9);
 }
 
 - (void)testRPN_Swap {
-    // Scenario: 1 Enter 2 Swap -> X=1, Y=2
-    // Stack order: [1, 2] -> Swap -> [2, 1] (Top is X)
-    
     [self.calculator inputNumber:UDValueMakeDouble(1)];
-    [self.calculator performOperation:UDOpEnter];
-    [self.calculator inputNumber:UDValueMakeDouble(2)];
-    
-    // Action
-    [self.calculator performOperation:UDOpSwap];  // Stack: [2, 1]
-    
-    // Verify Top (X Register) is 1
-    XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator currentInputValue]), 1.0, 0.0001);
-    
-    // Verify Depth 2 (Y Register) is 2
-    XCTAssertEqual(self.calculator.nodeStack.count, 1);
-    double yVal = UDValueAsDouble([[self.calculator.currentStackValues objectAtIndex:0] value]); // 0 is bottom
-    XCTAssertEqualWithAccuracy(yVal, 2.0, 0.0001);
+    [self.calculator performOperation:UDOpEnter];   // nodeStack=[1]
+    [self.calculator inputNumber:UDValueMakeDouble(2)]; // buffer=2, isTyping=YES
+
+    [self.calculator performOperation:UDOpSwap];    // nodeStack=[2,1], isTyping=NO
+
+    // X=1 is nodeStack.lastObject
+    XCTAssertEqual(self.calculator.nodeStack.count, 2);
+    XCTAssertEqualWithAccuracy(
+        UDValueAsDouble([self.calculator currentInputValue]), 1.0, 1e-9,
+        @"X register should be 1 after swap");
+
+    // Y=2 is nodeStack[0]
+    XCTAssertEqualWithAccuracy(
+        UDValueAsDouble([self.calculator evaluateNode:self.calculator.nodeStack[0]]), 2.0, 1e-9,
+        @"Y register should be 2 after swap");
 }
 
 - (void)testRPN_RollDown {
-    // Scenario: 1 Enter 2 Enter 3 Enter
-    // Stack: [1, 2, 3] (3 is Top/X)
-    // Roll Down: X moves to bottom. Y becomes X.
-    // Result: [3, 1, 2] (2 is now X)
-    
-    [self.calculator inputNumber:UDValueMakeDouble(1)];
-    [self.calculator performOperation:UDOpEnter];
-    [self.calculator inputNumber:UDValueMakeDouble(2)];
-    [self.calculator performOperation:UDOpEnter];
-    [self.calculator inputNumber:UDValueMakeDouble(3)];
-    
-    // Action
+    // Build stack [1, 2, 3] — 3 typed but not Enter'd
+    [self.calculator inputNumber:UDValueMakeDouble(1)]; [self.calculator performOperation:UDOpEnter];
+    [self.calculator inputNumber:UDValueMakeDouble(2)]; [self.calculator performOperation:UDOpEnter];
+    [self.calculator inputNumber:UDValueMakeDouble(3)]; // isTyping=YES, not committed
+
     [self.calculator performOperation:UDOpRollDown];
-    
-    // Verify Structure: [3, 1, 2]
-    NSArray<UDNumberNode *> *stack = self.calculator.currentStackValues;
-    XCTAssertEqual(stack.count, 3);
-    
-    XCTAssertEqualWithAccuracy(UDValueAsDouble([stack[0] value]), 3.0, 0.0001); // Bottom
-    XCTAssertEqualWithAccuracy(UDValueAsDouble([stack[1] value]), 1.0, 0.0001); // Middle
-    XCTAssertEqualWithAccuracy(UDValueAsDouble([stack[2] value]), 2.0, 0.0001); // Top (X)
+    // flushBufferToStack: [1,2,3]; X=3 moves to bottom → [3,1,2]; X=2
+
+    XCTAssertEqual(self.calculator.nodeStack.count, 3);
+    XCTAssertEqualWithAccuracy(
+        UDValueAsDouble([self.calculator evaluateNode:self.calculator.nodeStack[0]]), 3.0, 1e-9,
+        @"Bottom should be 3");
+    XCTAssertEqualWithAccuracy(
+        UDValueAsDouble([self.calculator evaluateNode:self.calculator.nodeStack[1]]), 1.0, 1e-9,
+        @"Middle should be 1");
+    XCTAssertEqualWithAccuracy(
+        UDValueAsDouble([self.calculator currentInputValue]), 2.0, 1e-9,
+        @"X (top) should be 2");
 }
 
 - (void)testRPN_RollUp {
-    // Scenario: 1 Enter 2 Enter 3 Enter
-    // Stack: [1, 2, 3] (3 is Top/X)
-    // Roll Up: Bottom moves to Top.
-    // Result: [2, 3, 1] (1 is now X)
-    
-    [self.calculator inputNumber:UDValueMakeDouble(1)];
-    [self.calculator performOperation:UDOpEnter];
-    [self.calculator inputNumber:UDValueMakeDouble(2)];
-    [self.calculator performOperation:UDOpEnter];
-    [self.calculator inputNumber:UDValueMakeDouble(3)];
-    
-    // Action
+    // Build stack [1, 2, 3] — 3 typed but not Enter'd
+    [self.calculator inputNumber:UDValueMakeDouble(1)]; [self.calculator performOperation:UDOpEnter];
+    [self.calculator inputNumber:UDValueMakeDouble(2)]; [self.calculator performOperation:UDOpEnter];
+    [self.calculator inputNumber:UDValueMakeDouble(3)]; // isTyping=YES, not committed
+
     [self.calculator performOperation:UDOpRollUp];
-    
-    // Verify Structure: [2, 3, 1]
-    NSArray<UDNumberNode *> *stack = self.calculator.currentStackValues;
-    XCTAssertEqual(stack.count, 3);
-    
-    XCTAssertEqualWithAccuracy(UDValueAsDouble([stack[0] value]), 2.0, 0.0001); // Bottom
-    XCTAssertEqualWithAccuracy(UDValueAsDouble([stack[1] value]), 3.0, 0.0001); // Middle
-    XCTAssertEqualWithAccuracy(UDValueAsDouble([stack[2] value]), 1.0, 0.0001); // Top (X)
+    // flushBufferToStack: [1,2,3]; bottom=1 moves to top → [2,3,1]; X=1
+
+    XCTAssertEqual(self.calculator.nodeStack.count, 3);
+    XCTAssertEqualWithAccuracy(
+        UDValueAsDouble([self.calculator evaluateNode:self.calculator.nodeStack[0]]), 2.0, 1e-9,
+        @"Bottom should be 2");
+    XCTAssertEqualWithAccuracy(
+        UDValueAsDouble([self.calculator evaluateNode:self.calculator.nodeStack[1]]), 3.0, 1e-9,
+        @"Middle should be 3");
+    XCTAssertEqualWithAccuracy(
+        UDValueAsDouble([self.calculator currentInputValue]), 1.0, 1e-9,
+        @"X (top) should be 1");
 }
 
 - (void)testRPN_ImplicitEnter {
@@ -150,106 +140,6 @@
     [self.calculator performOperation:UDOpAdd];   // 5+5
     
     XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator currentInputValue]), 10.0, 0.0001);
-}
-
-- (void)testRPN_Integration_AreaOfCircle {
-    // -------------------------------------------------------------------------
-    // SETUP
-    // -------------------------------------------------------------------------
-    self.calculator.isRPNMode = YES;
-    
-    // Helper Block to simulate the TableView requesting row count
-    NSInteger (^getRowCount)(void) = ^NSInteger{
-        NSInteger count = self.calculator.currentStackValues.count;
-        return count;
-    };
-    
-    // Helper to get the String for the LAST row (The X Register)
-    NSString* (^getXRegisterString)(void) = ^NSString*{
-        NSArray<UDNumberNode *> *values = [self.calculator currentStackValues];
-        
-        double val = UDValueAsDouble([[values lastObject] value]);
-        return [NSString stringWithFormat:@"%.4g", val]; // Simplified formatting
-    };
-
-    // -------------------------------------------------------------------------
-    // STEP 0: INITIAL STATE
-    // -------------------------------------------------------------------------
-    XCTAssertEqual(getRowCount(), 1, @"UI should show 1 row (Phantom Zero)");
-    XCTAssertEqualObjects(getXRegisterString(), @"0", @"X Register should be 0");
-
-    // -------------------------------------------------------------------------
-    // STEP 1: INPUT RADIUS ("5")
-    // -------------------------------------------------------------------------
-    [self.calculator inputDigit:5];
-    
-    // VERIFY:
-    // Mode: Typing
-    // Stack: [] (Empty)
-    // UI: 1 Row (The "Ghost Buffer" Row)
-    XCTAssertTrue(self.calculator.isTyping);
-    XCTAssertEqual(self.calculator.nodeStack.count, 0);
-    XCTAssertEqual(getRowCount(), 1);
-    XCTAssertEqualObjects(getXRegisterString(), @"5", @"UI should show buffer '5'");
-
-    // -------------------------------------------------------------------------
-    // STEP 2: MULTIPLY (Calculate r^2 -> 25)
-    // -------------------------------------------------------------------------
-    [self.calculator performOperation:UDOpSquare];
-    
-    // VERIFY:
-    // Mode: Idle
-    // Stack: [25] (Consumes 2, Pushes 1)
-    // UI: 1 Row
-    XCTAssertEqual(self.calculator.nodeStack.count, 0);
-    XCTAssertEqual(getRowCount(), 1);
-    XCTAssertEqualObjects(getXRegisterString(), @"25");
-
-    // -------------------------------------------------------------------------
-    // STEP 3: COMMIT
-    // -------------------------------------------------------------------------
-    [self.calculator performOperation:UDOpEnter];
-
-    XCTAssertEqual(self.calculator.nodeStack.count, 1);
-    XCTAssertEqual(getRowCount(), 2);
-    XCTAssertEqualObjects(getXRegisterString(), @"25");
-
-    // -------------------------------------------------------------------------
-    // STEP 4: INPUT PI ("3.14159")
-    // -------------------------------------------------------------------------
-    // Simulate typing: 3 . 1 4 ...
-    [self.calculator inputDigit:3];
-    [self.calculator inputDecimal]; // Assuming you have a helper/op for this
-    [self.calculator inputDigit:1];
-    [self.calculator inputDigit:4];
-    
-    // VERIFY:
-    // Mode: Typing
-    // Stack: [25] (Still there!)
-    // UI: 2 Rows (Row 0: Stack "25", Row 1: Buffer "3.14")
-    XCTAssertTrue(self.calculator.isTyping);
-    XCTAssertEqual(self.calculator.nodeStack.count, 1);
-    XCTAssertEqual(getRowCount(), 2, @"Should show Stack(25) AND Buffer(3.14)");
-    XCTAssertEqualObjects(getXRegisterString(), @"3.14"); // The buffer
-
-    // -------------------------------------------------------------------------
-    // STEP 5: FINAL MULTIPLY (Area)
-    // -------------------------------------------------------------------------
-    // Implicit Enter! User hits '*' while typing.
-    // 1. "3.14" flushes to stack -> [25, 3.14]
-    // 2. '*' consumes both -> [78.5]
-    [self.calculator performOperation:UDOpMul];
-    
-    // VERIFY:
-    // Mode: Idle
-    // Stack: [78.5]
-    // UI: 1 Row
-    XCTAssertTrue(self.calculator.isTyping);
-    XCTAssertEqual(self.calculator.nodeStack.count, 0);
-    XCTAssertEqual(getRowCount(), 1);
-    
-    double result = UDValueAsDouble([[self.calculator currentStackValues][0] value]);
-    XCTAssertEqualWithAccuracy(result, 78.5, 0.1);
 }
 
 @end

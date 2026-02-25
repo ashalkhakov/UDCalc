@@ -24,6 +24,16 @@ typedef NS_ENUM(NSInteger, UDCalcEncodingMode) {
     UDCalcEncodingModeUnicode   = 2
 };
 
+typedef NS_ENUM(NSInteger, UDSYState) {
+    UDSYStateIdle,           // Clean slate, nothing entered yet
+    UDSYStateTypingNumber,   // User is actively typing a number
+    UDSYStateAfterValue,     // A value is complete (number, constant, closing paren, postfix result)
+    UDSYStateAfterOperator,  // An infix operator was just pushed; expecting a new operand
+    UDSYStateAfterResult,    // "=" was pressed; result is displayed
+    UDSYStateRPNResult,      // RPN: result displayed; next digit replaces it,
+                             //      next op uses it (push-then-op)
+};
+
 @protocol UDCalcDelegate <NSObject>
 @optional
 - (void)calculator:(UDCalc *)calc didCalculateResult:(UDValue)result forTree:(UDASTNode *)tree;

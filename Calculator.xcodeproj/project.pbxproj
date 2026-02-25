@@ -13,6 +13,7 @@
 		9A22A84C2F2BBCA40087F296 /* UDCalcViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A22A84A2F2BBCA40087F296 /* UDCalcViewController.m */; };
 		9A3E0DFB2F438C6900EFEFD9 /* UDASTTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3E0DFA2F438C6900EFEFD9 /* UDASTTests.m */; };
 		9A4496B52F2143980024B55F /* UDCalcButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4496B42F2143980024B55F /* UDCalcButton.m */; };
+		9A51EE102F4F66F30054901A /* UDCalcFSMTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A51EE0F2F4F66F30054901A /* UDCalcFSMTests.m */; };
 		9A5589862F1FFDA500159E7B /* UDFrontendContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5589852F1FFDA500159E7B /* UDFrontendContext.m */; };
 		9A5E28BF2F2E76F2001A7618 /* UDValueFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5E28BE2F2E76F2001A7618 /* UDValueFormatter.m */; };
 		9A5E28C02F2E76FB001A7618 /* UDValueFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A5E28BE2F2E76F2001A7618 /* UDValueFormatter.m */; };
@@ -80,6 +81,7 @@
 		9A3E0DFA2F438C6900EFEFD9 /* UDASTTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDASTTests.m; sourceTree = "<group>"; };
 		9A4496B32F2143790024B55F /* UDCalcButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDCalcButton.h; sourceTree = "<group>"; };
 		9A4496B42F2143980024B55F /* UDCalcButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCalcButton.m; sourceTree = "<group>"; };
+		9A51EE0F2F4F66F30054901A /* UDCalcFSMTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCalcFSMTests.m; sourceTree = "<group>"; };
 		9A5589842F1FFD8A00159E7B /* UDFrontendContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDFrontendContext.h; sourceTree = "<group>"; };
 		9A5589852F1FFDA500159E7B /* UDFrontendContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDFrontendContext.m; sourceTree = "<group>"; };
 		9A5E28BC2F2E0481001A7618 /* UDValue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDValue.h; sourceTree = "<group>"; };
@@ -234,6 +236,7 @@
 				9A3E0DFA2F438C6900EFEFD9 /* UDASTTests.m */,
 				9A6666A72F4C36200088C676 /* UDUnitConverterTests.m */,
 				9A6666AE2F4C96040088C676 /* UDConversionHistoryManagerTests.m */,
+				9A51EE0F2F4F66F30054901A /* UDCalcFSMTests.m */,
 			);
 			path = CalculatorTests;
 			sourceTree = "<group>";
@@ -393,6 +396,7 @@
 				9AC4C60C2F27CA8300CD3AD4 /* UDCalc.m in Sources */,
 				9AC4C60F2F27CA8C00CD3AD4 /* UDConversionHistoryManager.m in Sources */,
 				9AC4C6162F27CAA000CD3AD4 /* UDCompiler.m in Sources */,
+				9A51EE102F4F66F30054901A /* UDCalcFSMTests.m in Sources */,
 				9A6666AF2F4C96040088C676 /* UDConversionHistoryManagerTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
