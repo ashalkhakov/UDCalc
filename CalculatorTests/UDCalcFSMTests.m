@@ -183,6 +183,33 @@ static double calcResult(UDCalc *c) {
     XCTAssertEqualWithAccuracy(calcResult(self.calc), 6.0, 1e-9);
 }
 
+- (void)test_Postfix_AdditivePercent {
+    // 100 + 10 % = 110
+    [self.calc inputDigit:1];
+    [self.calc inputDigit:0];
+    [self.calc inputDigit:0];
+    [self.calc performOperation:UDOpAdd];
+    [self.calc inputDigit:1];
+    [self.calc inputDigit:0];
+    [self.calc performOperation:UDOpPercent];
+    [self.calc performOperation:UDOpEq];
+    XCTAssertEqualWithAccuracy(calcResult(self.calc), 110.0, 1e-9);
+}
+
+- (void)test_Postfix_AdditivePercentRepeat {
+    // 100 + 10 % = = 121
+    [self.calc inputDigit:1];
+    [self.calc inputDigit:0];
+    [self.calc inputDigit:0];
+    [self.calc performOperation:UDOpAdd];
+    [self.calc inputDigit:1];
+    [self.calc inputDigit:0];
+    [self.calc performOperation:UDOpPercent];
+    [self.calc performOperation:UDOpEq];
+    [self.calc performOperation:UDOpEq];
+    XCTAssertEqualWithAccuracy(calcResult(self.calc), 121.0, 1e-9);
+}
+
 // ===========================================================================
 #pragma mark - 4. INFIX (binary) operators
 // ===========================================================================
@@ -259,6 +286,14 @@ static double calcResult(UDCalc *c) {
     [self.calc inputDigit:5];
     [self.calc performOperation:UDOpEq];
     XCTAssertEqualWithAccuracy(calcResult(self.calc), 5.0, 1e-9);
+}
+
+// Duplicates the left operand
+- (void)test_Infix_ImplicitOperand {
+    [self.calc inputDigit:5];
+    [self.calc performOperation:UDOpAdd];
+    [self.calc performOperation:UDOpEq];
+    XCTAssertEqualWithAccuracy(calcResult(self.calc), 10.0, 1e-9);
 }
 
 // ===========================================================================
@@ -391,7 +426,22 @@ static double calcResult(UDCalc *c) {
 }
 
 // ===========================================================================
-#pragma mark - 8. CLEAR OPS
+#pragma mark - 8. REPETITION
+// ===========================================================================
+
+- (void)test_Eq_ThenEq_RepeatsLastInfixOperation {
+    [self.calc inputDigit:2];
+    [self.calc performOperation:UDOpAdd];
+    [self.calc inputDigit:2];
+    [self.calc performOperation:UDOpMul];
+    [self.calc inputDigit:3];
+    [self.calc performOperation:UDOpEq];
+    [self.calc performOperation:UDOpEq];
+    XCTAssertEqualWithAccuracy(calcResult(self.calc), 24.0, 1e-9);
+}
+
+// ===========================================================================
+#pragma mark - 9. CLEAR OPS
 // ===========================================================================
 
 // ClearEntry while typing clears buffer but keeps expression
@@ -419,7 +469,7 @@ static double calcResult(UDCalc *c) {
 }
 
 // ===========================================================================
-#pragma mark - 9. MEMORY
+#pragma mark - 10. MEMORY
 // ===========================================================================
 
 - (void)test_Memory_MAddMSubMR {
@@ -447,7 +497,7 @@ static double calcResult(UDCalc *c) {
 }
 
 // ===========================================================================
-#pragma mark - 10. COMPLEX EXPRESSIONS (grammar sentences)
+#pragma mark - 11. COMPLEX EXPRESSIONS (grammar sentences)
 // ===========================================================================
 
 // 2 + 3 * (4 - 1) = 11
@@ -530,7 +580,7 @@ static double calcResult(UDCalc *c) {
 }
 
 // ===========================================================================
-#pragma mark - 11. RPN MODE
+#pragma mark - 12. RPN MODE
 // ===========================================================================
 
 - (void)setUp_RPN {

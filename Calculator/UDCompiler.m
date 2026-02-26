@@ -53,10 +53,29 @@
     // 2. BINARY OPERATOR (Recursively visit Left, then Right, then Op)
     else if ([node isKindOfClass:[UDBinaryOpNode class]]) {
         UDBinaryOpNode *bin = (UDBinaryOpNode *)node;
+
         // Recursion First (Post-Order Traversal)
         [self visitNode:bin.left into:prog withIntegerMode:integerMode];
-        [self visitNode:bin.right into:prog withIntegerMode:integerMode];
-        
+
+        // if the right operand is a postfix with percent operator, and we are looking at a binary op:
+        // e.g. 100 + 5% --> translate into
+        //   100
+        //   + 100 * 0.05
+        if ((bin.info.tag == UDOpAdd || bin.info.tag == UDOpSub)
+            && [bin.right isKindOfClass:[UDPostfixOpNode class]]
+            && ((UDPostfixOpNode *)bin.right).info.tag == UDOpPercent) {
+            UDPostfixOpNode *pn = (UDPostfixOpNode *)bin.right;
+            
+            [self visitNode:bin.left into:prog withIntegerMode:integerMode];
+
+            [self visitNode:pn.child into:prog withIntegerMode:integerMode];
+            [prog addObject:[UDInstruction push:integerMode ? UDValueMakeInt(100) : UDValueMakeDouble(100.0)]];
+            [prog addObject:[UDInstruction op:integerMode ? UDOpcodeDivI : UDOpcodeDiv]];
+            [prog addObject:[UDInstruction op:integerMode ? UDOpcodeMulI : UDOpcodeMul]];
+        } else {
+            [self visitNode:bin.right into:prog withIntegerMode:integerMode];
+        }
+
         // Emit Opcode
         if (bin.info.tag == UDOpAdd) [prog addObject:[UDInstruction op:integerMode? UDOpcodeAddI : UDOpcodeAdd]];
         else if (bin.info.tag == UDOpSub) [prog addObject:[UDInstruction op:integerMode? UDOpcodeSubI : UDOpcodeSub]];

@@ -236,6 +236,16 @@
 
         while (self.opStack.count > 0) [self reduceOp];
 
+        if (op == UDOpEq && self.syState == UDSYStateAfterResult) {
+            // repeat
+            UDASTNode *lastResult = self.nodeStack.lastObject;
+            UDBinaryOpNode *lastNode = [self extractLastInfixActionFromAST:lastResult];
+            if (lastResult && lastNode) {
+                [self.nodeStack removeLastObject];
+                [self.nodeStack addObject:[UDBinaryOpNode info:lastNode.info left:lastResult right:[lastNode.right copy]]];
+            }
+        }
+
         UDValue result = [self evaluateCurrentExpression];
         double  d      = UDValueAsDouble(result);
 
@@ -539,6 +549,25 @@
 }
 
 #pragma mark - AST Construction & Exec
+
+- (UDBinaryOpNode *)extractLastInfixActionFromAST:(UDASTNode *)root {
+    if (!root) return nil;
+
+    // Case 1: Binary Operation (e.g., 2 + 3)
+    if ([root isKindOfClass:[UDBinaryOpNode class]]) {
+        UDBinaryOpNode *bin = (UDBinaryOpNode *)root;
+        
+        // If the right side is another operation, we drill down
+        // to find the 'leaf' action (the last thing typed)
+        if ([bin.right isKindOfClass:[UDBinaryOpNode class]]) {
+            return [self extractLastInfixActionFromAST:bin.right];
+        }
+        
+        return bin;
+    }
+
+    return nil;
+}
 
 - (void)reduceOp {
     if (self.opStack.count == 0) return;

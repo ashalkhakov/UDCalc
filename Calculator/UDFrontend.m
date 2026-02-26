@@ -420,11 +420,23 @@
 - (UDFrontendAction)binaryOp:(NSInteger)opTag {
     __weak typeof(self) weakSelf = self;
     return ^UDASTNode *(UDFrontendContext *ctx) {
-        UDASTNode *r = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-        UDASTNode *l = [ctx.nodeStack lastObject]; [ctx.nodeStack removeLastObject];
-
-        UDOpInfo *info = [weakSelf infoForOp:opTag];
-        return [UDBinaryOpNode info:info left:l right:r];
+        if (ctx.nodeStack.count < 2) {
+            // implicitly duplicate the operand
+            UDASTNode *l = [ctx.nodeStack lastObject];
+            [ctx.nodeStack removeLastObject];
+            UDASTNode *r = [l copy];
+            
+            UDOpInfo *info = [weakSelf infoForOp:opTag];
+            return [UDBinaryOpNode info:info left:l right:r];
+        } else {
+            UDASTNode *r = [ctx.nodeStack lastObject];
+            [ctx.nodeStack removeLastObject];
+            UDASTNode *l = [ctx.nodeStack lastObject];
+            [ctx.nodeStack removeLastObject];
+            
+            UDOpInfo *info = [weakSelf infoForOp:opTag];
+            return [UDBinaryOpNode info:info left:l right:r];
+        }
     };
 }
 
