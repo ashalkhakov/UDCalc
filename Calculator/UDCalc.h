@@ -66,6 +66,7 @@ typedef NS_ENUM(NSInteger, UDSYState) {
 - (void)inputDigit:(NSInteger)digit;
 - (void)inputDecimal;
 - (void)inputNumber:(UDValue)number;
+- (void)inputEE;
 - (void)performOperation:(UDOp)op;
 - (void)reset;
 

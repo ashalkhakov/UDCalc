@@ -43,7 +43,11 @@ static const NSInteger kUDPrecedenceAtomic = 1000;
 }
 - (NSInteger)precedence { return kUDPrecedenceAtomic; }
 - (NSString *)prettyPrint {
-    return [UDValueFormatter stringForValue:self.value base:UDBaseDec showThousandsSeparators:NO decimalPlaces:10];
+    return [UDValueFormatter stringForValue:self.value
+                                       base:UDBaseDec
+                    showThousandsSeparators:NO
+                              decimalPlaces:10
+                            forceScientific:NO];
 }
 
 - (BOOL)isEqual:(id)object {

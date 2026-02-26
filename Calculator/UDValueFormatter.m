@@ -9,7 +9,7 @@
 
 @implementation UDValueFormatter
 
-+ (NSString *)stringForValue:(UDValue)val base:(UDBase)base showThousandsSeparators:(BOOL)showThousandsSeparators decimalPlaces:(NSInteger)places {
++ (NSString *)stringForValue:(UDValue)val base:(UDBase)base showThousandsSeparators:(BOOL)showThousandsSeparators decimalPlaces:(NSInteger)places forceScientific:(BOOL)forceScientific {
     // 1. Handle Errors
     if (val.type == UDValueTypeErr) {
         return @"Error";
@@ -18,20 +18,32 @@
     // 2. Handle Doubles (Scientific Mode)
     // Doubles ignore the 'base' and always print as Decimal
     if (val.type == UDValueTypeDouble) {
-        NSNumberFormatter *fmt = [[NSNumberFormatter alloc] init];
-        fmt.numberStyle = NSNumberFormatterDecimalStyle;
-        fmt.usesGroupingSeparator = showThousandsSeparators;
+        double dbl = val.v.doubleValue;
+        double absDbl = fabs(dbl);
         
-        if (places == -1) {
-            // AUTO Mode (Behavior like %.10g)
-            fmt.maximumFractionDigits = 10;
-        } else {
-            // FIXED Mode (Behavior like %.Nf)
-            fmt.maximumFractionDigits = places;
-        }
-        fmt.minimumFractionDigits = 0; // Don't force trailing zeros
+        NSNumberFormatter *fmt = [[NSNumberFormatter alloc] init];
+        fmt.usesGroupingSeparator = showThousandsSeparators;
+        fmt.minimumFractionDigits = 0;
+        
+        // Threshold check: Should we use Scientific Notation?
+        // Apple usually flips to scientific for numbers >= 1 billion
+        // or smaller than 0.001 (excluding zero).
+        BOOL useScientific = forceScientific || (absDbl >= 1e10 || (absDbl < 1e-4 && absDbl > 0));
 
-        return [fmt stringFromNumber:@(val.v.doubleValue)];
+        if (useScientific) {
+            fmt.numberStyle = NSNumberFormatterScientificStyle;
+            fmt.positiveFormat = @"0.######E0";
+            fmt.exponentSymbol = @" e ";
+        } else {
+            fmt.numberStyle = NSNumberFormatterDecimalStyle;
+            if (places == -1) {
+                fmt.maximumFractionDigits = 10;
+            } else {
+                fmt.maximumFractionDigits = places;
+            }
+        }
+
+        return [fmt stringFromNumber:@(dbl)];
     }
 
     // 3. Handle Integers (Programmer Mode)
