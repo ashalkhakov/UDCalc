@@ -273,7 +273,7 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
     settings.showBinaryView = self.calc.isBinaryViewShown;
     settings.showThousandsSeparators = self.calc.showThousandsSeparators;
     settings.decimalPlaces = self.calc.decimalPlaces;
-    
+
     [settings forceSync];
 }
 
@@ -473,9 +473,7 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
 }
 
 - (IBAction)decimalPressed:(NSButton *)sender {
-   NSLog(@"decimal pressed");
-
-     // 1. Update Calc
+    // 1. Update Calc
     // This switches 'typing' to YES and sets the internal decimal multiplier
     [self.calc inputDecimal];
 

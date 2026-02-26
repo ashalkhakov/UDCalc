@@ -915,4 +915,23 @@
     XCTAssertEqualWithAccuracy(UDValueAsDouble([self.calculator evaluateCurrentExpression]), 46.0, 0.0001);
 }
 
+#pragma mark - Exponent notation
+
+- (void)testExponentInput {
+    [self.calculator inputDigit:3];
+    [self.calculator inputEE];
+    [self.calculator inputDigit:2];
+    [self.calculator performOperation:UDOpNegate];
+    
+    XCTAssertEqualObjects(self.calculator.currentDisplayValue, @"3 e -2");
+}
+
+- (void)testExponentInputZero {
+    [self.calculator inputEE];
+    [self.calculator inputDigit:2];
+    [self.calculator performOperation:UDOpNegate];
+    
+    XCTAssertEqualObjects(self.calculator.currentDisplayValue, @"0 e -2");
+}
+
 @end

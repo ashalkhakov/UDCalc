@@ -613,19 +613,11 @@
 }
 
 - (UDValue)currentInputValue {
-    if (self.isTyping) return [self.inputBuffer finalizeValue];
-    if (self.nodeStack.count > 0) return [self evaluateCurrentExpression];
-    return UDValueMakeDouble(0.0);
+    return [self.inputBuffer finalizeValue];
 }
 
 - (NSString *)currentDisplayValue {
-    UDValue val = [self currentInputValue];
-
-    if (self.isTyping) {
-        return [self.inputBuffer stringForValue:val showThousandsSeparators:self.showThousandsSeparators decimalPlaces:15];
-    } else {
-        return [self stringForValue:val];
-    }
+    return [self.inputBuffer displayStringWithThousandsSeparators:self.showThousandsSeparators];
 }
 
 - (NSArray<UDNumberNode *> *)currentStackValues {
@@ -648,7 +640,11 @@
 }
 
 - (NSString *)stringForValue:(UDValue)value {
-    return [self.inputBuffer stringForValue:value showThousandsSeparators:self.showThousandsSeparators decimalPlaces:self.decimalPlaces];
+    return [UDValueFormatter stringForValue:value
+                                       base:self.inputBase
+                    showThousandsSeparators:self.showThousandsSeparators
+                              decimalPlaces:self.decimalPlaces
+                            forceScientific:NO];
 }
 
 - (NSString *)currentValueEncoded {

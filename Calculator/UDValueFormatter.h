@@ -12,9 +12,15 @@
 @interface UDValueFormatter : NSObject
 
 // Main method: Converts a UDValue to a string in the given base
-+ (NSString *)stringForValue:(UDValue)value base:(UDBase)base showThousandsSeparators:(BOOL)showThousandsSeparators decimalPlaces:(NSInteger)decimalPlaces;
++ (NSString *)stringForValue:(UDValue)value
+                        base:(UDBase)base
+     showThousandsSeparators:(BOOL)showThousandsSeparators
+               decimalPlaces:(NSInteger)decimalPlaces
+             forceScientific:(BOOL)forceScientific;
 
 // Helper: Converts a raw long long (useful for the InputBuffer display)
-+ (NSString *)stringForLong:(unsigned long long)val base:(UDBase)base showThousandsSeparators:(BOOL)showThousandsSeparators;
++ (NSString *)stringForLong:(unsigned long long)val
+                       base:(UDBase)base
+    showThousandsSeparators:(BOOL)showThousandsSeparators;
 
 @end

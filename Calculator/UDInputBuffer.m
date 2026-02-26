@@ -215,6 +215,21 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
         return UDValueMakeInt(self.mantissaBuffer);
     }
 
+    double value = [self mantissa];
+    
+    long long finalExp = self.exponentBuffer;
+    if (self.isExponentNegative) {
+        finalExp = -finalExp;
+    }
+    
+    if (finalExp != 0) {
+        value = value * pow(10, (double)finalExp);
+    }
+    
+    return UDValueMakeDouble(value);
+}
+
+- (double)mantissa {
     // 1. Convert Mantissa Digits
     double value = (double)self.mantissaBuffer;
     
@@ -227,25 +242,34 @@ static const long long MAX_DIGITS_LIMIT = 10000000000000000LL;
     if (self.decimalShift > 0) {
         value = value * pow(10, -((double)self.decimalShift));
     }
-    
-    // 4. Calculate Total Exponent
-    long long finalExp = self.exponentBuffer;
-    if (self.isExponentNegative) {
-        finalExp = -finalExp;
-    }
-    
-    // 5. Combine: Value * 10^Exp
-    if (finalExp != 0) {
-        value = value * pow(10, (double)finalExp);
-    }
-    
-    return UDValueMakeDouble(value);
+
+    return value;
 }
 
-- (NSString *)stringForValue:(UDValue)value showThousandsSeparators:(BOOL)showThousandsSeparators decimalPlaces:(NSInteger)places {
-    return _isIntegerMode
-        ? [UDValueFormatter stringForValue:value base:self.inputBase showThousandsSeparators:showThousandsSeparators decimalPlaces:places]
-        : [UDValueFormatter stringForValue:value base:UDBaseDec showThousandsSeparators:showThousandsSeparators decimalPlaces:places];
+- (NSString *)displayStringWithThousandsSeparators:(BOOL)showThousandsSeparators {
+    if (_isIntegerMode) {
+        return [UDValueFormatter stringForValue:[self finalizeValue]
+                                           base:self.inputBase
+                        showThousandsSeparators:showThousandsSeparators
+                                  decimalPlaces:15
+                                forceScientific:NO];
+    }
+   
+    NSNumberFormatter *fmt = [[NSNumberFormatter alloc] init];
+    fmt.usesGroupingSeparator = showThousandsSeparators;
+    fmt.minimumFractionDigits = 0;
+    fmt.numberStyle = NSNumberFormatterDecimalStyle;
+    fmt.maximumFractionDigits = 15;
+
+    if (_inExponentMode) {
+        double value = [self mantissa];
+
+        return [NSString stringWithFormat:@"%@ e %lld", [fmt stringFromNumber:@(value)], _isExponentNegative ? -_exponentBuffer : _exponentBuffer];
+    } else {
+        UDValue value = [self finalizeValue];
+        
+        return [fmt stringFromNumber:@(UDValueAsDouble(value))];
+    }
 }
 
 @end
