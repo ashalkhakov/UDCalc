@@ -18,29 +18,6 @@
 
 #ifdef GNUSTEP
 
-@implementation NSDimension (UDGNUstepCompat)
-
-- (BOOL)isEqual:(id)object {
-    if (self == object) return YES;
-
-    if (![object isKindOfClass:[NSDimension class]]) return NO;
-
-    NSDimension *other = (NSDimension *)object;
-    if (![self isMemberOfClass:[other class]]) return NO;
-
-    if (![self.symbol isEqualToString:other.symbol]) return NO;
-
-    if (![self.converter isEqual:other.converter]) return NO;
-
-    return YES;
-}
-
-- (NSUInteger)hash {
-    return [self.class hash] ^ [self.symbol hash];
-}
-
-@end
-
 @implementation NSUnitConverter (UDGNUstepCompat)
 
 - (BOOL)isEqual:(id)object {

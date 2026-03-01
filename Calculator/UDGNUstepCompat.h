@@ -14,9 +14,6 @@
  *
  * Compatibility shims provided:
  *
- *   NSDimension and NSUnitConverter:
- *     isEqual: Cocoa-compatible equality for dimensions
- *
  *   NSFont:
  *     monospacedDigitSystemFontOfSize - returns a fixed-pitch font that is
  *       suitable for displaying numeric values in a tabular layout where
@@ -60,18 +57,6 @@
 #ifndef IBInspectable
 #define IBInspectable
 #endif
-
-/* ------------------------------------------------------------
- * NSDimension
- * ------------------------------------------------------------ */
-#import <Foundation/NSUnit.h>
-
-@interface NSDimension (UDGNUstepCompat)
-- (BOOL) isEqual:(id)object;
-@end
-@interface NSUnitConverter (UDGNUstepCompat)
-- (BOOL) isEqual:(id)object;
-@end
 
 /* GUI shims below require AppKit; skip when building non-GUI targets
  * (e.g. command-line test runners linked with gnustep-base only). */
