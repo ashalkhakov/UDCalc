@@ -8,6 +8,7 @@
 #import "AppDelegate.h"
 #import "UDCalcButton.h"
 #import "UDSettingsManager.h"
+#import "UDSelfTest.h"
 
 @interface AppDelegate ()
 
@@ -69,7 +70,9 @@
     // GNUstep's First Responder (target=-1) resolution doesn't
     // reliably find action methods on view controllers.  Set the
     // targets directly so menu items are always enabled.
-    {
+    // Run with -UDMenusUseFirstResponder YES to leave them on the First
+    // Responder (to check newer GNUstep/Gershwin builds that resolve it).
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"UDMenusUseFirstResponder"]) {
         NSMenu *mainMenu = [NSApp mainMenu];
         for (NSInteger i = 0; i < [mainMenu numberOfItems]; i++) {
             NSMenu *sub = [[mainMenu itemAtIndex:i] submenu];
@@ -99,6 +102,10 @@
     // open the tape window
     if ([UDSettingsManager sharedManager].showTapeWindow) {
         [self showTape:nil];
+    }
+
+    if (UDSelfTestFilter) {
+        UDStartSelfTest(self);
     }
 }
 

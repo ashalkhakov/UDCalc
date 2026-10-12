@@ -851,6 +851,17 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
     [self updateDisplayIndicators];
 }
 
+#pragma mark - Responder chain
+
+// The menu's First Responder items (modes, RPN, Copy/Paste, ...) are
+// implemented here. The app makes this controller the window's first
+// responder at launch; GNUstep's -makeFirstResponder: refuses a responder
+// that does not accept first responder status, which would leave the window
+// as first responder and those items with nobody to send to.
+- (BOOL)acceptsFirstResponder {
+    return YES;
+}
+
 #pragma mark - Copy & Paste
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)item {
@@ -901,7 +912,9 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
 
     // 2. Clear and write to Pasteboard
     NSPasteboard *pb = [NSPasteboard generalPasteboard];
-    [pb clearContents];
+    // declareTypes: rather than clearContents: GNUstep only stores a type
+    // that was declared first; macOS accepts both.
+    [pb declareTypes:@[NSPasteboardTypeString] owner:nil];
     [pb setString:stringToCopy forType:NSPasteboardTypeString];
 }
 
