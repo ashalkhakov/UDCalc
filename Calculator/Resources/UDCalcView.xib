@@ -131,7 +131,7 @@
                                                             </textFieldCell>
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
-                                                                <tableCellView id="25A-dm-cLc">
+                                                                <tableCellView identifier="StackCell" id="25A-dm-cLc">
                                                                     <rect key="frame" x="8" y="0.0" width="531" height="24"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>

@@ -21,6 +21,7 @@
 		9A6666AD2F4C5A5B0088C676 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 9A6666AC2F4C5A5B0088C676 /* en.lproj */; };
 		9A6666AF2F4C96040088C676 /* UDConversionHistoryManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A6666AE2F4C96040088C676 /* UDConversionHistoryManagerTests.m */; };
 		9A717CA52F1D1D9F005A27B7 /* UDTape.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CA42F1D1D9F005A27B7 /* UDTape.m */; };
+		9ADD5E1F2F8A000000000001 /* UDSelfTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ADD5E1F2F8A000000000002 /* UDSelfTest.m */; };
 		9A717CAB2F1D2085005A27B7 /* UDTapeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CAA2F1D2085005A27B7 /* UDTapeWindowController.m */; };
 		9A717CAF2F1D493A005A27B7 /* UDFrontend.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CAE2F1D493A005A27B7 /* UDFrontend.m */; };
 		9A7B94EE2F1BB18600ED7306 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B94ED2F1BB18600ED7306 /* AppDelegate.m */; };
@@ -92,6 +93,8 @@
 		9A6666AE2F4C96040088C676 /* UDConversionHistoryManagerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDConversionHistoryManagerTests.m; sourceTree = "<group>"; };
 		9A717CA32F1D1D44005A27B7 /* UDTape.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDTape.h; sourceTree = "<group>"; };
 		9A717CA42F1D1D9F005A27B7 /* UDTape.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDTape.m; sourceTree = "<group>"; };
+		9ADD5E1F2F8A000000000002 /* UDSelfTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDSelfTest.m; sourceTree = "<group>"; };
+		9ADD5E1F2F8A000000000003 /* UDSelfTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDSelfTest.h; sourceTree = "<group>"; };
 		9A717CA92F1D2062005A27B7 /* UDTapeWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDTapeWindowController.h; sourceTree = "<group>"; };
 		9A717CAA2F1D2085005A27B7 /* UDTapeWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDTapeWindowController.m; sourceTree = "<group>"; };
 		9A717CAE2F1D493A005A27B7 /* UDFrontend.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDFrontend.m; sourceTree = "<group>"; };
@@ -193,6 +196,8 @@
 				9A7B95092F1C0E1A00ED7306 /* UDConversionHistoryManager.h */,
 				9A717CA32F1D1D44005A27B7 /* UDTape.h */,
 				9A717CA42F1D1D9F005A27B7 /* UDTape.m */,
+				9ADD5E1F2F8A000000000003 /* UDSelfTest.h */,
+				9ADD5E1F2F8A000000000002 /* UDSelfTest.m */,
 				9A717CA92F1D2062005A27B7 /* UDTapeWindowController.h */,
 				9A717CAA2F1D2085005A27B7 /* UDTapeWindowController.m */,
 				9A717CAE2F1D493A005A27B7 /* UDFrontend.m */,
@@ -361,6 +366,7 @@
 				9A0D01C22F234AD000FE2946 /* UDInputBuffer.m in Sources */,
 				9AE3F6862F1EAB1F00E1CFCF /* UDVM.m in Sources */,
 				9A717CA52F1D1D9F005A27B7 /* UDTape.m in Sources */,
+				9ADD5E1F2F8A000000000001 /* UDSelfTest.m in Sources */,
 				9A7B94FD2F1BE4FF00ED7306 /* UDCalc.m in Sources */,
 				9A4496B52F2143980024B55F /* UDCalcButton.m in Sources */,
 				9A7B95082F1C0E0700ED7306 /* UDConversionHistoryManager.m in Sources */,

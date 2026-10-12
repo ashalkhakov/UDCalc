@@ -73,7 +73,8 @@ UDUnitConverter.h \
 UDVM.h \
 UDValue.h \
 UDValueFormatter.h \
-UDGNUstepCompat.h
+UDGNUstepCompat.h \
+UDSelfTest.h
 
 #
 # Objective-C Class files
@@ -99,7 +100,8 @@ UDTapeWindowController.m \
 UDUnitConverter.m \
 UDVM.m \
 UDValueFormatter.m \
-UDGNUstepCompat.m
+UDGNUstepCompat.m \
+UDSelfTest.m
 
 #
 # Other sources
