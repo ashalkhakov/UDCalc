@@ -33,3 +33,17 @@ FIRST_RESPONDER=1 Tests/run-self-test.sh   # leave menu items on the First Respo
 Inside a running Gershwin session, `Calculator.app/Calculator --self-test`
 runs against the real desktop.
 
+# Trying it on Gershwin (dev) in Docker
+
+`Tests/gershwin-dev/` builds Gershwin's unstable desktop from source in a
+container you look at over VNC, with UDCalc built from this checkout and
+started in it:
+
+```sh
+Tests/gershwin-dev/run.sh build      # once, ~30-40 min
+Tests/gershwin-dev/run.sh desktop    # open vnc://localhost:5900 (password: gershwin)
+Tests/gershwin-dev/run.sh selftest   # the self-test against that build
+```
+
+See `Tests/gershwin-dev/README.md`.
+

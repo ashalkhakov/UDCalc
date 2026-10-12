@@ -1,0 +1,44 @@
+--- a/Source/NSScrollView.m	2026-10-12 15:15:02.981811126 +0500
++++ b/Source/NSScrollView.m	2026-10-12 15:15:03.025089643 +0500
+@@ -30,6 +30,7 @@
+    Boston, MA 02110-1301, USA.
+ */
+ 
++#import <Foundation/NSHashTable.h>
+ #import <Foundation/NSDebug.h>
+ #import <Foundation/NSException.h>
+ #import <Foundation/NSNotification.h>
+@@ -107,6 +108,7 @@
+ - (void) _synchronizeHeaderAndCornerView;
+ - (void) _themeDidActivate: (NSNotification*)notification;
+ - (void) _autohideScrollers;
++- (void) _autohideScrollersOnce;
+ - (void) _setHasHorizScroller: (BOOL)flag;
+ - (void) _setHasVertScroller: (BOOL)flag;
+ @end
+@@ -856,6 +858,25 @@
+  */
+ - (void) _autohideScrollers
+ {
++  static NSHashTable *deciding = nil;
++
++  /* Re-tiling for a decision comes back here; let the outer call decide. */
++  if (deciding == nil)
++    {
++      deciding = [[NSHashTable alloc]
++        initWithOptions: NSHashTableObjectPointerPersonality capacity: 4];
++    }
++  if ([deciding containsObject: self])
++    {
++      return;
++    }
++  [deciding addObject: self];
++  [self _autohideScrollersOnce];
++  [deciding removeObject: self];
++}
++
++- (void) _autohideScrollersOnce
++{
+   NSView *documentView = [_contentView documentView];
+   static const CGFloat fitSlack = 1.0;
+   NSSize documentSize;
