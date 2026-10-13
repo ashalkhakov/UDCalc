@@ -74,7 +74,8 @@ UDVM.h \
 UDValue.h \
 UDValueFormatter.h \
 UDGNUstepCompat.h \
-UDSelfTest.h
+UDSelfTest.h \
+UDUpdater.h
 
 #
 # Objective-C Class files
@@ -101,7 +102,8 @@ UDUnitConverter.m \
 UDVM.m \
 UDValueFormatter.m \
 UDGNUstepCompat.m \
-UDSelfTest.m
+UDSelfTest.m \
+UDUpdater.m
 
 #
 # Other sources

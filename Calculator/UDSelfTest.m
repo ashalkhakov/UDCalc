@@ -14,6 +14,7 @@
 #import "UDCalcViewController.h"
 #import "UDCalcButton.h"
 #import "UDSettingsManager.h"
+#import "UDUpdater.h"
 
 NSString *UDSelfTestFilter;
 
@@ -443,6 +444,17 @@ static void UDRunFeatures(void) {
               @"When the app quits and its windows are closed, the tape will open at the next launch");
         UDApp.tapeWindowController.isAppTerminating = NO;
         [UDWindow() makeKeyAndOrderFront:nil];
+    });
+
+    UDFeature(@"Updates");
+
+    // In the app menu where there is an updater (Sparkle, on macOS); not
+    // where the image is updated from outside (GNUstep's AppImage).
+    UDScenario(@"Check for Updates… where the app can update itself", ^{
+        BOOL hasUpdater = [[UDUpdater alloc] initStarting:NO].available;
+        NSMenuItem *check = [[[[NSApp mainMenu] itemAtIndex:0] submenu] itemWithTag:7100];
+        UDSay((check != nil) == hasUpdater && (!check || check.action == @selector(checkForUpdates:)),
+              [NSString stringWithFormat:@"Then Check for Updates… is %@", hasUpdater ? @"in the app menu" : @"not offered"]);
     });
 }
 

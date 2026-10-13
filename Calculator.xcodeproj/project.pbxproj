@@ -22,6 +22,8 @@
 		9A6666AF2F4C96040088C676 /* UDConversionHistoryManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A6666AE2F4C96040088C676 /* UDConversionHistoryManagerTests.m */; };
 		9A717CA52F1D1D9F005A27B7 /* UDTape.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CA42F1D1D9F005A27B7 /* UDTape.m */; };
 		9ADD5E1F2F8A000000000001 /* UDSelfTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ADD5E1F2F8A000000000002 /* UDSelfTest.m */; };
+		9ADD5E1F2F8A000000000101 /* UDUpdater-Apple.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ADD5E1F2F8A000000000102 /* UDUpdater-Apple.m */; };
+		9ADD5E1F2F8A000000000105 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 9ADD5E1F2F8A000000000107 /* Sparkle */; };
 		9A717CAB2F1D2085005A27B7 /* UDTapeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CAA2F1D2085005A27B7 /* UDTapeWindowController.m */; };
 		9A717CAF2F1D493A005A27B7 /* UDFrontend.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CAE2F1D493A005A27B7 /* UDFrontend.m */; };
 		9A7B94EE2F1BB18600ED7306 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B94ED2F1BB18600ED7306 /* AppDelegate.m */; };
@@ -95,6 +97,9 @@
 		9A717CA42F1D1D9F005A27B7 /* UDTape.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDTape.m; sourceTree = "<group>"; };
 		9ADD5E1F2F8A000000000002 /* UDSelfTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDSelfTest.m; sourceTree = "<group>"; };
 		9ADD5E1F2F8A000000000003 /* UDSelfTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDSelfTest.h; sourceTree = "<group>"; };
+		9ADD5E1F2F8A000000000103 /* UDUpdater.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDUpdater.h; sourceTree = "<group>"; };
+		9ADD5E1F2F8A000000000102 /* UDUpdater-Apple.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UDUpdater-Apple.m"; sourceTree = "<group>"; };
+		9ADD5E1F2F8A000000000104 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9A717CA92F1D2062005A27B7 /* UDTapeWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDTapeWindowController.h; sourceTree = "<group>"; };
 		9A717CAA2F1D2085005A27B7 /* UDTapeWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDTapeWindowController.m; sourceTree = "<group>"; };
 		9A717CAE2F1D493A005A27B7 /* UDFrontend.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDFrontend.m; sourceTree = "<group>"; };
@@ -142,6 +147,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9ADD5E1F2F8A000000000105 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +191,7 @@
 				9A7B94ED2F1BB18600ED7306 /* AppDelegate.m */,
 				9A7B94EF2F1BB18800ED7306 /* Assets.xcassets */,
 				9A7B94F42F1BB18800ED7306 /* main.m */,
+				9ADD5E1F2F8A000000000104 /* Info.plist */,
 				9A7B94F62F1BB18800ED7306 /* Calculator.entitlements */,
 				9A7B94FC2F1BE4FF00ED7306 /* UDCalc.m */,
 				9A7B94FE2F1BE51100ED7306 /* UDCalc.h */,
@@ -198,6 +205,8 @@
 				9A717CA42F1D1D9F005A27B7 /* UDTape.m */,
 				9ADD5E1F2F8A000000000003 /* UDSelfTest.h */,
 				9ADD5E1F2F8A000000000002 /* UDSelfTest.m */,
+				9ADD5E1F2F8A000000000103 /* UDUpdater.h */,
+				9ADD5E1F2F8A000000000102 /* UDUpdater-Apple.m */,
 				9A717CA92F1D2062005A27B7 /* UDTapeWindowController.h */,
 				9A717CAA2F1D2085005A27B7 /* UDTapeWindowController.m */,
 				9A717CAE2F1D493A005A27B7 /* UDFrontend.m */,
@@ -262,6 +271,9 @@
 			dependencies = (
 			);
 			name = Calculator;
+			packageProductDependencies = (
+				9ADD5E1F2F8A000000000107 /* Sparkle */,
+			);
 			productName = Calculator;
 			productReference = 9A7B94E92F1BB18600ED7306 /* Calculator.app */;
 			productType = "com.apple.product-type.application";
@@ -311,6 +323,9 @@
 				Base,
 			);
 			mainGroup = 9A7B94E02F1BB18600ED7306;
+			packageReferences = (
+				9ADD5E1F2F8A000000000106 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			productRefGroup = 9A7B94EA2F1BB18600ED7306 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -367,6 +382,7 @@
 				9AE3F6862F1EAB1F00E1CFCF /* UDVM.m in Sources */,
 				9A717CA52F1D1D9F005A27B7 /* UDTape.m in Sources */,
 				9ADD5E1F2F8A000000000001 /* UDSelfTest.m in Sources */,
+				9ADD5E1F2F8A000000000101 /* UDUpdater-Apple.m in Sources */,
 				9A7B94FD2F1BE4FF00ED7306 /* UDCalc.m in Sources */,
 				9A4496B52F2143980024B55F /* UDCalcButton.m in Sources */,
 				9A7B95082F1C0E0700ED7306 /* UDConversionHistoryManager.m in Sources */,
@@ -539,6 +555,7 @@
 				DEVELOPMENT_TEAM = H5GRGUR75L;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Calculator/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainNibFile = MainMenu;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -565,6 +582,7 @@
 				DEVELOPMENT_TEAM = H5GRGUR75L;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Calculator/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainNibFile = MainMenu;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -642,6 +660,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9ADD5E1F2F8A000000000106 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = 2.10.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9ADD5E1F2F8A000000000107 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9ADD5E1F2F8A000000000106 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9A7B94E12F1BB18600ED7306 /* Project object */;
 }

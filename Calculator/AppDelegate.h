@@ -27,6 +27,7 @@
 @property (nonatomic, weak) IBOutlet NSMenu *recentMenu;
 
 - (IBAction)conversionMenuClicked:(NSMenuItem *)sender;
+- (IBAction)checkForUpdates:(id)sender;
 
 @end
 
