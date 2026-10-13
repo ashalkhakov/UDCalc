@@ -3,7 +3,6 @@
 # universal, into $RELEASE_DIR. Built ad hoc signed; macos-sign signs it
 # for real when the certificate is there.
 set -euo pipefail
-./Scripts/stamp-version.sh "$APP_VERSION"
 xcodebuild -project Calculator.xcodeproj -scheme Calculator \
   -destination 'generic/platform=macOS' -configuration Release \
   -derivedDataPath "$RUNNER_TEMP/DerivedData" ONLY_ACTIVE_ARCH=NO \
