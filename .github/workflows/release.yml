@@ -28,9 +28,6 @@ permissions:
   contents: write   # to attach files to the release
 
 env:
-  # The shared repository the gnustep-gui fixes come from, and the pin that
-  # decides which of them this build gets (TopoText's).
-  GNUSTEP_PATCHES_REF: dcbad8f6db6db7054bc9152aad3e8686a233809d
   TAG: ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || '' }}
 
 jobs:
@@ -177,6 +174,12 @@ jobs:
         with:
           ref: ${{ env.TAG || github.ref }}
           path: source
+
+      # The commits this builds on: .github/pins.env, the only place.
+      - name: Pins
+        uses: ashalkhakov/gnustep-release-actions/pins@v1
+        with:
+          file: source/.github/pins.env
 
       - uses: actions/checkout@v4
         with:
