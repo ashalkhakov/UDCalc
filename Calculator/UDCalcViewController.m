@@ -18,7 +18,14 @@ NSString * const UDCalcResultKey = @"UDCalcResultKey";
 
 @interface UDCalcViewController ()
 @property (nonatomic, assign) NSInteger previousEncodingSegment;
+// The display's font as designed; a long number is shown smaller (#16).
+@property (nonatomic, strong) NSFont *displayBaseFont;
 @end
+
+// Smallest font a long number is shrunk to before it is clipped.
+static const CGFloat kMinDisplayFontSize = 16.0;
+// Room left on the right of the display text, so it does not touch the edge.
+static const CGFloat kDisplayTextMargin  = 8.0;
 
 // XIB-designed standard sizes (matching the frame rects in UDCalcView.xib)
 static const CGFloat kStandardScientificWidth       = 365.0;
@@ -83,6 +90,7 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
         for (NSTabViewItem *item in [self.displayTabView tabViewItems])
             [[item view] setFrame:NSMakeRect(0, 0, dw, dh)];
         [self.displayField setFrame:NSMakeRect(0, 0, dw, dh)];
+        [self fitDisplayFont];
 
         /* RPN tab (index 1): scroll view (stack table) fills left,
            button column hugs the right edge, aligned to the top. */
@@ -93,6 +101,17 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
         if (rpnScroll) {
             CGFloat scrollW = MAX(0, dw - kRPNButtonColumnWidth);
             [rpnScroll setFrame:NSMakeRect(0, 0, scrollW, dh)];
+
+            /* The stack's single column spans the visible width, so there
+               is nothing to scroll sideways to. AppKit does this from the
+               xib's column autoresizing style; GNUstep does not (#7). */
+            static const CGFloat kStackTextMargin = 8.0;
+            NSTableColumn *stackColumn = self.stackTableView.tableColumns.firstObject;
+            self.stackTableView.intercellSpacing = NSMakeSize(0, self.stackTableView.intercellSpacing.height);
+            CGFloat columnW = NSWidth(rpnScroll.contentView.bounds) - kStackTextMargin;
+            if (stackColumn && columnW > stackColumn.minWidth) {
+                stackColumn.width = columnW;
+            }
 
             /* The button stack view is the sibling of the scroll view */
             [self.stackButtonsView setFrame:NSMakeRect(scrollW, 0,
@@ -190,6 +209,20 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
     _layoutWrapperH    = kStandardBitWrapperHeight;
     _layoutDisplayH    = kMinDisplayHeight;
 
+    // The Rad and character indicators overlap the display field. As its
+    // siblings they are painted over whenever the field alone redraws for a
+    // new value on GNUstep, which does not redraw overlapping siblings
+    // (AppKit does). As its subviews they are always drawn after it.
+    for (NSTextField *indicator in @[ self.radLabel, self.charLabel ]) {
+        if (indicator.superview == self.displayField.superview) {
+            NSRect frame = [self.displayField convertRect:indicator.frame
+                                                 fromView:indicator.superview];
+            [indicator removeFromSuperview];
+            indicator.frame = frame;
+            [self.displayField addSubview:indicator];
+        }
+    }
+
 #ifdef GNUSTEP
     {
         NSColor *dark = [NSColor blackColor];
@@ -211,6 +244,10 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
     [self.programmerGridView mergeCellsInHorizontalRange:NSMakeRange(5, 2)
                                            verticalRange:NSMakeRange(5, 1)];
 #endif
+
+    self.stackTableView.allowsEmptySelection = YES;
+    [self.stackTableView deselectAll:nil];
+    self.stackTableView.enclosingScrollView.hasHorizontalScroller = NO;
 
     // Listen for the app closing
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -686,6 +723,12 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
     return MAX(0, visibleRows - actualRows);
 }
 
+// The stack shows values; a row is never selected (on GNUstep the table
+// otherwise highlights one, as the xib does not allow an empty selection).
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row {
+    return NO;
+}
+
 // 1. Data Source: How many rows?
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
     NSInteger count = self.calc.currentStackValues.count;
@@ -714,20 +757,27 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
     
     // Get a reusable cell view (Standard Cocoa pattern)
     NSTableCellView *cell = [tableView makeViewWithIdentifier:@"StackCell" owner:self];
-    
-    if (!cell) {
-        // If IB didn't create one, make it manually (Safe for simple tables)
-        cell = [[NSTableCellView alloc] initWithFrame:NSMakeRect(0, 0, 100, 20)];
-        NSTextField *tf = [NSTextField labelWithString:@""];
+
+    // GNUstep's copy of the xib's prototype keeps the textField outlet but
+    // not the view hierarchy: the text field is not in the cell, and
+    // nothing is drawn (#7). Build the cell here then, as when there is no
+    // prototype at all.
+    if (!cell || cell.textField.superview != cell) {
+        NSRect frame = NSMakeRect(0, 0, tableColumn.width, tableView.rowHeight);
+        cell = [[NSTableCellView alloc] initWithFrame:frame];
+        cell.identifier = @"StackCell";
+        NSTextField *tf = [[NSTextField alloc] initWithFrame:cell.bounds];
+        tf.editable = NO;
+        tf.selectable = NO;
+        tf.bezeled = NO;
+        tf.bordered = NO;
+        tf.drawsBackground = NO;
         tf.alignment = NSTextAlignmentRight;
-        tf.font = [NSFont systemFontOfSize:18]; // Nice readable font
-        tf.translatesAutoresizingMaskIntoConstraints = NO;
+        [tf.cell setLineBreakMode:NSLineBreakByTruncatingHead];
+        tf.font = [NSFont systemFontOfSize:18];
+        tf.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
         [cell addSubview:tf];
         cell.textField = tf;
-        
-        // Pin text field to cell edges
-        [cell addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[tf]|" options:0 metrics:nil views:@{@"tf":tf}]];
-        [cell addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[tf]|" options:0 metrics:nil views:@{@"tf":tf}]];
     }
     
     // FETCH DATA
@@ -766,6 +816,40 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
 
 #pragma mark - Helper
 
+// Shrinks the display font so the whole number fits, as Apple's
+// calculator does, from the designed size down to kMinDisplayFontSize (#16).
+// Text width grows in proportion to the font size, so one measurement at
+// the designed size gives the size that fits.
+- (void)fitDisplayFont {
+    NSTextField *field = self.displayField;
+    if (!field) {
+        return;
+    }
+    if (!self.displayBaseFont) {
+        self.displayBaseFont = field.font;
+    }
+    NSFont *base = self.displayBaseFont;
+
+    // Keep clear of an indicator (Rad, the character) on the left.
+    CGFloat left = kDisplayTextMargin;
+    for (NSTextField *indicator in @[ self.radLabel, self.charLabel ]) {
+        if (!indicator.isHidden && indicator.stringValue.length > 0) {
+            NSRect r = [field convertRect:indicator.bounds fromView:indicator];
+            left = MAX(left, NSMaxX(r) + kDisplayTextMargin);
+        }
+    }
+    CGFloat available = NSWidth(field.bounds) - left - kDisplayTextMargin;
+    CGFloat width = [field.stringValue sizeWithAttributes:@{ NSFontAttributeName : base }].width;
+
+    CGFloat size = base.pointSize;
+    if (width > available && available > 0) {
+        size = MAX(kMinDisplayFontSize, floor(base.pointSize * available / width));
+    }
+    if (field.font.pointSize != size) {
+        field.font = [NSFont fontWithName:base.fontName size:size] ?: [NSFont systemFontOfSize:size];
+    }
+}
+
 - (void)updateDisplayIndicators {
     UDCalcMode mode = self.calc.mode;
     NSTextField *radLabel = self.calc.isRPNMode ? self.radLabelRPN : self.radLabel;
@@ -792,13 +876,14 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
         if (glyph.length > 0) {
             charLabel.hidden = NO;
             charLabel.stringValue = glyph;
-            [charLabel setNeedsDisplay:YES];
         } else {
             charLabel.hidden = YES;
         }
     } else {
         charLabel.hidden = YES;
     }
+
+    [self fitDisplayFont];
 }
 
 - (void)updateUI {

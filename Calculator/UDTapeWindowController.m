@@ -14,7 +14,6 @@
 // Connect this outlet to the NSTextView in Interface Builder
 @property (unsafe_unretained) IBOutlet NSTextView *textView;
 
-@property (nonatomic, assign) BOOL isAppTerminating;
 
 @end
 

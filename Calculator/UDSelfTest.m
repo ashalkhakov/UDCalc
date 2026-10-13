@@ -13,6 +13,7 @@
 #import "AppDelegate.h"
 #import "UDCalcViewController.h"
 #import "UDCalcButton.h"
+#import "UDSettingsManager.h"
 
 NSString *UDSelfTestFilter;
 
@@ -177,6 +178,26 @@ static BOOL UDEnabled(NSString *path) {
     return UDValidatedItem(path).isEnabled;
 }
 
+/* How many dark pixels the display field draws inside rect (in the field's
+   coordinates), rendered the way it draws on screen: with its subviews. */
+static NSInteger UDInkInDisplay(NSRect rect) {
+    NSView *field = UDController().displayField;
+    [field.window displayIfNeeded];
+    NSBitmapImageRep *rep = [field bitmapImageRepForCachingDisplayInRect:field.bounds];
+    [field cacheDisplayInRect:field.bounds toBitmapImageRep:rep];
+    NSInteger ink = 0;
+    for (NSInteger y = 0; y < rep.pixelsHigh; y++) {
+        for (NSInteger x = 0; x < rep.pixelsWide; x++) {
+            /* bitmap rows run top-down; the field may not be flipped */
+            NSPoint p = NSMakePoint(x, field.isFlipped ? y : rep.pixelsHigh - 1 - y);
+            if (!NSPointInRect(p, rect)) continue;
+            NSColor *c = [[rep colorAtX:x y:y] colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+            if (c && c.redComponent + c.greenComponent + c.blueComponent < 1.5) ink++;
+        }
+    }
+    return ink;
+}
+
 static NSString *UDModeName(UDCalcMode mode) {
     switch (mode) {
         case UDCalcModeBasic: return @"Basic";
@@ -244,6 +265,20 @@ static void UDRunFeatures(void) {
         UDSay(UDFindButton(UDWindow().contentView, @"AC") != nil, @"And the clear key reads AC again");
     });
 
+    UDScenario(@"A long number is shown smaller instead of clipped", ^{
+        UDGivenFreshCalculator(UDCalcModeBasic);
+        NSTextField *field = UDController().displayField;
+        CGFloat designed = field.font.pointSize;
+        UDSay(UDClick(@"1 0 0 0 0 0 0 0 0 0 0 0 0"), @"When I type 1 and twelve zeros");
+        CGFloat width = [field.stringValue sizeWithAttributes:@{ NSFontAttributeName : field.font }].width;
+        UDSay(field.font.pointSize < designed,
+              [NSString stringWithFormat:@"Then the display font is smaller (%g pt, designed %g pt)", field.font.pointSize, designed]);
+        UDSay(width <= NSWidth(field.bounds),
+              [NSString stringWithFormat:@"And the whole number fits (%.0f of %.0f points)", width, NSWidth(field.bounds)]);
+        UDSay(UDClick(@"C") && field.font.pointSize == designed,
+              [NSString stringWithFormat:@"When I press C the font is back to %g pt (%g pt)", designed, field.font.pointSize]);
+    });
+
     UDFeature(@"Switching modes from the View menu");
 
     UDScenario(@"The current mode is ticked at start", ^{
@@ -281,6 +316,30 @@ static void UDRunFeatures(void) {
         UDGivenFreshCalculator(UDCalcModeBasic);
     });
 
+    UDFeature(@"Unit conversion");
+
+    UDScenario(@"Choosing a category from the Convert menu opens it", ^{
+        UDGivenFreshCalculator(UDCalcModeBasic);
+        UDClick(@"1");
+        UDSay(UDChoose(@"Convert/Length..."), @"When I enter 1 and choose Convert > Length...");
+        NSWindow *window = UDApp.converterWindow.window;
+        UDSay(UDWait(3, ^BOOL { return window.isVisible; }), @"Then the conversion window opens");
+        NSComboBox *type = [UDApp.converterWindow valueForKey:@"typeBox"];
+        NSComboBox *from = [UDApp.converterWindow valueForKey:@"fromBox"];
+        NSComboBox *to = [UDApp.converterWindow valueForKey:@"toBox"];
+        UDSay([type.stringValue isEqualToString:@"Length"],
+              [NSString stringWithFormat:@"And it shows the category Length (\"%@\")", type.stringValue]);
+        UDSay(from.stringValue.length > 0 && to.stringValue.length > 0,
+              [NSString stringWithFormat:@"And units to convert from and to (\"%@\" to \"%@\")", from.stringValue, to.stringValue]);
+        NSButton *convert = UDFindButton(window.contentView, @"Convert");
+        [convert performClick:nil];
+        UDSettle();
+        UDSay(!window.isVisible && fabs(UDValueShown() - 0.001) < 1e-12,
+              [NSString stringWithFormat:@"When I press Convert, 1 meter is shown as 0.001 kilometers (%g)", UDValueShown()]);
+        [window close];
+        [UDWindow() makeKeyAndOrderFront:nil];
+    });
+
     UDFeature(@"Reverse Polish Notation");
 
     UDScenario(@"Cmd-R turns RPN on and enter pushes onto the stack", ^{
@@ -289,6 +348,20 @@ static void UDRunFeatures(void) {
         UDSay(UDModel().isRPNMode && UDTicked(@"View/RPN Mode"), @"Then RPN mode is on and ticked in the View menu");
         UDSay(UDClick(@"3 enter 4 +"), @"When I press 3 enter 4 +");
         UDSay(fabs(UDValueShown() - 7) < 1e-9, [NSString stringWithFormat:@"Then the result is 7 (%g)", UDValueShown()]);
+        {
+            NSTableView *stack = UDController().stackTableView;
+            NSScrollView *scroll = stack.enclosingScrollView;
+            NSInteger last = stack.numberOfRows - 1;
+            NSTableCellView *cell = last >= 0 ? (NSTableCellView *)[stack viewAtColumn:0 row:last makeIfNecessary:YES] : nil;
+            UDSay(cell.textField.superview == cell && [cell.textField.stringValue isEqualToString:@"7"],
+                  [NSString stringWithFormat:@"And the bottom row of the stack shows 7 (\"%@\", %s)",
+                   cell.textField.stringValue, cell.textField.superview == cell ? "in the row" : "not in the row"]);
+            UDSay(stack.selectedRow == -1, [NSString stringWithFormat:@"And no row is highlighted (selected row %ld)", (long)stack.selectedRow]);
+            NSTableColumn *column = stack.tableColumns.firstObject;
+            UDSay(column.width <= NSWidth(scroll.contentView.bounds) && !scroll.horizontalScroller.superview,
+                  [NSString stringWithFormat:@"And the stack fits across without a scroller (column %.0f in %.0f)",
+                   column.width, NSWidth(scroll.contentView.bounds)]);
+        }
         UDSay(UDChoose(@"View/RPN Mode") && !UDModel().isRPNMode, @"When I choose View > RPN Mode again, RPN is off");
         UDSay(UDFindButton(UDWindow().contentView, @"=") != nil, @"And the = key is back");
     });
@@ -307,6 +380,35 @@ static void UDRunFeatures(void) {
         UDSay(fabs(UDValueShown() - 42) < 1e-9, [NSString stringWithFormat:@"Then the display shows 42 (\"%@\")", UDDisplay()]);
     });
 
+    UDFeature(@"Programmer mode");
+
+    UDScenario(@"The ASCII character follows the digits typed", ^{
+        UDGivenFreshCalculator(UDCalcModeProgrammer);
+        UDController().baseSegmentedControl.selectedSegment = 1;
+        [UDController() baseSelected:UDController().baseSegmentedControl];
+        UDSettle();
+        UDSay(UDModel().inputBase == UDBaseDec, @"Given decimal input");
+        NSSegmentedControl *encoding = UDController().encodingSegmentedControl;
+        if (UDModel().encodingMode != UDCalcEncodingModeASCII) {
+            encoding.selectedSegment = 0;
+            [UDController() encodingSelected:encoding];
+            UDSettle();
+        }
+        UDSay(UDModel().encodingMode == UDCalcEncodingModeASCII, @"And ASCII encoding is on");
+        UDSay(UDClick(@"6 5"), @"When I press 6 5");
+        NSTextField *label = UDController().charLabel;
+        UDSay(!label.isHidden && [label.stringValue isEqualToString:@"A"],
+              [NSString stringWithFormat:@"Then the character shown is A (\"%@\", %@)",
+               label.stringValue, label.isHidden ? @"hidden" : @"visible"]);
+        NSRect where = [UDController().displayField convertRect:label.bounds fromView:label];
+        NSInteger ink = UDInkInDisplay(where);
+        UDSay(ink > 0, [NSString stringWithFormat:@"And it is drawn on the display, not painted over (%ld dark pixels)", (long)ink]);
+        encoding.selectedSegment = 0;
+        [UDController() encodingSelected:encoding];   /* the same segment again: off */
+        UDSettle();
+        UDGivenFreshCalculator(UDCalcModeBasic);
+    });
+
     UDFeature(@"Paper tape");
 
     UDScenario(@"Showing and hiding the paper tape", ^{
@@ -320,6 +422,26 @@ static void UDRunFeatures(void) {
         UDClick(@"5 + 5 =");
         UDSay(UDChoose(@"Window/Hide Paper Tape"), @"When I choose Window > Hide Paper Tape");
         UDSay(UDWait(3, ^BOOL { return !UDApp.tapeWindowController.window.isVisible; }), @"Then the paper tape window is gone");
+        UDSay(![UDSettingsManager sharedManager].showTapeWindow, @"And it will not open at the next launch");
+        [UDWindow() makeKeyAndOrderFront:nil];
+    });
+
+    UDScenario(@"An open paper tape is remembered when the app quits", ^{
+        UDGivenFreshCalculator(UDCalcModeBasic);
+        if (!UDApp.tapeWindowController.window.isVisible) UDShortcut(@"t");
+        UDSay(UDWait(3, ^BOOL { return UDApp.tapeWindowController.window.isVisible; }), @"Given the paper tape is open");
+        /* What -[NSApplication terminate:] does first, then what a desktop
+           that closes the windows of a quitting app does, before the
+           will-terminate notification. The app is not actually quit. */
+        id<NSApplicationDelegate> delegate = NSApp.delegate;
+        if ([(NSObject *)delegate respondsToSelector:@selector(applicationShouldTerminate:)]) {
+            [delegate applicationShouldTerminate:NSApp];
+        }
+        [UDApp.tapeWindowController.window close];
+        UDSettle();
+        UDSay([UDSettingsManager sharedManager].showTapeWindow,
+              @"When the app quits and its windows are closed, the tape will open at the next launch");
+        UDApp.tapeWindowController.isAppTerminating = NO;
         [UDWindow() makeKeyAndOrderFront:nil];
     });
 }
