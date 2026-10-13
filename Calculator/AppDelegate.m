@@ -109,6 +109,16 @@
     }
 }
 
+// Whether the paper tape is open is recorded here, before anything is
+// closed (#12). NSApplicationWillTerminateNotification comes too late on a
+// desktop that closes the app's windows first: the tape's windowWillClose:
+// would see a user closing it and forget that it was open.
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
+    [UDSettingsManager sharedManager].showTapeWindow = self.tapeWindowController.window.isVisible;
+    self.tapeWindowController.isAppTerminating = YES;
+    return NSTerminateNow;
+}
+
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
     // Insert code here to tear down your application
 }

@@ -45,7 +45,7 @@ Resources/CalcIcon.png
 #
 Calculator_LANGUAGES = en
 Calculator_LOCALIZED_RESOURCE_FILES = \
-en.lproj/Localizable.strings 
+Localizable.strings 
 
 
 #

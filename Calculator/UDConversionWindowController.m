@@ -23,6 +23,17 @@ NSString * const UDUnitConverterResultKey = @"UDUnitConverterResultKey";
 
 @end
 
+// Selects an item and shows it in the box. AppKit shows a programmatically
+// selected item; GNUstep only records the index, leaving the box empty
+// (#3). Setting the text as well does the same on both.
+static void UDComboSelect(NSComboBox *box, NSInteger index) {
+    if (index < 0 || index >= box.numberOfItems) {
+        return;
+    }
+    [box selectItemAtIndex:index];
+    box.objectValue = [box itemObjectValueAtIndex:index];
+}
+
 @implementation UDConversionWindowController {
     NSArray<NSUnit *> *_currentUnits; // Shadow array to track objects by index
 }
@@ -42,7 +53,7 @@ NSString * const UDUnitConverterResultKey = @"UDUnitConverterResultKey";
     
     [self.typeBox addItemsWithObjectValues:localizedCategories];
 
-    [self.typeBox selectItemAtIndex:0];
+    UDComboSelect(self.typeBox, 0);
     [self typeChanged:self.typeBox];
 }
 
@@ -67,8 +78,8 @@ NSString * const UDUnitConverterResultKey = @"UDUnitConverterResultKey";
     [self.toBox addItemsWithObjectValues:names];
     
     if (names.count > 0) {
-        [self.fromBox selectItemAtIndex:0];
-        if (names.count > 1) [self.toBox selectItemAtIndex:1];
+        UDComboSelect(self.fromBox, 0);
+        if (names.count > 1) UDComboSelect(self.toBox, 1);
     }
 }
 
@@ -79,7 +90,8 @@ NSString * const UDUnitConverterResultKey = @"UDUnitConverterResultKey";
     }
     
     // Select the item in the UI
-    [self.typeBox selectItemWithObjectValue:categoryName];
+    UDComboSelect(self.typeBox, [self.typeBox indexOfItemWithObjectValue:
+                                     [self.converter localizedNameForCategory:categoryName]]);
     
     // Trigger the update logic manually so the Unit boxes refresh
     [self typeChanged:self.typeBox];
