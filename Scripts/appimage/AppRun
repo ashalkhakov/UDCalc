@@ -1,0 +1,103 @@
+#!/bin/sh
+# The AppImage's entry point. Ported from HomeRow's and TopoText's
+# Scripts/appimage/AppRun (after XFormsKit's, RDLKit's and UDQuakeTools').
+#
+#   UDCalc-Linux-*.AppImage                  the calculator
+#   UDCalc-Linux-*.AppImage --self-test      its use cases (Calculator/UDSelfTest.h)
+#
+# GNUstep finds its libraries, backend and the app through paths that are
+# not known until the image is mounted, so its configuration is written
+# here, each time.
+set -eu
+
+HERE="$(dirname "$(readlink -f "$0")")"
+
+export GNUSTEP_CONFIG_FILE="/tmp/GNUstep-UDCalc-$$.conf"
+cat << IN_EOF > "$GNUSTEP_CONFIG_FILE"
+GNUSTEP_USER_CONFIG_FILE=.GNUstep.conf
+GNUSTEP_USER_DEFAULTS_DIR=GNUstep/Defaults
+GNUSTEP_SYSTEM_USERS_DIR=/home
+GNUSTEP_NETWORK_USERS_DIR=/home
+GNUSTEP_LOCAL_USERS_DIR=/home
+GNUSTEP_SYSTEM_ROOT=$HERE/usr/System
+GNUSTEP_SYSTEM_LIBRARIES=$HERE/usr/System/Library
+GNUSTEP_SYSTEM_LIBRARY=$HERE/usr/System/Library
+GNUSTEP_SYSTEM_TOOLS=$HERE/usr/System/Tools
+GNUSTEP_SYSTEM_APPS=$HERE/usr/System/Applications
+GNUSTEP_LOCAL_ROOT=$HERE/usr/Local
+GNUSTEP_LOCAL_LIBRARY=$HERE/usr/Local/Library
+GNUSTEP_LOCAL_TOOLS=$HERE/usr/Local/Tools
+GNUSTEP_LOCAL_APPS=$HERE/usr/Local/Applications
+IN_EOF
+chmod 600 "$GNUSTEP_CONFIG_FILE"
+
+export GNUSTEP_SYSTEM_ROOT="$HERE/usr/System"
+export GNUSTEP_SYSTEM_LIBRARY="$HERE/usr/System/Library"
+export GNUSTEP_SYSTEM_TOOLS="$HERE/usr/System/Tools"
+export GNUSTEP_SYSTEM_APPS="$HERE/usr/System/Applications"
+export GNUSTEP_LOCAL_ROOT="$HERE/usr/Local"
+export GNUSTEP_LOCAL_LIBRARY="$HERE/usr/Local/Library"
+export GNUSTEP_LOCAL_TOOLS="$HERE/usr/Local/Tools"
+export GNUSTEP_LOCAL_APPS="$HERE/usr/Local/Applications"
+
+# Saved before they are pointed at the image: Scripts/appimage/open puts these
+# back before handing a URL to the host's browser, which cannot run against the
+# libraries this image carries.
+export UD_HOST_LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}"
+export UD_HOST_PATH="$PATH"
+
+export LD_LIBRARY_PATH="$HERE/usr/lib:$HERE/usr/Local/Library/Libraries:$HERE/usr/System/Library/Libraries:${LD_LIBRARY_PATH:-}"
+export PATH="$HERE/usr/bin:$HERE/usr/System/Tools:$PATH"
+
+# Fontconfig for the fonts the image carries, plus whatever the host has,
+# so the window lays out the same on a machine that has none of them.
+# Written here with the image's path: fontconfig before 2.14 (Ubuntu 22.04's)
+# does not read a directory relative to the configuration file. Its cache is
+# kept between launches: a new one each time made every start scan every
+# font on the machine, which on a desktop with many takes long.
+FONT_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/UDCalc/fontconfig"
+mkdir -p "$FONT_CACHE" 2>/dev/null || FONT_CACHE="/tmp/fc-cache-udcalc-$(id -u)"
+mkdir -p "$FONT_CACHE"
+export FONTCONFIG_FILE="/tmp/fonts-udcalc-$$.conf"
+cat << IN_EOF > "$FONTCONFIG_FILE"
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <dir>$HERE/usr/share/fonts</dir>
+  <dir>/usr/share/fonts</dir>
+  <dir>~/.fonts</dir>
+  <cachedir>$FONT_CACHE</cachedir>
+  <config><rescan><int>30</int></rescan></config>
+</fontconfig>
+IN_EOF
+trap 'rm -f "$GNUSTEP_CONFIG_FILE" "$FONTCONFIG_FILE"' EXIT
+
+# The Eau theme and the Liberation fonts the image carries, and Ctrl as
+# Command, as on any other Linux window: GNUstep's default is NeXT's, Alt as
+# Command (see gnustep-gui's KeyboardSetup). The left Control fires menu key
+# equivalents; the right one stays a Control for the text bindings. Only
+# what the user has not set: a theme or font chosen by hand stays.
+DEFAULTS_TOOL=$(find "$HERE" -name defaults -type f -perm -111 | head -n 1)
+if [ -n "$DEFAULTS_TOOL" ]; then
+  set_default() {
+    "$DEFAULTS_TOOL" read "$1" "$2" > /dev/null 2>&1 || "$DEFAULTS_TOOL" write "$1" "$2" "$3"
+  }
+  for domain in Calculator; do
+    set_default "$domain" GSTheme Eau
+    set_default "$domain" NSFont LiberationSans
+    set_default "$domain" NSBoldFont LiberationSans-Bold
+    set_default "$domain" NSUserFont LiberationSans
+    set_default "$domain" NSUserFixedPitchFont LiberationMono
+    # What NSWorkspace runs for a URL it has no application for (the Info
+    # panel's link): ours, in the bundle's Tools (Scripts/appimage/open).
+    set_default "$domain" GSUnknownFileTool open
+    set_default "$domain" GSFirstCommandKey Control_L
+    set_default "$domain" GSFirstControlKey NoSymbol
+    set_default "$domain" GSSecondControlKey Control_R
+    set_default "$domain" GSFirstAlternateKey Alt_L
+    set_default "$domain" GSSecondAlternateKey Alt_R
+  done
+fi
+
+# Where gnustep-make installed it (Scripts/prepare-appdir.sh).
+exec "$HERE/usr/System/Applications/Calculator.app/Calculator" "$@"

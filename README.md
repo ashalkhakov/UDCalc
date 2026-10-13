@@ -6,6 +6,15 @@ This is a clone of the MacOSX built-in Calculator.app ported to GNUstep.
 ![Scientific](docs/images/scientific-mode.png)
 ![Programmer](docs/images/programmer-mode.png)
 
+# Download
+
+[Releases](https://github.com/ashalkhakov/UDCalc/releases) carry the Mac
+app (a zip) and a Linux AppImage. The Mac app updates itself (Calculator >
+Check for Updates…); the AppImage is updated by Gear Lever or AppImageUpdate.
+A `v*` tag builds and attaches both (`.github/workflows/release.yml`); the
+signing, notarization and `SPARKLE_PRIVATE_KEY` secrets live in the
+repository's `production` environment.
+
 # Testing under GNUstep
 
 1. Ensure you have [`xctest`](https://github.com/gnustep/tools-xctest) tool installed.`

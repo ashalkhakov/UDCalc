@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=UDCalc
+GenericName=Calculator
+Comment=A calculator with basic, scientific and programmer modes
+Exec=AppRun
+Icon=udcalc
+Terminal=false
+Categories=Utility;Calculator;
