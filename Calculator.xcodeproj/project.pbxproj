@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		08129A19FE6064C1CDF299BA /* Sparkle.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 44CA7A92F1EA188D223EB711 /* Sparkle.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9A0D01C22F234AD000FE2946 /* UDInputBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A0D01C12F234AD000FE2946 /* UDInputBuffer.m */; };
 		9A20771D2F291BFE00A28E88 /* UDCalcRPNTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A20771C2F291BFE00A28E88 /* UDCalcRPNTests.m */; };
 		9A22A84B2F2BBCA40087F296 /* UDCalcViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A22A84A2F2BBCA40087F296 /* UDCalcViewController.m */; };
@@ -23,7 +24,7 @@
 		9A717CA52F1D1D9F005A27B7 /* UDTape.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CA42F1D1D9F005A27B7 /* UDTape.m */; };
 		9ADD5E1F2F8A000000000001 /* UDSelfTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ADD5E1F2F8A000000000002 /* UDSelfTest.m */; };
 		9ADD5E1F2F8A000000000101 /* UDUpdater-Apple.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ADD5E1F2F8A000000000102 /* UDUpdater-Apple.m */; };
-		9ADD5E1F2F8A000000000105 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 9ADD5E1F2F8A000000000107 /* Sparkle */; };
+		9ADD5E1F2F8A000000000105 /* Sparkle.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44CA7A92F1EA188D223EB711 /* Sparkle.xcframework */; };
 		9A717CAB2F1D2085005A27B7 /* UDTapeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CAA2F1D2085005A27B7 /* UDTapeWindowController.m */; };
 		9A717CAF2F1D493A005A27B7 /* UDFrontend.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A717CAE2F1D493A005A27B7 /* UDFrontend.m */; };
 		9A7B94EE2F1BB18600ED7306 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7B94ED2F1BB18600ED7306 /* AppDelegate.m */; };
@@ -75,7 +76,22 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		A2B5F51BFF1F5CD093FB5B85 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				08129A19FE6064C1CDF299BA /* Sparkle.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		44CA7A92F1EA188D223EB711 /* Sparkle.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sparkle.xcframework; path = .deps/Sparkle.xcframework; sourceTree = SOURCE_ROOT; };
 		9A0D01C02F234AA900FE2946 /* UDInputBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDInputBuffer.h; sourceTree = "<group>"; };
 		9A0D01C12F234AD000FE2946 /* UDInputBuffer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDInputBuffer.m; sourceTree = "<group>"; };
 		9A20771C2F291BFE00A28E88 /* UDCalcRPNTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDCalcRPNTests.m; sourceTree = "<group>"; };
@@ -147,7 +163,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9ADD5E1F2F8A000000000105 /* Sparkle in Frameworks */,
+				9ADD5E1F2F8A000000000105 /* Sparkle.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -164,6 +180,7 @@
 		9A7B94E02F1BB18600ED7306 = {
 			isa = PBXGroup;
 			children = (
+				44CA7A92F1EA188D223EB711 /* Sparkle.xcframework */,
 				9A7B94EB2F1BB18600ED7306 /* Calculator */,
 				9AC4C6032F27CA3000CD3AD4 /* CalculatorTests */,
 				9A7B94EA2F1BB18600ED7306 /* Products */,
@@ -265,15 +282,13 @@
 				9A7B94E52F1BB18600ED7306 /* Sources */,
 				9A7B94E62F1BB18600ED7306 /* Frameworks */,
 				9A7B94E72F1BB18600ED7306 /* Resources */,
+				A2B5F51BFF1F5CD093FB5B85 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = Calculator;
-			packageProductDependencies = (
-				9ADD5E1F2F8A000000000107 /* Sparkle */,
-			);
 			productName = Calculator;
 			productReference = 9A7B94E92F1BB18600ED7306 /* Calculator.app */;
 			productType = "com.apple.product-type.application";
@@ -323,9 +338,6 @@
 				Base,
 			);
 			mainGroup = 9A7B94E02F1BB18600ED7306;
-			packageReferences = (
-				9ADD5E1F2F8A000000000106 /* XCRemoteSwiftPackageReference "Sparkle" */,
-			);
 			productRefGroup = 9A7B94EA2F1BB18600ED7306 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -661,24 +673,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		9ADD5E1F2F8A000000000106 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sparkle-project/Sparkle";
-			requirement = {
-				kind = exactVersion;
-				version = 2.10.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		9ADD5E1F2F8A000000000107 /* Sparkle */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9ADD5E1F2F8A000000000106 /* XCRemoteSwiftPackageReference "Sparkle" */;
-			productName = Sparkle;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9A7B94E12F1BB18600ED7306 /* Project object */;
 }

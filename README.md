@@ -16,11 +16,21 @@ builds are the run's artifacts), and a `v*` tag attaches them to its release;
 the signing, notarization and `SPARKLE_PRIVATE_KEY` secrets live in the
 repository's `production` environment.
 
-# Testing under GNUstep
+# Building and testing
 
-1. Ensure you have [`xctest`](https://github.com/gnustep/tools-xctest) tool installed.`
-2. Go to CalculatorTests and run `make run-tests`
-3. If you add new classes to the app that you want to test, please also add them to the CalculatorTests makefile
+The familiar way, with what `.github/pins.env` names (the GNUstep stack
+gnustep-patches publishes; Sparkle's XCFramework in `.deps/` on the Mac,
+which gnustep-release-actions' `scripts/deps.sh apple` fetches):
+
+```sh
+make && make check && make install           # GNUstep: the unit tests, and the self-test's
+                                             # Arithmetic and Updates scenarios, headless
+make -f Makefile.apple && make -f Makefile.apple check   # macOS
+```
+
+GNUstep's tests need [`xctest`](https://github.com/gnustep/tools-xctest)
+(part of that stack). If you add new classes to the app that you want to
+test, add them to the CalculatorTests makefile too.
 
 # Self-test (use cases, end to end)
 

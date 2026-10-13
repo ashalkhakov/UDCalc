@@ -7,3 +7,5 @@ obj/
 stamp.make
 _codeql_detected_source_root
 *~
+.deps/
+build/

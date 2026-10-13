@@ -1,6 +1,8 @@
 include $(GNUSTEP_MAKEFILES)/common.make
 
 BUNDLE_NAME = CalculatorTests
+# Built and run, never installed.
+CalculatorTests_STANDARD_INSTALL = no
 
 CalculatorTests_OBJC_FILES = $(wildcard *.m)
 CalculatorTests_OBJC_FILES += \
