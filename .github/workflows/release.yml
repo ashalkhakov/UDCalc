@@ -1,19 +1,14 @@
 name: Release
 
-# UDCalc, packaged: ported from HomeRow's and TopoText's release workflows.
-# A v* tag builds every package and attaches it to that release; run by
-# hand with a tag, it builds that tag and attaches to its release; with
-# none, it builds the branch, as artifacts only (a dry run). A tag with a -
-# in it (v0.2.0-rc1) makes a pre-release.
+# UDCalc for macOS (signed, notarized, updated by Sparkle) and Linux (an
+# AppImage that updates itself), by gnustep-release-actions' release
+# workflows, the same as every app's. What is UDCalc's own is in
+# .github/release/ (build, test, package); the commit it builds on in
+# .github/pins.env.
 #
-#   macOS    Calculator.app, universal, signed with a Developer ID and
-#            notarized (unsigned, and named so, without the secrets), and
-#            the appcast its Sparkle reads
-#   Linux    an AppImage, and the .zsync it updates itself by
-#
-# Signing, notarizing, the appcast, the GNUstep stack and the AppImage tools
-# are gnustep-release-actions', the same in every app's release. Each step
-# skips itself, saying so, when its secrets are absent (a fork, a dry run).
+# A v* tag builds both and attaches them to its release (a pre-release when
+# the tag has a '-'). Run by hand with a tag, it builds that tag; with none,
+# this branch, as artifacts only.
 on:
   push:
     tags: ['v*']
@@ -25,243 +20,18 @@ on:
         default: ''
 
 permissions:
-  contents: write   # to attach files to the release
-
-env:
-  TAG: ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || '' }}
+  contents: write
 
 jobs:
-  ################################ macOS ################################
   macos:
-    name: macOS (signed)
-    runs-on: macos-15
-    timeout-minutes: 45
-    # The signing and notarisation secrets live in this environment, and an
-    # environment's secrets are only readable by a job that names it: without
-    # this line every one of them resolves to the empty string and the job
-    # ships an unsigned build, saying so and passing.
-    environment: production
-    defaults:
-      run:
-        working-directory: ${{ github.workspace }}/source
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.TAG || github.ref }}
-          path: source
+    uses: ashalkhakov/gnustep-release-actions/.github/workflows/macos-release.yml@v1
+    with:
+      tag: ${{ inputs.tag }}
+      apps: UDCalc=Calculator
+    secrets: inherit
 
-      - name: Version
-        run: |
-          if [ -n "$TAG" ]; then
-            echo "APP_VERSION=${TAG#v}" >> "$GITHUB_ENV"
-          else
-            echo "APP_VERSION=0.0.0-build${{ github.run_number }}" >> "$GITHUB_ENV"
-          fi
-
-      - name: Stamp the version
-        run: ./Scripts/stamp-version.sh "$APP_VERSION"
-
-      # Release, universal (arm64 and x86_64), Sparkle embedded. Signed to
-      # run locally here, and without the hardened runtime, which would
-      # refuse an ad-hoc app the Sparkle framework it embeds (signed by
-      # Sparkle's team): macos-sign gives the app the hardened runtime and
-      # the Developer ID together.
-      - name: Build
-        run: |
-          xcodebuild -project Calculator.xcodeproj -scheme Calculator \
-            -destination 'generic/platform=macOS' -configuration Release \
-            -derivedDataPath "$RUNNER_TEMP/release" ONLY_ACTIVE_ARCH=NO \
-            CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= ENABLE_HARDENED_RUNTIME=NO build
-          app="$RUNNER_TEMP/release/Build/Products/Release/Calculator.app"
-          echo "APP=$app" >> "$GITHUB_ENV"
-          test -d "$app/Contents/Frameworks/Sparkle.framework" \
-            || { echo "::error::Calculator.app does not embed Sparkle.framework"; exit 1; }
-          lipo "$app/Contents/MacOS/Calculator" -verify_arch arm64 x86_64
-
-      # The app has to start and pass its self-test before anything else.
-      # Its arithmetic and its updater only: the menu scenarios are written
-      # against GNUstep (the Linux job runs them all, in the AppImage).
-      - name: Self-test
-        timeout-minutes: 3
-        run: |
-          export HOME="$RUNNER_TEMP/selftest-home"; mkdir -p "$HOME"
-          export CFFIXED_USER_HOME="$HOME"
-          "$APP/Contents/MacOS/Calculator" --self-test Arithmetic
-          "$APP/Contents/MacOS/Calculator" --self-test Updates
-
-      - name: Sign
-        id: sign
-        uses: ashalkhakov/gnustep-release-actions/macos-sign@v1
-        with:
-          app: ${{ env.APP }}
-          certificate: ${{ secrets.MACOS_CERTIFICATE }}
-          certificate-password: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
-          identity: ${{ secrets.MACOS_SIGN_IDENTITY }}
-
-      # The hardened runtime loads only frameworks signed by the same team:
-      # the signed app has to start and pass again.
-      - name: Self-test, signed
-        if: steps.sign.outputs.signed == 'true'
-        timeout-minutes: 3
-        run: |
-          export HOME="$RUNNER_TEMP/selftest-home"; mkdir -p "$HOME"
-          export CFFIXED_USER_HOME="$HOME"
-          "$APP/Contents/MacOS/Calculator" --self-test Arithmetic
-          "$APP/Contents/MacOS/Calculator" --self-test Updates
-
-      - name: Notarize
-        if: steps.sign.outputs.signed == 'true'
-        uses: ashalkhakov/gnustep-release-actions/macos-notarize@v1
-        with:
-          app: ${{ env.APP }}
-          apple-id: ${{ secrets.NOTARY_APPLE_ID }}
-          team-id: ${{ secrets.NOTARY_TEAM_ID }}
-          password: ${{ secrets.NOTARY_PASSWORD }}
-
-      - name: Package
-        run: |
-          suffix=""
-          [ "${{ steps.sign.outputs.signed }}" = "true" ] || suffix="-unsigned"
-          ditto -c -k --keepParent "$APP" "UDCalc-macOS-${APP_VERSION}${suffix}.zip"
-
-      # The appcast the app's Sparkle reads (SUFeedURL: the newest release's
-      # appcast.xml), signed with the key whose public half is SUPublicEDKey;
-      # for a release only.
-      - name: Appcast
-        if: steps.sign.outputs.signed == 'true'
-        uses: ashalkhakov/gnustep-release-actions/sparkle-appcast@v1
-        with:
-          archive: ${{ github.workspace }}/source/UDCalc-macOS-${{ env.APP_VERSION }}.zip
-          output: ${{ github.workspace }}/source/appcast.xml
-          tag: ${{ env.TAG }}
-          private-key: ${{ secrets.SPARKLE_PRIVATE_KEY }}
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: UDCalc-macOS-${{ env.APP_VERSION }}
-          path: |
-            ${{ github.workspace }}/source/UDCalc-macOS-*.zip
-            ${{ github.workspace }}/source/appcast.xml
-          if-no-files-found: error
-
-      - name: Attach to the release
-        if: env.TAG != ''
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG }}
-          prerelease: ${{ contains(env.TAG, '-') }}
-          generate_release_notes: true
-          files: |
-            ${{ github.workspace }}/source/UDCalc-macOS-*.zip
-            ${{ github.workspace }}/source/appcast.xml
-
-  ########################### Linux AppImage ###########################
   appimage:
-    name: Linux AppImage
-    # Built on the oldest Ubuntu LTS still in support, not ubuntu-latest: an
-    # AppImage carries its own libraries but not glibc, so it runs only on a
-    # system at least as new as the one it was linked on (XFormsKit's
-    # experience). Raise this only when that release leaves support.
-    runs-on: ubuntu-22.04
-    timeout-minutes: 150
-    # The stack's settings (PREFIX, COMPONENTS, the toolchain) are
-    # gnustep-release-actions/gnustep-stack's.
-    defaults:
-      run:
-        working-directory: ${{ github.workspace }}/source
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.TAG || github.ref }}
-          path: source
-
-      # The commits this builds on: .github/pins.env, the only place.
-      - name: Pins
-        uses: ashalkhakov/gnustep-release-actions/pins@v1
-        with:
-          file: source/.github/pins.env
-
-      - uses: actions/checkout@v4
-        with:
-          repository: ashalkhakov/gnustep-patches
-          ref: ${{ env.GNUSTEP_PATCHES_REF }}
-          path: gnustep-patches
-
-      - name: Version
-        run: |
-          if [ -n "$TAG" ]; then
-            echo "APP_VERSION=${TAG#v}" >> "$GITHUB_ENV"
-          else
-            echo "APP_VERSION=0.0.0-build${{ github.run_number }}" >> "$GITHUB_ENV"
-          fi
-
-      # The patched stack, cached by its recipe: Foundation (with
-      # libdispatch, which the app links), gui and back, and the Eau theme
-      # it looks as with (AppRun sets it in the app's defaults).
-      - name: GNUstep
-        uses: ashalkhakov/gnustep-release-actions/gnustep-stack@v1
-        with:
-          patches: ${{ github.workspace }}/gnustep-patches
-
-      - name: linuxdeploy and the AppImage runtime
-        uses: ashalkhakov/gnustep-release-actions/appimage-tools@v1
-
-      - name: Stamp the version
-        run: ./Scripts/stamp-version.sh "$APP_VERSION"
-
-      - name: Assemble AppDir
-        run: GNUSTEP_PREFIX="$PREFIX" ./Scripts/prepare-appdir.sh
-
-      # A release's image updates itself from the newest release (through
-      # AppImageUpdate, Gear Lever and the like), by the .zsync attached
-      # beside it; a pre-release's does not.
-      - name: Update information
-        uses: ashalkhakov/gnustep-release-actions/appimage-update-info@v1
-        with:
-          tag: ${{ env.TAG }}
-          zsync: UDCalc-Linux-*x86_64.AppImage.zsync
-
-      - name: Package the AppImage
-        run: GNUSTEP_PREFIX="$PREFIX" ./Scripts/package-appimage.sh
-
-      # Where it will run: a plain Ubuntu with no GNUstep, and only the
-      # libraries every desktop has (AppImage leaves those to the host). The
-      # app's self-test drives the window: the scenarios the macOS job runs,
-      # which pass on both (the RPN scenario ends the app on GNUstep, and
-      # more fail on macOS, before this pipeline as after). The host's fonts
-      # are removed first, so the window lays out with the fonts the image
-      # carries.
-      - name: Smoke-test the AppImage on a clean system
-        run: |
-          image=$(ls UDCalc-Linux-*.AppImage)
-          chmod +x "$image"
-          docker run --rm -v "$PWD:/w" -w /w ubuntu:22.04 bash -c '
-            export DEBIAN_FRONTEND=noninteractive APPIMAGE_EXTRACT_AND_RUN=1
-            for i in 1 2 3; do
-              apt-get update -qq && apt-get install -y -qq --fix-missing xvfb xauth \
-                libfontconfig1 libfreetype6 libx11-6 libx11-xcb1 libxcb1 libgl1 libharfbuzz0b > /dev/null && break
-              sleep 10
-            done
-            rm -rf /usr/share/fonts
-            for scenario in Arithmetic Updates; do
-              timeout 300 xvfb-run -a -s "-screen 0 1280x1024x24" ./'"$image"' --self-test "$scenario" || exit 1
-            done'
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: UDCalc-AppImage-${{ env.APP_VERSION }}
-          path: |
-            ${{ github.workspace }}/source/UDCalc-Linux-*.AppImage
-            ${{ github.workspace }}/source/UDCalc-Linux-*.AppImage.zsync
-          if-no-files-found: error
-
-      - name: Attach to the release
-        if: env.TAG != ''
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG }}
-          prerelease: ${{ contains(env.TAG, '-') }}
-          generate_release_notes: true
-          files: |
-            ${{ github.workspace }}/source/UDCalc-Linux-*.AppImage
-            ${{ github.workspace }}/source/UDCalc-Linux-*.AppImage.zsync
+    uses: ashalkhakov/gnustep-release-actions/.github/workflows/appimage-release.yml@v1
+    with:
+      tag: ${{ inputs.tag }}
+      appimage: UDCalc-Linux
