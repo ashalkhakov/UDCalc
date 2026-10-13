@@ -24,13 +24,13 @@ permissions:
 
 jobs:
   macos:
-    uses: ashalkhakov/gnustep-release-actions/.github/workflows/macos-release.yml@v1
+    uses: ashalkhakov/gnustep-release-actions/.github/workflows/macos-release.yml@stamp-version
     with:
       tag: ${{ inputs.tag }}
       apps: UDCalc=Calculator
     secrets: inherit
 
   appimage:
-    uses: ashalkhakov/gnustep-release-actions/.github/workflows/appimage-release.yml@v1
+    uses: ashalkhakov/gnustep-release-actions/.github/workflows/appimage-release.yml@stamp-version
     with:
       tag: ${{ inputs.tag }}
