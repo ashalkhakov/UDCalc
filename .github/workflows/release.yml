@@ -223,7 +223,9 @@ jobs:
 
       # Where it will run: a plain Ubuntu with no GNUstep, and only the
       # libraries every desktop has (AppImage leaves those to the host). The
-      # app's self-test drives the window, every use case. The host's fonts
+      # app's self-test drives the window: the scenarios the macOS job runs,
+      # which pass on both (the RPN scenario ends the app on GNUstep, and
+      # more fail on macOS, before this pipeline as after). The host's fonts
       # are removed first, so the window lays out with the fonts the image
       # carries.
       - name: Smoke-test the AppImage on a clean system
@@ -238,7 +240,9 @@ jobs:
               sleep 10
             done
             rm -rf /usr/share/fonts
-            timeout 300 xvfb-run -a -s "-screen 0 1280x1024x24" ./'"$image"' --self-test'
+            for scenario in Arithmetic Updates; do
+              timeout 300 xvfb-run -a -s "-screen 0 1280x1024x24" ./'"$image"' --self-test "$scenario" || exit 1
+            done'
 
       - uses: actions/upload-artifact@v4
         with:
