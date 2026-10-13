@@ -11,8 +11,9 @@ This is a clone of the MacOSX built-in Calculator.app ported to GNUstep.
 [Releases](https://github.com/ashalkhakov/UDCalc/releases) carry the Mac
 app (a zip) and a Linux AppImage. The Mac app updates itself (Calculator >
 Check for Updates…); the AppImage is updated by Gear Lever or AppImageUpdate.
-A `v*` tag builds and attaches both (`.github/workflows/release.yml`); the
-signing, notarization and `SPARKLE_PRIVATE_KEY` secrets live in the
+`.github/workflows/build.yml` builds and tests both on every push (the
+builds are the run's artifacts), and a `v*` tag attaches them to its release;
+the signing, notarization and `SPARKLE_PRIVATE_KEY` secrets live in the
 repository's `production` environment.
 
 # Testing under GNUstep
