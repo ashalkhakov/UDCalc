@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- UDCalc's AppStream metadata: what software centres and the AppImage
      catalog show (name, description, screenshots). Installed into the
-     AppImage by Scripts/package-appimage.sh, as *.appdata.xml (the name the
+     AppImage by gnustep-release-actions' appimage, as *.appdata.xml (the name the
      catalog's appdir-lint.sh looks for) in usr/share/metainfo. Ported from
      TopoText's. -->
 <component type="desktop-application">

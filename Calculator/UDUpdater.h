@@ -6,7 +6,7 @@
 //  (SUFeedURL in Info.plist, signed with the key SUPublicEDKey names) is
 //  checked once a day if the user allows it, and Check for Updates… checks
 //  now. On GNUstep, nothing: the AppImage carries its update information,
-//  for AppImageUpdate, Gear Lever and the like (Scripts/package-appimage.sh).
+//  for AppImageUpdate, Gear Lever and the like (gnustep-release-actions' appimage).
 //
 //  UDUpdater-Apple.m is the macOS one (Xcode), UDUpdater.m the GNUstep one
 //  (GNUmakefile).
