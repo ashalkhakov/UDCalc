@@ -31,6 +31,6 @@ jobs:
     secrets: inherit
 
   appimage:
-    uses: ashalkhakov/gnustep-release-actions/.github/workflows/appimage-release.yml@v1
+    uses: ashalkhakov/gnustep-release-actions/.github/workflows/appimage-release.yml@appimage-shared
     with:
       tag: ${{ inputs.tag }}
