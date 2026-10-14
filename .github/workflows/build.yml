@@ -1,0 +1,44 @@
+name: Build
+
+# UDCalc, built, tested and installed the familiar way (make, make check,
+# make install; Makefile.apple on macOS) by gnustep-release-actions'
+# workflows, the same as every repository's: every push is built, tested (the
+# unit tests, and the self-test's Arithmetic and Updates scenarios) and
+# uploaded as artifacts; a v* tag (or a run started by hand with one) is also
+# released: the Mac app signed and notarized with its Sparkle appcast, the
+# AppImage with its update information, attached to the tag's release (a
+# pre-release when the tag has a '-'). What it builds on is in
+# .github/pins.env.
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'A v* tag to build and release (empty: this branch, as artifacts)'
+        required: false
+        default: ''
+
+# Pushes only: a push to a branch already shows its checks on the branch's
+# pull request. A newer push supersedes the run before it; a release is
+# never cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    uses: ashalkhakov/gnustep-release-actions/.github/workflows/linux.yml@v1
+    with:
+      tag: ${{ inputs.tag }}
+
+  macos:
+    uses: ashalkhakov/gnustep-release-actions/.github/workflows/macos.yml@v1
+    with:
+      tag: ${{ inputs.tag }}
+      apps: UDCalc=Calculator
+    secrets: inherit

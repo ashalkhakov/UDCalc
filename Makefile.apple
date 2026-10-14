@@ -1,0 +1,51 @@
+# UDCalc on macOS, the familiar way (gnustep-release-actions' macos.yml runs
+# the same):
+#
+#   make -f Makefile.apple            Calculator.app, universal (Release), signed
+#                                     ad hoc, as the project signs it (a release
+#                                     is signed for real, with the hardened
+#                                     runtime, by gnustep-release-actions'
+#                                     macos-sign)
+#   make -f Makefile.apple check      the unit tests
+#   make -f Makefile.apple install DESTDIR=<dir>       Calculator.app
+#   make -f Makefile.apple installcheck DESTDIR=<dir>  the installed app's
+#                                     self-test scenarios that pass on both
+#                                     systems (Arithmetic, Updates), in a fresh
+#                                     home
+#
+# Sparkle's XCFramework is in .deps/, by the version .github/pins.env names
+# (gnustep-release-actions' scripts/deps.sh apple). GNUstep: GNUmakefile.
+
+BUILD = build
+DERIVED = $(BUILD)/DerivedData
+RELEASE = $(DERIVED)/Build/Products/Release
+# Where a failed test's result bundle is kept (CI uploads it from there).
+RESULTS ?= $(or $(RUNNER_TEMP),$(BUILD))
+XCODEBUILD = xcodebuild -project Calculator.xcodeproj -derivedDataPath $(DERIVED)
+SELF_TESTS = Arithmetic Updates
+
+all:
+	@test -d .deps/Sparkle.xcframework \
+	  || { echo "no Sparkle in .deps: gnustep-release-actions' scripts/deps.sh apple fetches what .github/pins.env names"; exit 1; }
+	$(XCODEBUILD) -scheme Calculator -configuration Release -destination 'generic/platform=macOS' ONLY_ACTIVE_ARCH=NO build
+
+check:
+	rm -rf $(RESULTS)/CalculatorTests.xcresult
+	$(XCODEBUILD) -scheme Calculator -configuration Debug -destination 'platform=macOS' \
+	  -resultBundlePath $(RESULTS)/CalculatorTests.xcresult test
+
+install: all
+	@test -n "$(DESTDIR)" || { echo "install: give DESTDIR"; exit 1; }
+	mkdir -p $(DESTDIR)
+	rm -rf $(DESTDIR)/Calculator.app
+	ditto $(RELEASE)/Calculator.app $(DESTDIR)/Calculator.app
+
+installcheck:
+	@home=$$(mktemp -d); for scenario in $(SELF_TESTS); do \
+	  HOME=$$home CFFIXED_USER_HOME=$$home $(DESTDIR)/Calculator.app/Contents/MacOS/Calculator --self-test $$scenario || exit 1; \
+	done
+
+clean:
+	rm -rf $(BUILD)
+
+.PHONY: all check install installcheck clean

@@ -29,8 +29,11 @@
     UDASTNode *num = [UDNumberNode value:UDValueMakeInt(42)];
     XCTAssertEqualObjects([num prettyPrint], @"42");
 
+    // In the user's locale, as the display shows it: a comma in some, a point
+    // in others.
     UDASTNode *dbl = [UDNumberNode value:UDValueMakeDouble(3.14159)];
-    XCTAssertEqualObjects([dbl prettyPrint], @"3,14159");
+    NSString *point = [[NSLocale currentLocale] objectForKey:NSLocaleDecimalSeparator];
+    XCTAssertEqualObjects([dbl prettyPrint], ([NSString stringWithFormat:@"3%@14159", point]));
 }
 
 #pragma mark - 2. Simple Binary (No Parens)

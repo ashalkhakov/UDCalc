@@ -9,13 +9,26 @@
 #import "UDCalcButton.h"
 #import "UDSettingsManager.h"
 #import "UDSelfTest.h"
+#import "UDUpdater.h"
 
 @interface AppDelegate ()
 
 @property (strong) IBOutlet NSWindow *window;
+@property (nonatomic, strong) UDUpdater *updater;
 @end
 
 @implementation AppDelegate
+
+// Updates, set up before the app finishes launching (as Sparkle asks);
+// not started in a self-test. Where there is no updater, no menu item.
+- (void)applicationWillFinishLaunching:(NSNotification *)aNotification {
+    self.updater = [[UDUpdater alloc] initStarting:!UDSelfTestFilter];
+    if (!self.updater.available) {
+        NSMenu *appMenu = [[[NSApp mainMenu] itemAtIndex:0] submenu];
+        NSMenuItem *check = [appMenu itemWithTag:7100];
+        if (check) [appMenu removeItem:check];
+    }
+}
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
@@ -161,6 +174,10 @@
 
 #pragma mark - Button Actions
 
+- (IBAction)checkForUpdates:(id)sender {
+    [self.updater checkForUpdates:sender];
+}
+
 - (IBAction)showTape:(id)sender {
     if (!self.tapeWindowController) {
         self.tapeWindowController = [[UDTapeWindowController alloc] initWithWindowNibName:@"UDTapeWindow"];
@@ -298,6 +315,9 @@
     }
     if ([item action] == @selector(conversionMenuClicked:)) {
         return (self.calcViewController.calc.mode != UDCalcModeProgrammer);
+    }
+    if ([item action] == @selector(checkForUpdates:)) {
+        return self.updater.canCheckForUpdates;
     }
 
     return YES;
