@@ -2,7 +2,10 @@
 # the same):
 #
 #   make -f Makefile.apple            Calculator.app, universal (Release), signed
-#                                     ad hoc (the release signs it for real)
+#                                     ad hoc, as the project signs it (a release
+#                                     is signed for real, with the hardened
+#                                     runtime, by gnustep-release-actions'
+#                                     macos-sign)
 #   make -f Makefile.apple check      the unit tests
 #   make -f Makefile.apple install DESTDIR=<dir>       Calculator.app
 #   make -f Makefile.apple installcheck DESTDIR=<dir>  the installed app's
@@ -20,20 +23,15 @@ RELEASE = $(DERIVED)/Build/Products/Release
 RESULTS ?= $(or $(RUNNER_TEMP),$(BUILD))
 XCODEBUILD = xcodebuild -project Calculator.xcodeproj -derivedDataPath $(DERIVED)
 SELF_TESTS = Arithmetic Updates
-# Signed ad hoc, without the hardened runtime: under it, an ad hoc app may not
-# load an ad hoc framework (Sparkle), whose Team ID is not its own. A release
-# is signed again, for real, with both (gnustep-release-actions' macos-sign).
-AD_HOC = CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= ENABLE_HARDENED_RUNTIME=NO
 
 all:
 	@test -d .deps/Sparkle.xcframework \
 	  || { echo "no Sparkle in .deps: gnustep-release-actions' scripts/deps.sh apple fetches what .github/pins.env names"; exit 1; }
-	$(XCODEBUILD) -scheme Calculator -configuration Release -destination 'generic/platform=macOS' ONLY_ACTIVE_ARCH=NO \
-	  $(AD_HOC) build
+	$(XCODEBUILD) -scheme Calculator -configuration Release -destination 'generic/platform=macOS' ONLY_ACTIVE_ARCH=NO build
 
 check:
 	rm -rf $(RESULTS)/CalculatorTests.xcresult
-	$(XCODEBUILD) -scheme Calculator -configuration Debug -destination 'platform=macOS' $(AD_HOC) \
+	$(XCODEBUILD) -scheme Calculator -configuration Debug -destination 'platform=macOS' \
 	  -resultBundlePath $(RESULTS)/CalculatorTests.xcresult test
 
 install: all
