@@ -25,7 +25,6 @@ CalculatorTests_OBJC_FILES += \
 CalculatorTests_INCLUDE_DIRS = \
     -I../Calculator
 
-CalculatorTests_LIBRARIES = objc gnustep-base XCTest
 
 XCTEST ?= xctest
 
