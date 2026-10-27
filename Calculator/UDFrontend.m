@@ -10,17 +10,6 @@
 #import "UDAST.h"
 #import "UDConstants.h"
 
-/* A number in [0, 1] from the system's random generator: the first four
-   bytes of a random (version 4) NSUUID, all of them random. arc4random is
-   not on every system UDCalc runs on (Windows). */
-static double UDRandomUnit(void) {
-    uuid_t bytes;
-    [[NSUUID UUID] getUUIDBytes:bytes];
-    uint32_t r;
-    memcpy(&r, bytes, sizeof r);
-    return (double)r / UINT32_MAX;
-}
-
 @implementation UDOpInfo
 + (instancetype)infoWithSymbol:(NSString *)sym tag:(NSInteger)tag placement:(UDOpPlacement)place assoc:(UDOpAssociativity)assoc precedence:(NSInteger)precedence action:(UDFrontendAction)action {
     UDOpInfo *i = [[UDOpInfo alloc] init];
@@ -422,7 +411,7 @@ static double UDRandomUnit(void) {
 
     // Rand
     self.table[@(UDOpRand)] = [UDOpInfo infoWithSymbol:@"rand" tag:UDOpRand action:^UDASTNode *(UDFrontendContext *ctx) {
-        return [UDConstantNode value:UDValueMakeDouble(UDRandomUnit()) symbol:@"rand"];
+        return [UDConstantNode value:UDValueMakeDouble(((double)arc4random()/UINT32_MAX)) symbol:@"rand"];
     }];
 }
 
