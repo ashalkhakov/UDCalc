@@ -1,4 +1,6 @@
 # Additional flags to pass to Objective-C compiler
 ADDITIONAL_OBJCFLAGS += -fobjc-arc
 
-ADDITIONAL_LDFLAGS += -ldispatch
+# Libraries, not linker flags: on Windows the flags are linked whole
+# (--whole-archive), and two import libraries linked whole collide.
+CalculatorTests_BUNDLE_LIBS += -lXCTest -ldispatch

@@ -12,7 +12,7 @@ ADDITIONAL_OBJCFLAGS += -fobjc-arc -include UDGNUstepCompat.h
 ADDITIONAL_CFLAGS += 
 
 # Additional flags to pass to the linker
-ADDITIONAL_LDFLAGS += -ldispatch 
+ADDITIONAL_LDFLAGS += 
 
 # Additional include directories the compiler should search
 ADDITIONAL_INCLUDE_DIRS += 
@@ -20,6 +20,7 @@ ADDITIONAL_INCLUDE_DIRS +=
 # Additional library directories the linker should search
 ADDITIONAL_LIB_DIRS += 
 
-# Additional GUI libraries to link
-ADDITIONAL_GUI_LIBS += 
+# Additional GUI libraries to link: a library here, not among the linker's
+# flags (on Windows those are linked whole, and import libraries collide)
+ADDITIONAL_GUI_LIBS += -ldispatch
 
