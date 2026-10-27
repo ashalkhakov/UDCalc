@@ -9,7 +9,8 @@ This is a clone of the MacOSX built-in Calculator.app ported to GNUstep.
 # Download
 
 [Releases](https://github.com/ashalkhakov/UDCalc/releases) carry the Mac
-app (a zip) and a Linux AppImage. The Mac app updates itself (Calculator >
+app (a zip), a Linux AppImage and a Windows installer (`UDCalc-<version>-win64.msi`,
+and a portable zip). The Mac app updates itself (Calculator >
 Check for Updates…); the AppImage is updated by Gear Lever or AppImageUpdate.
 `.github/workflows/build.yml` builds and tests both on every push (the
 builds are the run's artifacts), and a `v*` tag attaches them to its release;

@@ -6,7 +6,7 @@ name: Build
 # unit tests, and the self-test's Arithmetic and Updates scenarios) and
 # uploaded as artifacts; a v* tag (or a run started by hand with one) is also
 # released: the Mac app signed and notarized with its Sparkle appcast, the
-# AppImage with its update information, attached to the tag's release (a
+# AppImage with its update information, the Windows installer, attached to the tag's release (a
 # pre-release when the tag has a '-'). What it builds on is in
 # .github/pins.env.
 on:
@@ -33,6 +33,11 @@ permissions:
 jobs:
   linux:
     uses: ashalkhakov/gnustep-release-actions/.github/workflows/linux.yml@v1
+    with:
+      tag: ${{ inputs.tag }}
+
+  windows:
+    uses: ashalkhakov/gnustep-release-actions/.github/workflows/windows.yml@v1
     with:
       tag: ${{ inputs.tag }}
 

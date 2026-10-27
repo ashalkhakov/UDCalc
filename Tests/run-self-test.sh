@@ -15,6 +15,8 @@ set -u
 
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 APP="${APP:-$HERE/Calculator/Calculator.app/Calculator}"
+# Windows names it Calculator.exe.
+[ ! -x "$APP" ] && [ -x "$APP.exe" ] && APP="$APP.exe"
 FILTER="${1:-}"
 
 if [ ! -x "$APP" ]; then
@@ -30,8 +32,9 @@ set -- --self-test
 [ "${FIRST_RESPONDER:-0}" = "1" ] && set -- "$@" -UDMenusUseFirstResponder YES
 
 # Without a display, start one, with a pasteboard server for Copy/Paste;
-# with one (a desktop session), use it as it is.
-if [ -z "${DISPLAY:-}" ]; then
+# with one (a desktop session), use it as it is. Windows has no X display
+# and needs none: the desktop is there.
+if [ -z "${DISPLAY:-}" ] && command -v xvfb-run >/dev/null; then
     env HOME="$TESTHOME" GNUSTEP_USER_ROOT="$TESTHOME/GNUstep" \
         xvfb-run -a -s "-screen 0 1280x1024x24" \
         sh -c '(command -v gpbs >/dev/null && gpbs >/dev/null 2>&1 &); sleep 1; exec "$0" "$@"' "$APP" "$@"
