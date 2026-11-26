@@ -15,6 +15,7 @@
 #import "UDCalcButton.h"
 #import "UDSettingsManager.h"
 #import "UDUpdater.h"
+#import "UDSelectors.h"
 
 NSString *UDSelfTestFilter;
 
@@ -312,7 +313,7 @@ static void UDRunFeatures(void) {
         NSMenu *convert = UDApp.convertMenu;
         NSMenuItem *first = nil;
         [convert update];
-        for (NSMenuItem *i in convert.itemArray) if (i.action == @selector(conversionMenuClicked:)) { first = i; break; }
+        for (NSMenuItem *i in convert.itemArray) if (UDSameSelector(i.action, @selector(conversionMenuClicked:))) { first = i; break; }
         UDSay(first && !first.isEnabled, [NSString stringWithFormat:@"And the Convert menu's categories are disabled (%@)", first.title ?: @"none listed"]);
         UDGivenFreshCalculator(UDCalcModeBasic);
     });
@@ -379,6 +380,17 @@ static void UDRunFeatures(void) {
         UDSay(UDEnabled(@"Edit/Paste"), @"And Edit > Paste is enabled");
         UDSay(UDShortcut(@"v"), @"When I clear and press Cmd-V");
         UDSay(fabs(UDValueShown() - 42) < 1e-9, [NSString stringWithFormat:@"Then the display shows 42 (\"%@\")", UDDisplay()]);
+    });
+
+    /* Edit > Paste is validated by its action: on GNUstep a XIB's paste: is
+       not == @selector(paste:), so it is compared by name (UDSameSelector). */
+    UDScenario(@"Paste needs a number on the pasteboard", ^{
+        UDGivenFreshCalculator(UDCalcModeBasic);
+        [[NSPasteboard generalPasteboard] clearContents];
+        UDSay(!UDEnabled(@"Edit/Paste"), @"When the pasteboard holds nothing, Edit > Paste is disabled");
+        [[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString] owner:nil];
+        [[NSPasteboard generalPasteboard] setString:@"5" forType:NSPasteboardTypeString];
+        UDSay(UDEnabled(@"Edit/Paste"), @"When it holds 5, Edit > Paste is enabled");
     });
 
     UDFeature(@"Programmer mode");
@@ -453,7 +465,7 @@ static void UDRunFeatures(void) {
     UDScenario(@"Check for Updates… where the app can update itself", ^{
         BOOL hasUpdater = [[UDUpdater alloc] initStarting:NO].available;
         NSMenuItem *check = [[[[NSApp mainMenu] itemAtIndex:0] submenu] itemWithTag:7100];
-        UDSay((check != nil) == hasUpdater && (!check || check.action == @selector(checkForUpdates:)),
+        UDSay((check != nil) == hasUpdater && (!check || UDSameSelector(check.action, @selector(checkForUpdates:))),
               [NSString stringWithFormat:@"Then Check for Updates… is %@", hasUpdater ? @"in the app menu" : @"not offered"]);
     });
 }
