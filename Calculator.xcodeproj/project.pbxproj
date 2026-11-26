@@ -113,7 +113,6 @@
 		9A717CA42F1D1D9F005A27B7 /* UDTape.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDTape.m; sourceTree = "<group>"; };
 		9ADD5E1F2F8A000000000002 /* UDSelfTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UDSelfTest.m; sourceTree = "<group>"; };
 		9ADD5E1F2F8A000000000003 /* UDSelfTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDSelfTest.h; sourceTree = "<group>"; };
-		BDD2B6383F1C716E00364141 /* UDSelectors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDSelectors.h; sourceTree = "<group>"; };
 		9ADD5E1F2F8A000000000103 /* UDUpdater.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UDUpdater.h; sourceTree = "<group>"; };
 		9ADD5E1F2F8A000000000102 /* UDUpdater-Apple.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UDUpdater-Apple.m"; sourceTree = "<group>"; };
 		9ADD5E1F2F8A000000000104 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -222,7 +221,6 @@
 				9A717CA32F1D1D44005A27B7 /* UDTape.h */,
 				9A717CA42F1D1D9F005A27B7 /* UDTape.m */,
 				9ADD5E1F2F8A000000000003 /* UDSelfTest.h */,
-				BDD2B6383F1C716E00364141 /* UDSelectors.h */,
 				9ADD5E1F2F8A000000000002 /* UDSelfTest.m */,
 				9ADD5E1F2F8A000000000103 /* UDUpdater.h */,
 				9ADD5E1F2F8A000000000102 /* UDUpdater-Apple.m */,

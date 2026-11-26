@@ -15,7 +15,7 @@
 #import "UDCalcButton.h"
 #import "UDSettingsManager.h"
 #import "UDUpdater.h"
-#import "UDSelectors.h"
+#import <objc/runtime.h>
 
 NSString *UDSelfTestFilter;
 
@@ -313,7 +313,7 @@ static void UDRunFeatures(void) {
         NSMenu *convert = UDApp.convertMenu;
         NSMenuItem *first = nil;
         [convert update];
-        for (NSMenuItem *i in convert.itemArray) if (UDSameSelector(i.action, @selector(conversionMenuClicked:))) { first = i; break; }
+        for (NSMenuItem *i in convert.itemArray) if (sel_isEqual(i.action, @selector(conversionMenuClicked:))) { first = i; break; }
         UDSay(first && !first.isEnabled, [NSString stringWithFormat:@"And the Convert menu's categories are disabled (%@)", first.title ?: @"none listed"]);
         UDGivenFreshCalculator(UDCalcModeBasic);
     });
@@ -383,7 +383,7 @@ static void UDRunFeatures(void) {
     });
 
     /* Edit > Paste is validated by its action: on GNUstep a XIB's paste: is
-       not == @selector(paste:), so it is compared by name (UDSameSelector). */
+       not == @selector(paste:), so it is compared by name (sel_isEqual). */
     UDScenario(@"Paste needs a number on the pasteboard", ^{
         UDGivenFreshCalculator(UDCalcModeBasic);
         [[NSPasteboard generalPasteboard] clearContents];
@@ -465,7 +465,7 @@ static void UDRunFeatures(void) {
     UDScenario(@"Check for Updates… where the app can update itself", ^{
         BOOL hasUpdater = [[UDUpdater alloc] initStarting:NO].available;
         NSMenuItem *check = [[[[NSApp mainMenu] itemAtIndex:0] submenu] itemWithTag:7100];
-        UDSay((check != nil) == hasUpdater && (!check || UDSameSelector(check.action, @selector(checkForUpdates:))),
+        UDSay((check != nil) == hasUpdater && (!check || sel_isEqual(check.action, @selector(checkForUpdates:))),
               [NSString stringWithFormat:@"Then Check for Updates… is %@", hasUpdater ? @"in the app menu" : @"not offered"]);
     });
 }

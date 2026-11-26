@@ -75,7 +75,6 @@ UDValue.h \
 UDValueFormatter.h \
 UDGNUstepCompat.h \
 UDSelfTest.h \
-UDSelectors.h \
 UDUpdater.h
 
 #

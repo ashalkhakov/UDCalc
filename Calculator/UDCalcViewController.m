@@ -10,7 +10,7 @@
 #import "UDCalcButton.h"
 #import "UDValueFormatter.h"
 #import "UDSettingsManager.h"
-#import "UDSelectors.h"
+#import <objc/runtime.h>
 
 NSString * const UDCalcDidFinishCalculationNotification = @"org.underivable.calculator.DidFinishCalculation";
 
@@ -955,12 +955,12 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
         NSMenuItem *menuItem = (NSMenuItem *)item;
         SEL action = item.action;
         
-        if (UDSameSelector(action, @selector(paste:))) {
+        if (sel_isEqual(action, @selector(paste:))) {
             // Only enable Paste if the clipboard has a string
             return [[NSPasteboard generalPasteboard] canReadItemWithDataConformingToTypes:@[NSPasteboardTypeString]];
         }
         
-        if (UDSameSelector(action, @selector(changeMode:))) {
+        if (sel_isEqual(action, @selector(changeMode:))) {
             
             UDCalcMode targetMode = (UDCalcMode)menuItem.tag;
             
@@ -969,19 +969,19 @@ static const CGFloat kRPNDisplayHeight  = 103.0;  /* XIB-designed height for RPN
             return YES; // The item is enabled
         }
         
-        if (UDSameSelector(action, @selector(changeRPNMode:))) {
+        if (sel_isEqual(action, @selector(changeRPNMode:))) {
             menuItem.state = self.calc.isRPNMode ? NSControlStateValueOn : NSControlStateValueOff;
             
             return YES;
         }
         
-        if (UDSameSelector(action, @selector(showThousandsSeparators:))) {
+        if (sel_isEqual(action, @selector(showThousandsSeparators:))) {
             menuItem.state = self.calc.showThousandsSeparators ? NSControlStateValueOn : NSControlStateValueOff;
             
             return YES;
         }
 
-        if (UDSameSelector([item action], @selector(changeDecimalPlaces:))) {
+        if (sel_isEqual([item action], @selector(changeDecimalPlaces:))) {
             NSInteger current = self.calc.decimalPlaces;
             [(NSMenuItem *)item setState:(item.tag == current ? NSControlStateValueOn : NSControlStateValueOff)];
             return YES;

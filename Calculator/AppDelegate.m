@@ -10,7 +10,7 @@
 #import "UDSettingsManager.h"
 #import "UDSelfTest.h"
 #import "UDUpdater.h"
-#import "UDSelectors.h"
+#import <objc/runtime.h>
 
 @interface AppDelegate ()
 
@@ -96,12 +96,12 @@
                 SEL act = [mi action];
                 if (!act) continue;
 
-                if (UDSameSelector(act, @selector(changeMode:)) ||
-                    UDSameSelector(act, @selector(changeRPNMode:))) {
+                if (sel_isEqual(act, @selector(changeMode:)) ||
+                    sel_isEqual(act, @selector(changeRPNMode:))) {
                     [mi setTarget:self.calcViewController];
-                } else if (UDSameSelector(act, @selector(showTape:)) ||
-                           UDSameSelector(act, @selector(conversionMenuClicked:)) ||
-                           UDSameSelector(act, @selector(openConverter:))) {
+                } else if (sel_isEqual(act, @selector(showTape:)) ||
+                           sel_isEqual(act, @selector(conversionMenuClicked:)) ||
+                           sel_isEqual(act, @selector(openConverter:))) {
                     [mi setTarget:self];
                  }
             }
@@ -309,15 +309,15 @@
 }
 
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
-    if (UDSameSelector([item action], @selector(showTape:)) && [(NSObject *)item isKindOfClass:[NSMenuItem class]]) {
+    if (sel_isEqual([item action], @selector(showTape:)) && [(NSObject *)item isKindOfClass:[NSMenuItem class]]) {
         BOOL isVisible = self.tapeWindowController.window.isVisible;
         [(NSMenuItem *)item setTitle: isVisible? @"Hide Paper Tape" : @"Show Paper Tape"];
         return YES;
     }
-    if (UDSameSelector([item action], @selector(conversionMenuClicked:))) {
+    if (sel_isEqual([item action], @selector(conversionMenuClicked:))) {
         return (self.calcViewController.calc.mode != UDCalcModeProgrammer);
     }
-    if (UDSameSelector([item action], @selector(checkForUpdates:))) {
+    if (sel_isEqual([item action], @selector(checkForUpdates:))) {
         return self.updater.canCheckForUpdates;
     }
 
