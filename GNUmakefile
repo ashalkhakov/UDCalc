@@ -20,7 +20,8 @@ SUBPROJECTS = Calculator CalculatorTests
 
 include $(GNUSTEP_MAKEFILES)/aggregate.make
 
-SELF_TESTS = Arithmetic Updates
+# "paste": Copy and paste (needs the pasteboard server run-self-test.sh starts).
+SELF_TESTS = Arithmetic Updates paste
 check::
 	$(MAKE) -C CalculatorTests run-tests
 	@for scenario in $(SELF_TESTS); do Tests/run-self-test.sh $$scenario || exit 1; done

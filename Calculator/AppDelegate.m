@@ -10,6 +10,7 @@
 #import "UDSettingsManager.h"
 #import "UDSelfTest.h"
 #import "UDUpdater.h"
+#import <objc/runtime.h>
 
 @interface AppDelegate ()
 
@@ -95,12 +96,12 @@
                 SEL act = [mi action];
                 if (!act) continue;
 
-                if (act == @selector(changeMode:) ||
-                    act == @selector(changeRPNMode:)) {
+                if (sel_isEqual(act, @selector(changeMode:)) ||
+                    sel_isEqual(act, @selector(changeRPNMode:))) {
                     [mi setTarget:self.calcViewController];
-                } else if (act == @selector(showTape:) ||
-                           act == @selector(conversionMenuClicked:) ||
-                           act == @selector(openConverter:)) {
+                } else if (sel_isEqual(act, @selector(showTape:)) ||
+                           sel_isEqual(act, @selector(conversionMenuClicked:)) ||
+                           sel_isEqual(act, @selector(openConverter:))) {
                     [mi setTarget:self];
                  }
             }
@@ -308,15 +309,15 @@
 }
 
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
-    if ([item action] == @selector(showTape:) && [(NSObject *)item isKindOfClass:[NSMenuItem class]]) {
+    if (sel_isEqual([item action], @selector(showTape:)) && [(NSObject *)item isKindOfClass:[NSMenuItem class]]) {
         BOOL isVisible = self.tapeWindowController.window.isVisible;
         [(NSMenuItem *)item setTitle: isVisible? @"Hide Paper Tape" : @"Show Paper Tape"];
         return YES;
     }
-    if ([item action] == @selector(conversionMenuClicked:)) {
+    if (sel_isEqual([item action], @selector(conversionMenuClicked:))) {
         return (self.calcViewController.calc.mode != UDCalcModeProgrammer);
     }
-    if ([item action] == @selector(checkForUpdates:)) {
+    if (sel_isEqual([item action], @selector(checkForUpdates:))) {
         return self.updater.canCheckForUpdates;
     }
 
