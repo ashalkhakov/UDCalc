@@ -6,6 +6,7 @@
 #                                        connect to vnc://localhost:5900
 #   Tests/gershwin-dev/run.sh selftest [filter]
 #                                        run Calculator --self-test headless
+#                                        (FIRST_RESPONDER=1 is passed on)
 #   Tests/gershwin-dev/run.sh shell      a shell in the running desktop
 #   Tests/gershwin-dev/run.sh stop       stop the desktop
 #
@@ -37,7 +38,8 @@ case "${1:-}" in
     ;;
   selftest)
     shift
-    docker run --rm --shm-size=1g -v "$REPO:/src/UDCalc:ro" "$IMAGE" bash -lc \
+    docker run --rm --shm-size=1g -e FIRST_RESPONDER="${FIRST_RESPONDER:-0}" \
+      -v "$REPO:/src/UDCalc:ro" "$IMAGE" bash -lc \
       '. /System/Library/Makefiles/GNUstep.sh && cd /src/UDCalc/Calculator \
        && make GNUSTEP_BUILD_DIR=/tmp/udcalc-build >/tmp/udcalc-build.log 2>&1 \
        || { tail -30 /tmp/udcalc-build.log; exit 1; }; \
