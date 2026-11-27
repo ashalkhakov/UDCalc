@@ -38,14 +38,13 @@ they land:
 - libs-gui `scrollview-autohide-reentrancy`, `patches/` here: the same change
   as in gnustep-patches, regenerated against Gershwin's own patched
   `NSScrollView.m`. Without it the default (non-Eau) theme crashes.
-- Eau `fix/menu-action-state-push` (gershwin-eau-theme#31), fetched from the
-  fork branch. Without it a mode chosen from the global menu leaves the
-  check mark on the old one.
 
-To see stock dev behaviour, leave fixes out with empty build arguments:
-`docker build --build-arg EAU_FIX_REF= -t gershwin-dev-stock Tests/gershwin-dev`
-(Eau fix), `--build-arg GNUSTEP_PATCHES_SHA=` (both libs-gui fixes; the
-calculator window is then empty).
+Both replace Gershwin's libs-gui in the System domain, so there is one
+libs-gui in the image whatever the library path.
+
+To see stock dev behaviour, leave the fixes out with an empty build argument:
+`docker build --build-arg GNUSTEP_PATCHES_SHA= -t gershwin-dev-stock
+Tests/gershwin-dev` (the calculator window is then empty).
 
 To rebuild against newer dev, `docker build --no-cache` (the clone of
 gershwin-developer is cached otherwise).

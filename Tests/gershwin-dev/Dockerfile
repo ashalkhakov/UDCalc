@@ -7,16 +7,19 @@ ARG GERSHWIN_DEVELOPER_REF=dev
 # gnustep-patches commit carrying libs-gui/tableview-prototype-identifier.
 # Empty: leave the libs-gui fixes out.
 ARG GNUSTEP_PATCHES_SHA=945c2fe719e19efb2324ad87c9ad9212ae1c5189
-# The Eau fix for the stale check mark (gershwin-eau-theme#31), until merged.
-# Empty: leave it out.
-ARG EAU_FIX_REPO=https://github.com/ashalkhakov/gershwin-eau-theme
-ARG EAU_FIX_REF=fix/menu-action-state-push
 
 ENV DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8
 
-RUN apt-get update \
+# Everything after this fetches packages over HTTPS: over plain HTTP the
+# Ubuntu mirrors' downloads can arrive corrupt or cut short (hash sum
+# mismatches) behind some networks, and the build fails at random packages.
+# The few packages fetched before there are certificates to check HTTPS
+# with are retried instead.
+RUN printf 'Acquire::Retries "10";\nAcquire::http::Pipeline-Depth "0";\n' > /etc/apt/apt.conf.d/80-retries \
+ && apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates git make sudo patch \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* \
+ && sed -i 's|http://|https://|g' /etc/apt/sources.list.d/ubuntu.sources
 
 # The whole desktop: gershwin-developer installs its own build dependencies
 # (bootstrap.sh), checks out every repository on the dev branch where it has
@@ -31,6 +34,9 @@ COPY patches/ /tmp/udcalc-patches/
 
 # Unmerged fixes. Each step skips a fix that is already in the tree (it
 # reverse-applies), so the image keeps building after they land upstream.
+# libs-gui goes back into the System domain over Gershwin's own copy: in the
+# default (Local) domain there would be two, and a login shell's library
+# path finds the unpatched System one first.
 RUN set -e; umask 022; \
     applyp() { if patch -p1 -F0 -R --dry-run -s -f < "$1" >/dev/null 2>&1; then \
                  echo "already applied: $1"; \
@@ -43,16 +49,9 @@ RUN set -e; umask 022; \
       applyp /tmp/gnustep-patches/libs-gui/tableview-prototype-identifier/0001-tableview-prototype-identifier.patch; \
       applyp /tmp/udcalc-patches/libs-gui-scrollview-autohide-reentrancy.patch; \
     fi; \
-    cd /Developer/Library/Sources/gershwin-eau-theme; \
-    if [ -n "$EAU_FIX_REF" ]; then \
-      git fetch -q "$EAU_FIX_REPO" "$EAU_FIX_REF" && git format-patch -1 --stdout FETCH_HEAD > /tmp/eau-fix.patch; \
-      applyp /tmp/eau-fix.patch; \
-    fi; \
     . /System/Library/Makefiles/GNUstep.sh; \
-    cd /Developer/Library/Sources/libs-gui && make -j"$(nproc)" >/tmp/libs-gui.log 2>&1 && make install >>/tmp/libs-gui.log 2>&1 \
+    cd /Developer/Library/Sources/libs-gui && make -j"$(nproc)" >/tmp/libs-gui.log 2>&1 && make install GNUSTEP_INSTALLATION_DOMAIN=SYSTEM >>/tmp/libs-gui.log 2>&1 \
       || { tail -40 /tmp/libs-gui.log; exit 1; }; \
-    cd /Developer/Library/Sources/gershwin-eau-theme && make -j"$(nproc)" >/tmp/eau.log 2>&1 && make install >>/tmp/eau.log 2>&1 \
-      || { tail -40 /tmp/eau.log; exit 1; }; \
     rm -rf /tmp/gnustep-patches /tmp/udcalc-patches
 
 # What the desktop needs to run without a screen: a virtual display, a VNC
